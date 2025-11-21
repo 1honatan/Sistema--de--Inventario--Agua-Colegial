@@ -1,0 +1,589 @@
+/**
+ * ================================================
+ * AGUA COLEGIAL - ESTILOS GLOBALES UNIFICADOS
+ * Sistema de Diseño Moderno y Consistente
+ * ================================================
+ */
+
+/* ==========================================
+   PALETA DE COLORES UNIFICADA
+   ========================================== */
+:root {
+    /* Colores Primarios - Azul/Cyan/Turquesa */
+    --primary-gradient-start: #0ea5e9;
+    --primary-gradient-mid: #06b6d4;
+    --primary-gradient-end: #14b8a6;
+
+    /* Colores Secundarios - Azul Oscuro */
+    --secondary-dark: #1e40af;
+    --secondary-blue: #3b82f6;
+    --secondary-cyan: #06b6d4;
+
+    /* Colores de Acción */
+    --success-start: #10b981;
+    --success-end: #059669;
+    --warning-start: #f59e0b;
+    --warning-end: #ea580c;
+    --danger-start: #dc2626;
+    --danger-end: #b91c1c;
+    --info-start: #8b5cf6;
+    --info-end: #6366f1;
+
+    /* Grises */
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+
+    /* Sombras */
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.2);
+    --shadow-xl: 0 25px 80px rgba(0, 0, 0, 0.25);
+
+    /* Bordes Redondeados */
+    --radius-sm: 12px;
+    --radius-md: 20px;
+    --radius-lg: 25px;
+    --radius-xl: 30px;
+
+    /* Transiciones */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================
+   FONDO GLOBAL CON PATRÓN
+   ========================================== */
+body.modern-bg {
+    background: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-mid) 50%, var(--primary-gradient-end) 100%);
+    min-height: 100vh;
+    position: relative;
+}
+
+body.modern-bg::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ==========================================
+   TARJETAS MODERNAS UNIFICADAS
+   ========================================== */
+.modern-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    animation: fadeInUp 0.8s ease-out;
+    position: relative;
+    z-index: 1;
+    transition: var(--transition-slow);
+}
+
+.modern-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
+}
+
+.modern-card-header {
+    background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--secondary-blue) 50%, var(--secondary-cyan) 100%);
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+.modern-card-header::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    animation: float 6s ease-in-out infinite;
+}
+
+.modern-card-header::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    left: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    animation: float 8s ease-in-out infinite reverse;
+}
+
+.modern-card-title {
+    position: relative;
+    z-index: 1;
+    color: white;
+    font-size: 1.75rem;
+    font-weight: 800;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    margin: 0;
+}
+
+.modern-card-subtitle {
+    position: relative;
+    z-index: 1;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    margin: 0.5rem 0 0 0;
+}
+
+.modern-card-body {
+    padding: 2rem;
+}
+
+/* ==========================================
+   SECCIONES CON BORDES DE COLORES
+   ========================================== */
+.section-box {
+    border-radius: var(--radius-lg);
+    padding: 30px;
+    margin-bottom: 30px;
+    transition: var(--transition-slow);
+    background: white;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.section-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: inherit;
+    opacity: 0.5;
+}
+
+.section-box:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Bordes de Colores */
+.section-box.border-orange {
+    border: 3px solid var(--warning-start);
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+}
+
+.section-box.border-blue {
+    border: 3px solid #6366f1;
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+}
+
+.section-box.border-green {
+    border: 3px solid var(--success-start);
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+}
+
+.section-box.border-purple {
+    border: 3px solid #8b5cf6;
+    background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+}
+
+.section-box.border-cyan {
+    border: 3px solid #06b6d4;
+    background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%);
+}
+
+/* ==========================================
+   CABECERAS DE SECCIÓN
+   ========================================== */
+.section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 4px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(90deg, var(--secondary-blue), var(--secondary-cyan), var(--primary-gradient-end)) border-box;
+    border-bottom: 4px solid transparent;
+    position: relative;
+}
+
+.section-header i {
+    font-size: 2rem;
+    margin-right: 15px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.section-header h4, .section-header h3 {
+    margin: 0;
+    font-weight: 800;
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--secondary-cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+}
+
+/* ==========================================
+   INPUTS Y FORMULARIOS MEJORADOS
+   ========================================== */
+.form-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.form-label {
+    font-weight: 700;
+    color: var(--gray-700);
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    transition: var(--transition-normal);
+}
+
+.form-control,
+.modern-input,
+.modern-select,
+.modern-textarea {
+    border: 3px solid var(--gray-200);
+    border-radius: 15px;
+    padding: 14px 18px;
+    transition: var(--transition-normal);
+    font-size: 1rem;
+    width: 100%;
+    background: var(--gray-50);
+    font-weight: 600;
+}
+
+.form-control:focus,
+.modern-input:focus,
+.modern-select:focus,
+.modern-textarea:focus {
+    border-color: var(--secondary-blue);
+    background: white;
+    box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.15);
+    outline: none;
+    transform: translateY(-3px);
+}
+
+input[type="number"].modern-input {
+    text-align: center;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: var(--gray-800);
+}
+
+input[type="number"].modern-input:focus {
+    color: var(--secondary-blue);
+}
+
+/* Inputs especiales con gradiente */
+.input-gradient-orange {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+    border: 3px solid var(--warning-start) !important;
+    font-weight: 800 !important;
+    box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
+}
+
+.input-gradient-orange:focus {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%) !important;
+    border-color: var(--warning-end) !important;
+    box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.25), 0 8px 20px rgba(245, 158, 11, 0.3) !important;
+    transform: translateY(-4px) scale(1.02) !important;
+}
+
+/* ==========================================
+   BOTONES MODERNOS
+   ========================================== */
+.btn-modern {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 16px 50px;
+    border-radius: 15px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    transition: var(--transition-normal);
+    cursor: pointer;
+    border: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-modern:hover::before {
+    width: 400px;
+    height: 400px;
+}
+
+.btn-modern.btn-primary {
+    background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--secondary-blue) 100%);
+    color: white;
+    box-shadow: 0 10px 30px rgba(30, 64, 175, 0.4);
+}
+
+.btn-modern.btn-primary:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 45px rgba(30, 64, 175, 0.6);
+}
+
+.btn-modern.btn-success {
+    background: linear-gradient(135deg, var(--success-start) 0%, var(--success-end) 100%);
+    color: white;
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+}
+
+.btn-modern.btn-success:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 45px rgba(16, 185, 129, 0.6);
+}
+
+.btn-modern.btn-danger {
+    background: linear-gradient(135deg, var(--danger-start) 0%, var(--danger-end) 100%);
+    color: white;
+    box-shadow: 0 10px 30px rgba(220, 38, 38, 0.4);
+}
+
+.btn-modern.btn-danger:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 45px rgba(220, 38, 38, 0.6);
+}
+
+.btn-modern.btn-secondary {
+    background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+    color: white;
+    box-shadow: 0 10px 30px rgba(100, 116, 139, 0.4);
+}
+
+.btn-modern.btn-secondary:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 45px rgba(100, 116, 139, 0.6);
+}
+
+/* ==========================================
+   DISPLAY DE TOTALES Y ESTADÍSTICAS
+   ========================================== */
+.stat-display {
+    background: linear-gradient(135deg, var(--info-start) 0%, var(--info-end) 50%, var(--secondary-blue) 100%);
+    border-radius: var(--radius-lg);
+    padding: 35px;
+    color: white;
+    text-align: center;
+    margin-bottom: 30px;
+    box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5);
+    position: relative;
+    overflow: hidden;
+    animation: pulseGlow 3s ease-in-out infinite;
+    border: 5px solid rgba(255, 255, 255, 0.2);
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 20px 60px rgba(139, 92, 246, 0.7);
+        transform: scale(1.02);
+    }
+}
+
+.stat-display::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shine 4s linear infinite;
+}
+
+@keyframes shine {
+    from { transform: rotate(0deg) translate(-50%, -50%); }
+    to { transform: rotate(360deg) translate(-50%, -50%); }
+}
+
+.stat-display h3 {
+    margin: 0;
+    font-size: 4rem;
+    font-weight: 900;
+    text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    position: relative;
+    z-index: 1;
+    letter-spacing: -2px;
+}
+
+.stat-display p {
+    margin: 10px 0 0 0;
+    opacity: 0.95;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ==========================================
+   TABLAS MODERNAS
+   ========================================== */
+.modern-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: white;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.modern-table thead {
+    background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--secondary-blue) 100%);
+}
+
+.modern-table thead th {
+    color: white;
+    font-weight: 700;
+    padding: 1rem 1.5rem;
+    text-align: left;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.modern-table tbody tr {
+    transition: var(--transition-fast);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.modern-table tbody tr:hover {
+    background: var(--gray-50);
+    transform: scale(1.01);
+}
+
+.modern-table tbody td {
+    padding: 1rem 1.5rem;
+    color: var(--gray-700);
+}
+
+/* ==========================================
+   BADGES MODERNOS
+   ========================================== */
+.badge-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-modern.badge-success {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #065f46;
+}
+
+.badge-modern.badge-warning {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #92400e;
+}
+
+.badge-modern.badge-danger {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #991b1b;
+}
+
+.badge-modern.badge-info {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1e40af;
+}
+
+/* ==========================================
+   ANIMACIONES GLOBALES
+   ========================================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, 30px) scale(1.1); }
+}
+
+@keyframes inputChange {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.input-changed {
+    animation: inputChange 0.4s ease;
+}
+
+/* ==========================================
+   UTILIDADES
+   ========================================== */
+.required-mark::after {
+    content: " *";
+    color: var(--danger-start);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--secondary-cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.shadow-hover {
+    transition: var(--transition-normal);
+}
+
+.shadow-hover:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-5px);
+}

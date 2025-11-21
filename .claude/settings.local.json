@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"C:\\xampp\\mysql\\bin\\mysql.exe\" --port=3307 -u root -e \"SHOW DATABASES;\")",
+      "Bash(\"C:\\xampp\\mysql\\bin\\mysql.exe\" --port=3306 -u root -e \"SHOW DATABASES LIKE ''agua%'';\")",
+      "Bash(\"C:\\xampp\\mysql\\bin\\mysql.exe\" --port=3307 -u root -e \"CREATE DATABASE IF NOT EXISTS agua_colegial_bd CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Bash(\"C:\\xampp\\mysql\\bin\\mysql.exe\":*)",
+      "Bash(php artisan db:seed:*)",
+      "Bash(php artisan:*)",
+      "Bash(dir /s \"C:\\xampp\\htdocs\\agua_colegial\\resources\\views\")",
+      "Bash(dir /s \"C:\\xampp\\htdocs\\agua_colegial\\resources\\views\\control\")",
+      "Bash(\"C:\\xampp\\mysql\\bin\\mysql.exe\" --port=3307 -u root agua_colegial_bd -e \"INSERT IGNORE INTO migrations (migration, batch) VALUES (''2025_11_10_125528_create_control_salidas_productos_table'', 1), (''2025_11_13_022716_add_vehiculo_to_control_salidas_productos_table'', 1);\")",
+      "Bash(php:*)",
+      "Bash(find:*)",
+      "Bash(\"C:\\xampp\\mysql\\bin\\mysql.exe\" --port=3307 -u root agua_colegial_bd -e \"DESCRIBE personal;\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

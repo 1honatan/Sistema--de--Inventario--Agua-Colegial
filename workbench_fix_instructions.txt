@@ -1,0 +1,179 @@
+═══════════════════════════════════════════════════════════════════
+  SOLUCIÓN AL PROBLEMA DE CIERRE DE MYSQL WORKBENCH
+  Durante Ingeniería Inversa (Reverse Engineering)
+═══════════════════════════════════════════════════════════════════
+
+✓ CAMBIOS REALIZADOS AUTOMÁTICAMENTE:
+
+1. ✓ Se creó respaldo de configuración:
+   C:\Users\hp\AppData\Roaming\MySQL\Workbench\wb_options.xml.backup
+
+2. ✓ Se optimizó wb_options.xml:
+   - Agregado timeout para ingeniería inversa: 300 segundos
+   - Máximo de objetos: 100
+   - Forzado renderizado por software (más estable)
+
+3. ✓ Se optimizaron las conexiones (connections.xml):
+   - Timeout de lectura aumentado a 300 segundos
+
+4. ✓ Se limpió el caché de Workbench
+
+
+═══════════════════════════════════════════════════════════════════
+  PASOS ADICIONALES MANUALES (RECOMENDADOS)
+═══════════════════════════════════════════════════════════════════
+
+PASO 1: Aumentar memoria de Workbench (IMPORTANTE)
+───────────────────────────────────────────────────
+
+1. Cierra completamente MySQL Workbench si está abierto
+
+2. Haz clic derecho en el icono de Workbench y selecciona
+   "Ejecutar como administrador"
+
+3. Una vez abierto, ve a: Edit → Preferences → Modeling
+
+4. En la sección "Model", establece:
+   - Default target MySQL Version: 8.0.43
+
+5. Ve a: Edit → Preferences → SQL Editor
+
+6. Establece estos valores:
+   - DBMS connection read time out: 300
+   - DBMS connection time out: 60
+
+
+PASO 2: Proceso de Ingeniería Inversa Optimizado
+──────────────────────────────────────────────────
+
+1. Abre Workbench como ADMINISTRADOR (clic derecho → Run as administrator)
+
+2. Conecta a tu base de datos 'agua_colegial_bd'
+
+3. Ve a: Database → Reverse Engineer
+
+4. IMPORTANTE - En el paso "Select Objects":
+
+   Primera vez (PRUEBA):
+   ════════════════════
+   - NO selecciones todas las tablas
+   - Selecciona solo estas 5 tablas primero:
+     □ roles
+     □ tipos_producto
+     □ personal
+     □ productos
+     □ vehiculos
+
+   - Presiona "Execute"
+   - Si funciona, continúa con las demás tablas
+
+   Segunda vez (RESTO):
+   ═══════════════════
+   - Selecciona las tablas restantes:
+     □ usuarios
+     □ produccion
+     □ inventario
+     □ despachos
+     □ detalle_despacho
+     □ alertas_stock
+     □ asistencias
+
+   - Presiona "Execute"
+
+5. Una vez cargadas ambas partes, puedes unir los diagramas
+
+
+PASO 3: Si aún se cierra Workbench
+────────────────────────────────────
+
+Opción A - Usar phpMyAdmin (MÁS FÁCIL):
+═════════════════════════════════════════
+1. Abre: http://localhost/phpmyadmin
+2. Selecciona la base de datos 'agua_colegial_bd'
+3. Clic en la pestaña "Diseñador" (arriba)
+4. Verás el diagrama ER completo e interactivo
+5. Puedes exportar el diagrama: Página → Exportar/Importar
+
+
+Opción B - Descargar DBeaver (GRATIS, MÁS ESTABLE):
+═══════════════════════════════════════════════════════
+1. Descarga desde: https://dbeaver.io/download/
+2. Instala DBeaver Community Edition
+3. Conecta a: localhost:3306, usuario: root
+4. Clic derecho en 'agua_colegial_bd' → ER Diagram
+5. DBeaver es más estable que Workbench para bases grandes
+
+
+Opción C - Actualizar Workbench:
+════════════════════════════════════
+Descarga la última versión desde:
+https://dev.mysql.com/downloads/workbench/
+
+
+═══════════════════════════════════════════════════════════════════
+  INFORMACIÓN DE TU BASE DE DATOS
+═══════════════════════════════════════════════════════════════════
+
+Base de datos: agua_colegial_bd
+Motor: MariaDB 10.4.32
+Tablas totales: 20
+Foreign Keys: 14 relaciones
+
+Tablas principales:
+  • roles (4 registros)
+  • tipos_producto (8 registros)
+  • personal (9 registros)
+  • productos (13 registros)
+  • usuarios (8 registros)
+  • produccion (8 registros)
+  • inventario (23 registros)
+  • despachos (9 registros)
+  • detalle_despacho (12 registros)
+  • alertas_stock (12 registros)
+
+
+═══════════════════════════════════════════════════════════════════
+  PROBLEMAS COMUNES Y SOLUCIONES
+═══════════════════════════════════════════════════════════════════
+
+Problema: Workbench se cierra al presionar "Execute"
+Solución:
+  - Ejecuta Workbench como Administrador
+  - Selecciona menos tablas a la vez (5-6 máximo)
+  - Usa phpMyAdmin o DBeaver como alternativa
+
+Problema: "Connection timeout"
+Solución:
+  - Ya se configuró timeout de 300 segundos
+  - Verifica que MySQL/XAMPP esté corriendo
+
+Problema: Workbench muy lento
+Solución:
+  - Ya se habilitó renderizado por software
+  - Cierra otras aplicaciones pesadas
+  - Aumenta RAM disponible cerrando programas
+
+
+═══════════════════════════════════════════════════════════════════
+  RESTAURAR CONFIGURACIÓN ORIGINAL
+═══════════════════════════════════════════════════════════════════
+
+Si deseas volver a la configuración original:
+
+1. Cierra Workbench completamente
+
+2. Ejecuta estos comandos en la terminal:
+
+   cd C:\Users\hp\AppData\Roaming\MySQL\Workbench
+   copy wb_options.xml.backup wb_options.xml
+
+3. Reinicia Workbench
+
+
+═══════════════════════════════════════════════════════════════════
+
+Última actualización: 2025-11-04
+Configuración respaldada en:
+  C:\Users\hp\AppData\Roaming\MySQL\Workbench\wb_options.xml.backup
+
+═══════════════════════════════════════════════════════════════════
