@@ -74,6 +74,84 @@ class EmpleadoController extends Controller
     }
 
     /**
+     * Display the specified employee.
+     */
+    public function show($id)
+    {
+        $empleado = Personal::findOrFail($id);
+        return view('control.empleados.show', compact('empleado'));
+    }
+
+    /**
+     * Show the form for editing the specified employee.
+     */
+    public function edit($id)
+    {
+        $empleado = Personal::findOrFail($id);
+        return view('control.empleados.edit', compact('empleado'));
+    }
+
+    /**
+     * Update the specified employee in storage.
+     */
+    public function update(Request $request, $id)
+    {
+        $empleado = Personal::findOrFail($id);
+
+        $validated = $request->validate([
+            'nombre_completo' => 'required|string|max:255',
+            'cargo' => 'required|string|max:255',
+            'telefono' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string|max:255',
+            'fecha_ingreso' => 'required|date',
+            'salario' => 'nullable|numeric|min:0',
+            'observaciones' => 'nullable|string',
+            'foto_documento' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'foto_licencia' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'foto_id_chofer' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+        ]);
+
+        // Actualizar email si cambió el nombre
+        $validated['email'] = strtolower(str_replace(' ', '.', $validated['nombre_completo'])) . '@aguacolegial.com';
+
+        // Si es chofer, marcar es_chofer
+        if ($validated['cargo'] === 'Chofer') {
+            $validated['es_chofer'] = true;
+        } else {
+            $validated['es_chofer'] = false;
+        }
+
+        // Procesar imagen del documento
+        if ($request->hasFile('foto_documento')) {
+            $imagen = $request->file('foto_documento');
+            $nombreArchivo = 'doc_' . time() . '_' . uniqid() . '.' . $imagen->getClientOriginalExtension();
+            $imagen->move(public_path('uploads/documentos'), $nombreArchivo);
+            $validated['foto_documento'] = 'uploads/documentos/' . $nombreArchivo;
+        }
+
+        // Procesar imagen de licencia de conducir
+        if ($request->hasFile('foto_licencia')) {
+            $imagen = $request->file('foto_licencia');
+            $nombreArchivo = 'lic_' . time() . '_' . uniqid() . '.' . $imagen->getClientOriginalExtension();
+            $imagen->move(public_path('uploads/licencias'), $nombreArchivo);
+            $validated['foto_licencia'] = 'uploads/licencias/' . $nombreArchivo;
+        }
+
+        // Procesar imagen de ID chofer
+        if ($request->hasFile('foto_id_chofer')) {
+            $imagen = $request->file('foto_id_chofer');
+            $nombreArchivo = 'id_' . time() . '_' . uniqid() . '.' . $imagen->getClientOriginalExtension();
+            $imagen->move(public_path('uploads/documentos'), $nombreArchivo);
+            $validated['foto_id_chofer'] = 'uploads/documentos/' . $nombreArchivo;
+        }
+
+        $empleado->update($validated);
+
+        return redirect()->route('control.asistencia-semanal.registro-rapido')
+            ->with('success', 'Empleado actualizado exitosamente.');
+    }
+
+    /**
      * Remove the specified employee from storage.
      */
     public function destroy($id)

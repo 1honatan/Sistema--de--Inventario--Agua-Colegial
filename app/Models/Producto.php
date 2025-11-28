@@ -17,13 +17,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $nombre
  * @property string $tipo
  * @property string|null $imagen
- * @property int|null $id_tipo_producto
  * @property string $unidad_medida
  * @property string $estado (activo|inactivo)
  * @property \Carbon\Carbon $fecha_registro
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property-read TipoProducto|null $tipoProducto
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Produccion[] $producciones
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Inventario[] $movimientosInventario
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\AlertaStock[] $alertasStock
@@ -40,10 +38,11 @@ class Producto extends Model
      */
     protected $fillable = [
         'nombre',
+        'descripcion',
         'tipo',
         'imagen',
-        'id_tipo_producto',
         'unidad_medida',
+        'stock_minimo',
         'estado',
     ];
 
@@ -54,6 +53,7 @@ class Producto extends Model
         'fecha_registro' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'stock_minimo' => 'integer',
     ];
 
     /**
@@ -73,14 +73,6 @@ class Producto extends Model
     }
 
     /**
-     * Relación: Un producto pertenece a un tipo de producto.
-     */
-    public function tipoProducto(): BelongsTo
-    {
-        return $this->belongsTo(TipoProducto::class, 'id_tipo_producto');
-    }
-
-    /**
      * Relación: Un producto puede tener muchas alertas de stock.
      */
     public function alertasStock(): HasMany
@@ -91,11 +83,11 @@ class Producto extends Model
     /**
      * Obtener nombre del tipo de producto.
      *
-     * @return string Nombre del tipo o "Sin tipo" si no tiene asignado
+     * @return string Nombre del tipo desde la columna 'tipo'
      */
     public function nombreTipo(): string
     {
-        return $this->tipoProducto->nombre ?? 'Sin tipo';
+        return $this->tipo ?? 'Sin tipo';
     }
 
     /**

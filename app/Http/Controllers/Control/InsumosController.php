@@ -35,6 +35,10 @@ class InsumosController extends Controller
             'observaciones' => 'nullable|string',
         ]);
 
+        // Asignar la cantidad como stock_actual inicial
+        $validated['stock_actual'] = $validated['cantidad'];
+        $validated['stock_minimo'] = 0;
+
         Insumo::create($validated);
 
         return redirect()->route('control.insumos.index')

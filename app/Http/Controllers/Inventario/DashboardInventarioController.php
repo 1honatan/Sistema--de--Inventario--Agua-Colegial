@@ -57,7 +57,6 @@ class DashboardInventarioController extends Controller
 
         // Todos los productos con su stock actual
         $productos = Producto::where('estado', 'activo')
-            ->with('tipoProducto')
             ->get()
             ->map(function ($producto) {
                 $stockActual = Inventario::stockDisponible($producto->id);

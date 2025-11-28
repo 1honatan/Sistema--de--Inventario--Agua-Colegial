@@ -133,8 +133,14 @@ Editar Registro #{{ $produccion->id }}
                                                 required>
                                             <option value="">Seleccione un responsable...</option>
                                             @foreach($personal ?? [] as $persona)
+                                                @php
+                                                    $isCurrentUser = auth()->check() &&
+                                                                     auth()->user()->personal &&
+                                                                     auth()->user()->personal->id === $persona->id;
+                                                    $shouldAutoSelect = $isCurrentUser && auth()->user()->rol->nombre === 'produccion';
+                                                @endphp
                                                 <option value="{{ $persona->nombre_completo }}"
-                                                    {{ old('responsable', $produccion->responsable) == $persona->nombre_completo ? 'selected' : '' }}>
+                                                    {{ old('responsable', $produccion->responsable) == $persona->nombre_completo || (!old('responsable') && !$produccion->responsable && $shouldAutoSelect) ? 'selected' : '' }}>
                                                     {{ $persona->nombre_completo }} ({{ $persona->cargo }})
                                                 </option>
                                             @endforeach
@@ -195,23 +201,6 @@ Editar Registro #{{ $produccion->id }}
                                                        value="{{ $producto->cantidad }}"
                                                        data-product-qty
                                                        required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label class="form-label">
-                                                    <i class="fas fa-ruler"></i> Unidad
-                                                </label>
-                                                <select name="productos[{{ $index }}][unidad_medida]" class="modern-select">
-                                                    <option value="">Seleccione...</option>
-                                                    <option value="10 unidades" {{ ($producto->unidad_medida ?? '') == '10 unidades' ? 'selected' : '' }}>10 unidades</option>
-                                                    <option value="25 unidades" {{ ($producto->unidad_medida ?? '') == '25 unidades' ? 'selected' : '' }}>25 unidades</option>
-                                                    <option value="50 unidades" {{ ($producto->unidad_medida ?? '') == '50 unidades' ? 'selected' : '' }}>50 unidades</option>
-                                                    <option value="100 unidades" {{ ($producto->unidad_medida ?? '') == '100 unidades' ? 'selected' : '' }}>100 unidades</option>
-                                                    <option value="20 litros" {{ ($producto->unidad_medida ?? '') == '20 litros' ? 'selected' : '' }}>20 litros</option>
-                                                    <option value="bolsa" {{ ($producto->unidad_medida ?? '') == 'bolsa' ? 'selected' : '' }}>Bolsa</option>
-                                                    <option value="unidad" {{ ($producto->unidad_medida ?? '') == 'unidad' ? 'selected' : '' }}>Unidad</option>
-                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-md-1">
@@ -401,23 +390,6 @@ Editar Registro #{{ $produccion->id }}
                             <input type="number" name="productos[${productoIndex}][cantidad]" class="modern-input text-center" min="0" value="0" data-product-qty required>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-ruler"></i> Unidad
-                            </label>
-                            <select name="productos[${productoIndex}][unidad_medida]" class="modern-select">
-                                <option value="">Seleccione...</option>
-                                <option value="10 unidades">10 unidades</option>
-                                <option value="25 unidades">25 unidades</option>
-                                <option value="50 unidades">50 unidades</option>
-                                <option value="100 unidades">100 unidades</option>
-                                <option value="20 litros">20 litros</option>
-                                <option value="bolsa">Bolsa</option>
-                                <option value="unidad">Unidad</option>
-                            </select>
-                        </div>
-                    </div>
                     <div class="col-md-1">
                         <button type="button" class="btn-remove-item w-100" onclick="eliminarItem(this)" title="Eliminar">
                             <i class="fas fa-trash"></i>
@@ -428,7 +400,6 @@ Editar Registro #{{ $produccion->id }}
         `;
         $('#productos-container').append(html);
         ModernComponents.initModernSelect2(`select[name="productos[${productoIndex}][producto]"]`);
-        ModernComponents.initModernSelect2(`select[name="productos[${productoIndex}][unidad_medida]"]`);
         productoIndex++;
     }
 

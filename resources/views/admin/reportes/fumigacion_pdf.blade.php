@@ -27,7 +27,7 @@
     <div class="header">
         <h1>REPORTE DE FUMIGACIÓN</h1>
         <p>Sistema de Gestión - Agua Colegial</p>
-        <p>Generado el: {{ now()->format('d/m/Y H:i:s') }}</p>
+        <p>Generado el: {{ now()->format('d/m/Y') }}</p>
     </div>
 
     <div class="info-section">
@@ -99,7 +99,7 @@
 
     <div class="footer">
         <p>Sistema de Gestión Integral - Agua Colegial</p>
-        <p>Documento generado automáticamente - {{ now()->format('d/m/Y H:i:s') }}</p>
+        <p>Documento generado automáticamente - {{ now()->format('d/m/Y') }}</p>
     </div>
 </body>
 </html>

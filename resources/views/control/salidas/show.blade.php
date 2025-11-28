@@ -41,6 +41,81 @@
                             <span class="badge badge-primary" style="font-size: 0.9rem;">{{ $salida->tipo_salida ?? 'Sin Tipo' }}</span>
                         </p>
                     </div>
+
+                    @if($salida->tipo_salida === 'Pedido Cliente')
+                        <div>
+                            <p class="text-sm text-gray-600">
+                                <i class="fas fa-user mr-1"></i>
+                                Cliente
+                            </p>
+                            <p class="font-bold text-lg">{{ $salida->nombre_cliente ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">
+                                <i class="fas fa-map-marker-alt mr-1"></i>
+                                Dirección
+                            </p>
+                            <p class="font-bold text-lg">{{ $salida->direccion_entrega ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">
+                                <i class="fas fa-phone mr-1"></i>
+                                Teléfono
+                            </p>
+                            <p class="font-bold text-lg">{{ $salida->telefono_cliente ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">
+                                <i class="fas fa-user mr-1"></i>
+                                Chofer
+                            </p>
+                            <p class="font-bold text-lg">{{ $salida->chofer ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">
+                                <i class="fas fa-user-tie mr-1"></i>
+                                Distribuidor
+                            </p>
+                            <p class="font-bold text-lg">{{ $salida->nombre_distribuidor ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">
+                                <i class="fas fa-car mr-1"></i>
+                                Vehículo
+                            </p>
+                            <p class="font-bold text-lg">{{ $salida->vehiculo_placa ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">
+                                <i class="fas fa-calendar-alt mr-1"></i>
+                                Fecha
+                            </p>
+                            <p class="font-bold text-lg">{{ $salida->fecha->format('d/m/Y') }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">
+                                <i class="fas fa-clock mr-1"></i>
+                                Hora de Llegada
+                            </p>
+                            <p class="font-bold text-lg">{{ $salida->hora_llegada ? \Carbon\Carbon::parse($salida->hora_llegada)->format('H:i') : '-' }}</p>
+                        </div>
+                    @else
+                    @if($salida->chofer && $salida->nombre_distribuidor && $salida->chofer != $salida->nombre_distribuidor)
+                    <div>
+                        <p class="text-sm text-gray-600">
+                            <i class="fas fa-user mr-1"></i>
+                            Chofer
+                        </p>
+                        <p class="font-bold text-lg">{{ $salida->chofer }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">
+                            <i class="fas fa-user-tie mr-1"></i>
+                            Distribuidor
+                        </p>
+                        <p class="font-bold text-lg">{{ $salida->nombre_distribuidor }}</p>
+                    </div>
+                    @else
                     <div>
                         <p class="text-sm text-gray-600">
                             <i class="fas fa-user-tie mr-1"></i>
@@ -48,6 +123,7 @@
                         </p>
                         <p class="font-bold text-lg">{{ $salida->nombre_distribuidor }}</p>
                     </div>
+                    @endif
                     <div>
                         <p class="text-sm text-gray-600">
                             <i class="fas fa-car mr-1"></i>
@@ -62,6 +138,7 @@
                         </p>
                         <p class="font-bold text-lg">{{ $salida->fecha->format('d/m/Y') }}</p>
                     </div>
+                    @if($salida->tipo_salida !== 'Pedido Cliente')
                     <div>
                         <p class="text-sm text-gray-600">
                             <i class="fas fa-clock mr-1"></i>
@@ -69,6 +146,8 @@
                         </p>
                         <p class="font-bold text-lg">{{ $salida->hora_llegada ? \Carbon\Carbon::parse($salida->hora_llegada)->format('H:i') : '-' }}</p>
                     </div>
+                    @endif
+                    @endif
                 </div>
             </div>
 
@@ -92,7 +171,6 @@
                         ['nombre' => 'Hielo', 'cantidad' => $salida->hielo ?? 0, 'icono' => 'fa-snowflake', 'color' => 'green'],
                         ['nombre' => 'Dispenser', 'cantidad' => $salida->dispenser ?? 0, 'icono' => 'fa-faucet', 'color' => 'green'],
                         ['nombre' => 'Choreados', 'cantidad' => $salida->choreados ?? 0, 'icono' => 'fa-tint-slash', 'color' => 'red'],
-                        ['nombre' => 'Choreados Retorno', 'cantidad' => $salida->choreados_retorno ?? 0, 'icono' => 'fa-undo-alt', 'color' => 'orange'],
                     ];
 
                     $productosConCantidad = collect($productos)->filter(fn($p) => $p['cantidad'] > 0);
@@ -147,6 +225,7 @@
             </div>
 
             <!-- Detalle de Retornos -->
+            @if($salida->tipo_salida !== 'Pedido Cliente')
             @php
                 $retornosDetalle = [
                     ['nombre' => 'Botellones', 'cantidad' => $salida->retorno_botellones ?? 0, 'icono' => 'fa-water'],
@@ -186,6 +265,7 @@
                     <p class="text-5xl font-bold text-white">{{ number_format($totalRetornos) }}</p>
                 </div>
             </div>
+            @endif
 
             <!-- Observaciones -->
             @if($salida->observaciones)
@@ -200,8 +280,8 @@
 
             <!-- Metadata -->
             <div class="mt-4 text-sm text-gray-500 text-right">
-                <p>Creado: {{ $salida->created_at->format('d/m/Y H:i') }}</p>
-                <p>Última actualización: {{ $salida->updated_at->format('d/m/Y H:i') }}</p>
+                <p>Creado: {{ $salida->created_at ? $salida->created_at->format('d/m/Y H:i') : 'No disponible' }}</p>
+                <p>Última actualización: {{ $salida->updated_at ? $salida->updated_at->format('d/m/Y H:i') : 'No disponible' }}</p>
             </div>
         </div>
     </div>

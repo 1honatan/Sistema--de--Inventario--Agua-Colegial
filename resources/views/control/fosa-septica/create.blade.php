@@ -62,11 +62,16 @@
                                                name="fecha_limpieza"
                                                id="fecha_limpieza"
                                                class="modern-input @error('fecha_limpieza') is-invalid @enderror"
-                                               value="{{ old('fecha_limpieza', date('Y-m-d')) }}"
+                                               value="{{ date('Y-m-d') }}"
+                                               readonly
+                                               style="background-color: #f3f4f6; cursor: not-allowed;"
                                                required>
                                         @error('fecha_limpieza')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle"></i> Fecha automática (hoy)
+                                        </small>
                                     </div>
                                 </div>
 
@@ -237,9 +242,9 @@
         // Advertencia de cambios no guardados
         ModernComponents.initUnsavedChangesWarning('#fosaForm');
 
-        // Calcular próxima fecha automáticamente al cambiar fecha de limpieza
-        $('#fecha_limpieza').on('change', function() {
-            const fechaLimpieza = new Date($(this).val());
+        // Función para calcular próxima fecha (5 meses después)
+        function calcularProximaFecha() {
+            const fechaLimpieza = new Date($('#fecha_limpieza').val());
             if (fechaLimpieza) {
                 // Agregar 5 meses
                 fechaLimpieza.setMonth(fechaLimpieza.getMonth() + 5);
@@ -248,7 +253,13 @@
                 const day = String(fechaLimpieza.getDate()).padStart(2, '0');
                 $('#proxima_limpieza').val(`${year}-${month}-${day}`);
             }
-        });
+        }
+
+        // Calcular próxima fecha al cargar la página (fecha automática de hoy)
+        calcularProximaFecha();
+
+        // Mantener el evento por si se necesita en el futuro
+        $('#fecha_limpieza').on('change', calcularProximaFecha);
     });
 </script>
 @endpush

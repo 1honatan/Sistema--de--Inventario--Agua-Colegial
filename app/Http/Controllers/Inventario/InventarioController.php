@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreInventarioRequest;
 use App\Models\Inventario;
 use App\Models\Producto;
-use App\Models\TipoProducto;
+// use App\Models\TipoProducto; // ELIMINADO - No se usa tipos_producto
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -30,11 +30,11 @@ class InventarioController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Producto::with('tipoProducto')->where('estado', 'activo');
+        $query = Producto::where('estado', 'activo');
 
-        // Filtrar por tipo de producto si se proporciona
-        if ($request->filled('id_tipo_producto')) {
-            $query->where('id_tipo_producto', $request->id_tipo_producto);
+        // Filtrar por tipo si se proporciona
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
         }
 
         $productos = $query->orderBy('nombre')->get();
@@ -66,13 +66,9 @@ class InventarioController extends Controller
             ];
         });
 
-        // Obtener tipos de producto activos para filtro
-        $tiposProducto = TipoProducto::activos()->ordenadoPorNombre()->get();
-
         return view('inventario.index', compact(
             'productos',
             'inventario',
-            'tiposProducto',
             'stockTotal',
             'entradasHoy',
             'salidasHoy'
@@ -605,5 +601,73 @@ class InventarioController extends Controller
 
         return redirect()->route('inventario.alertas')
             ->with('success', 'Alerta marcada como ignorada');
+    }
+
+    /**
+     * Mostrar formulario para crear producto.
+     */
+    public function createProducto(): View
+    {
+        return view('inventario.productos.create');
+    }
+
+    /**
+     * Guardar nuevo producto.
+     */
+    public function storeProducto(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'unidad_medida' => 'required|string|max:50',
+            'stock_minimo' => 'nullable|integer|min:0',
+        ]);
+
+        $validated['estado'] = 'activo';
+        $validated['tipo'] = 'General'; // Valor por defecto
+
+        Producto::create($validated);
+
+        return redirect()->route('inventario.index')
+            ->with('success', 'Producto creado exitosamente');
+    }
+
+    /**
+     * Mostrar formulario para editar producto.
+     */
+    public function editProducto(Producto $producto): View
+    {
+        return view('inventario.productos.edit', compact('producto'));
+    }
+
+    /**
+     * Actualizar producto.
+     */
+    public function updateProducto(Request $request, Producto $producto): RedirectResponse
+    {
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'unidad_medida' => 'required|string|max:50',
+            'stock_minimo' => 'nullable|integer|min:0',
+        ]);
+
+        $validated['tipo'] = 'General'; // Valor por defecto
+
+        $producto->update($validated);
+
+        return redirect()->route('inventario.index')
+            ->with('success', 'Producto actualizado exitosamente');
+    }
+
+    /**
+     * Eliminar producto.
+     */
+    public function destroyProducto(Producto $producto): RedirectResponse
+    {
+        $producto->update(['estado' => 'inactivo']);
+
+        return redirect()->route('inventario.index')
+            ->with('success', 'Producto desactivado exitosamente');
     }
 }

@@ -164,11 +164,63 @@
                     </p>
                 </div>
                 <div class="modern-card-body">
+                    <!-- Navegación de Semanas Mejorada -->
+                    <div class="mb-4" style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{ route('control.salidas.index', ['semana' => ($semana ?? 0) - 1]) }}"
+                               class="btn"
+                               style="background: white; color: #0284c7; border: 2px solid #0ea5e9; border-radius: 12px; padding: 0.75rem 1.5rem; font-weight: 600; box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2); transition: all 0.3s ease;"
+                               onmouseover="this.style.background='#0ea5e9'; this.style.color='white'; this.style.transform='translateX(-5px)'"
+                               onmouseout="this.style.background='white'; this.style.color='#0284c7'; this.style.transform='translateX(0)'">
+                                <i class="fas fa-chevron-left mr-2"></i>
+                                <span>Semana Anterior</span>
+                            </a>
+
+                            <div class="text-center" style="background: white; padding: 1rem 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                                <div style="color: #64748b; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem;">
+                                    <i class="fas fa-calendar-week" style="color: #0ea5e9;"></i> Semana Actual
+                                </div>
+                                <h4 class="mb-0" style="color: #0284c7; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.5px;">
+                                    {{ $inicioSemana->format('d/m/Y') }} - {{ $finSemana->format('d/m/Y') }}
+                                </h4>
+                                <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.25rem;">
+                                    {{ $inicioSemana->locale('es')->isoFormat('MMMM YYYY') }}
+                                </div>
+                            </div>
+
+                            <a href="{{ route('control.salidas.index', ['semana' => ($semana ?? 0) + 1]) }}"
+                               class="btn"
+                               style="background: white; color: #0284c7; border: 2px solid #0ea5e9; border-radius: 12px; padding: 0.75rem 1.5rem; font-weight: 600; box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2); transition: all 0.3s ease;"
+                               onmouseover="this.style.background='#0ea5e9'; this.style.color='white'; this.style.transform='translateX(5px)'"
+                               onmouseout="this.style.background='white'; this.style.color='#0284c7'; this.style.transform='translateX(0)'">
+                                <span>Semana Siguiente</span>
+                                <i class="fas fa-chevron-right ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
                     <div class="d-flex justify-content-end mb-3">
                         <a href="{{ route('control.salidas.create') }}" class="btn-modern btn-success">
                             <i class="fas fa-plus-circle"></i>
                             Nueva Salida
                         </a>
+                    </div>
+
+                    <!-- Filtro por Tipo de Salida -->
+                    <div class="mb-4">
+                        <form method="GET" action="{{ route('control.salidas.index') }}" class="d-flex align-items-center gap-3">
+                            <input type="hidden" name="semana" value="{{ $semana ?? 0 }}">
+                            <div class="flex-grow-1" style="max-width: 300px;">
+                                <label class="form-label mb-2" style="font-weight: 600; color: #0284c7;">
+                                    <i class="fas fa-filter mr-2"></i>Filtrar por Tipo de Salida
+                                </label>
+                                <select name="tipo_salida" class="form-select" style="border: 2px solid #0ea5e9; border-radius: 8px; padding: 0.5rem;" onchange="this.form.submit()">
+                                    <option value="">Todos los tipos</option>
+                                    <option value="Despacho Interno" {{ request('tipo_salida') == 'Despacho Interno' ? 'selected' : '' }}>Despacho Interno</option>
+                                    <option value="Pedido Cliente" {{ request('tipo_salida') == 'Pedido Cliente' ? 'selected' : '' }}>Pedido Cliente</option>
+                                    <option value="Venta Directa" {{ request('tipo_salida') == 'Venta Directa' ? 'selected' : '' }}>Venta Directa</option>
+                                </select>
+                            </div>
+                        </form>
                     </div>
 
                     @if(session('success'))
@@ -182,6 +234,11 @@
                     @endif
 
                     @if($salidas->count() > 0)
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Mostrando <strong>{{ $salidas->count() }}</strong> registro(s) de salida en esta semana
+                        </div>
+
                         @foreach($salidas as $salida)
                         <div class="salida-card">
                             <div class="salida-header">
@@ -189,8 +246,31 @@
                                     <h5 class="mb-0">
                                         <i class="fas fa-clipboard-list mr-2"></i>
                                         <span class="badge badge-primary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">{{ $salida->tipo_salida ?? 'Sin Tipo' }}</span>
-                                        <i class="fas fa-user-tie ml-3 mr-2"></i>
-                                        <span class="badge-distribuidor">{{ $salida->nombre_distribuidor }}</span>
+
+                                        @if($salida->tipo_salida === 'Pedido Cliente')
+                                            @if($salida->chofer)
+                                            <i class="fas fa-user ml-3 mr-1"></i>
+                                            <span class="badge-distribuidor">Chofer: {{ $salida->chofer }}</span>
+                                            @endif
+
+                                            @if($salida->nombre_distribuidor && $salida->nombre_distribuidor !== $salida->nombre_cliente)
+                                            <i class="fas fa-user-tie ml-3 mr-1"></i>
+                                            <span class="badge-distribuidor">Distribuidor: {{ $salida->nombre_distribuidor }}</span>
+                                            @endif
+
+                                            @if($salida->nombre_cliente)
+                                            <i class="fas fa-store ml-3 mr-1"></i>
+                                            <span class="badge-distribuidor">Cliente: {{ $salida->nombre_cliente }}</span>
+                                            @endif
+                                        @else
+                                            @if($salida->chofer && $salida->nombre_distribuidor)
+                                            <i class="fas fa-user-tie ml-3 mr-2"></i>
+                                            <span class="badge-distribuidor">Chofer: {{ $salida->chofer }}, Distribuidor: {{ $salida->nombre_distribuidor }}</span>
+                                            @else
+                                            <i class="fas fa-user-tie ml-3 mr-2"></i>
+                                            <span class="badge-distribuidor">{{ $salida->nombre_distribuidor }}</span>
+                                            @endif
+                                        @endif
                                     </h5>
                                 </div>
                                 <div class="action-buttons">
@@ -229,6 +309,17 @@
                                             <small>({{ \Carbon\Carbon::parse($salida->fecha)->locale('es')->isoFormat('dddd') }})</small>
                                         </span>
                                     </div>
+
+                                    @if($salida->tipo_salida)
+                                    <div class="info-item">
+                                        <span class="info-label">
+                                            <i class="fas fa-tag text-success"></i> Tipo de Salida
+                                        </span>
+                                        <span class="badge-producto">
+                                            <i class="fas fa-shipping-fast mr-1"></i> {{ $salida->tipo_salida }}
+                                        </span>
+                                    </div>
+                                    @endif
 
                                     @if($salida->vehiculo_placa)
                                     <div class="info-item">
@@ -360,10 +451,6 @@
                             </div>
                         </div>
                         @endforeach
-
-                        <div class="mt-4">
-                            {{ $salidas->links() }}
-                        </div>
                     @else
                         <div class="text-center py-5">
                             <i class="fas fa-truck-loading text-gray-300" style="font-size: 4rem;"></i>

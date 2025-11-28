@@ -113,7 +113,7 @@
     <div class="header">
         <h1>REPORTE DE INVENTARIO</h1>
         <p>Sistema de Gestión - Agua Colegial</p>
-        <p>Generado el: {{ now()->format('d/m/Y H:i:s') }}</p>
+        <p>Generado el: {{ now()->format('d/m/Y') }}</p>
     </div>
 
     {{-- Tabla de Inventario --}}
@@ -121,9 +121,9 @@
         <thead>
             <tr>
                 <th>Producto</th>
-                <th>Código</th>
-                <th>Tipo</th>
+                <th>Descripción</th>
                 <th style="text-align: center;">Stock Actual</th>
+                <th style="text-align: center;">Unidad</th>
                 <th style="text-align: center;">Stock Mínimo</th>
                 <th style="text-align: center;">Estado</th>
             </tr>
@@ -135,17 +135,17 @@
                 @endphp
                 <tr>
                     <td>{{ $item['producto']->nombre }}</td>
-                    <td>{{ $item['producto']->tipo }}</td>
-                    <td>{{ $item['producto']->tipoProducto->nombre ?? 'N/A' }}</td>
+                    <td>{{ $item['producto']->descripcion ?? 'Sin descripción' }}</td>
                     <td style="text-align: center;" class="{{ $stockBajo ? 'stock-bajo' : 'stock-normal' }}">
                         {{ number_format($item['stock_actual']) }}
                     </td>
+                    <td style="text-align: center;">{{ $item['producto']->unidad_medida ?? 'Unidad' }}</td>
                     <td style="text-align: center;">{{ number_format($item['stock_minimo']) }}</td>
                     <td style="text-align: center;">
                         @if($stockBajo)
-                            <span style="color: #dc2626; font-weight: bold;">⚠ BAJO</span>
+                            <span style="color: #dc2626; font-weight: bold;">BAJO</span>
                         @else
-                            <span style="color: #16a34a;">✓ OK</span>
+                            <span style="color: #16a34a; font-weight: bold;">OK</span>
                         @endif
                     </td>
                 </tr>
@@ -184,7 +184,7 @@
     {{-- Pie de página --}}
     <div class="footer">
         <p>Sistema de Gestión Integral - Agua Colegial</p>
-        <p>Documento generado automáticamente - {{ now()->format('d/m/Y H:i:s') }}</p>
+        <p>Documento generado automáticamente - {{ now()->format('d/m/Y') }}</p>
     </div>
 </body>
 </html>

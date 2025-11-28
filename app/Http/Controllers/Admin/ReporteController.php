@@ -121,7 +121,7 @@ class ReporteController extends Controller
         // Obtener productos con su stock actual desde la vista optimizada
         $inventarios = DB::table('v_stock_actual')
             ->where('estado', 'activo')
-            ->select('id', 'nombre', 'tipo', 'unidad_medida', 'stock_actual')
+            ->select('id', 'nombre', 'descripcion', 'tipo', 'unidad_medida', 'stock_actual')
             ->orderBy('nombre')
             ->get();
 
@@ -151,15 +151,26 @@ class ReporteController extends Controller
             'id_producto' => ['nullable', 'exists:productos,id'],
         ]);
 
-        $query = Produccion::with(['producto', 'personal'])
-            ->whereBetween('fecha_produccion', [$validado['fecha_inicio'], $validado['fecha_fin']]);
+        // Obtener producciones diarias con sus productos y materiales
+        $producciones = ProduccionDiaria::with(['productos.producto', 'materiales'])
+            ->whereBetween('fecha', [$validado['fecha_inicio'], $validado['fecha_fin']])
+            ->orderBy('fecha', 'desc')
+            ->get();
 
+        // Filtrar por producto si se especifica
         if (!empty($validado['id_producto'])) {
-            $query->where('id_producto', $validado['id_producto']);
+            $producciones = $producciones->filter(function ($produccion) use ($validado) {
+                return $produccion->productos->contains('producto_id', $validado['id_producto']);
+            });
         }
 
-        $producciones = $query->orderBy('fecha_produccion', 'desc')->get();
-        $totalCantidad = $producciones->sum('cantidad');
+        // Calcular total de productos
+        $totalCantidad = 0;
+        foreach ($producciones as $produccion) {
+            foreach ($produccion->productos as $prod) {
+                $totalCantidad += $prod->cantidad;
+            }
+        }
 
         // Registrar en historial
         HistorialReporte::create([

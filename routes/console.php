@@ -83,10 +83,34 @@ Schedule::command('log:clear --days=30')
  */
 Schedule::command('verificar:stock-bajo --umbral=10')
     ->dailyAt('02:00')
-    ->timezone('America/Bogota')
+    ->timezone('America/La_Paz')
     ->onSuccess(function () {
         info('✅ Verificación de stock bajo completada exitosamente.');
     })
     ->onFailure(function () {
         info('❌ Error en verificación de stock bajo.');
+    });
+
+/**
+ * Limpieza Automática de Cache (diario)
+ *
+ * Limpia todos los caches del sistema automáticamente:
+ * - Cache de aplicación
+ * - Cache de configuración
+ * - Cache de rutas
+ * - Vistas compiladas
+ * - Cache de eventos
+ * - Logs antiguos
+ * - Sesiones expiradas
+ *
+ * Se ejecuta todos los días a las 3:00 AM.
+ */
+Schedule::command('cache:clear-all')
+    ->dailyAt('03:00')
+    ->timezone('America/La_Paz')
+    ->onSuccess(function () {
+        info('✅ Limpieza automática de cache completada exitosamente.');
+    })
+    ->onFailure(function () {
+        info('❌ Error en la limpieza automática de cache.');
     });

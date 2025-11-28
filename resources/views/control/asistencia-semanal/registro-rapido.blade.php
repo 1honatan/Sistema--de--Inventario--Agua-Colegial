@@ -138,18 +138,73 @@
         box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
     }
 
-    .btn-eliminar {
-        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    .btn-detalle {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
         color: white;
-        box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
-        padding: 0.5rem 0.75rem;
-        font-size: 0.85rem;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+        text-decoration: none;
+    }
+
+    .btn-detalle:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-editar {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+        text-decoration: none;
+    }
+
+    .btn-editar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-eliminar {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
     }
 
     .btn-eliminar:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(107, 114, 128, 0.4);
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
     }
 
     .btn-action:disabled {
@@ -312,6 +367,18 @@
                                 </button>
                             </form>
 
+                            <a href="{{ route('control.empleados.show', $empleado->id) }}"
+                               class="btn-action btn-detalle ml-2"
+                               title="Ver detalle">
+                                <i class="fas fa-eye"></i>
+                            </a>
+
+                            <a href="{{ route('control.empleados.edit', $empleado->id) }}"
+                               class="btn-action btn-editar ml-2"
+                               title="Editar empleado">
+                                <i class="fas fa-edit"></i>
+                            </a>
+
                             <form action="{{ route('control.empleados.destroy', $empleado->id) }}"
                                   method="POST"
                                   style="display: inline;"
@@ -367,13 +434,16 @@ $(document).ready(function() {
         });
     });
 
-    // Confirmación antes de registrar
+    // Confirmación antes de registrar (solo para entrada/salida, no para eliminar)
     $('form').on('submit', function(e) {
         const isEntrada = $(this).find('.btn-entrada').length > 0;
-        const accion = isEntrada ? 'entrada' : 'salida';
+        const isSalida = $(this).find('.btn-salida').length > 0;
 
-        if (!confirm(`¿Confirmar registro de ${accion}?`)) {
-            e.preventDefault();
+        if (isEntrada || isSalida) {
+            const accion = isEntrada ? 'entrada' : 'salida';
+            if (!confirm(`¿Confirmar registro de ${accion}?`)) {
+                e.preventDefault();
+            }
         }
     });
 

@@ -205,6 +205,40 @@
                     </p>
                 </div>
                 <div class="modern-card-body">
+                    <!-- Navegación de Semanas Mejorada -->
+                    <div class="mb-4" style="background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{ route('control.produccion.index', ['semana' => ($semana ?? 0) - 1]) }}"
+                               class="btn"
+                               style="background: white; color: #4f46e5; border: 2px solid #6366f1; border-radius: 12px; padding: 0.75rem 1.5rem; font-weight: 600; box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2); transition: all 0.3s ease;"
+                               onmouseover="this.style.background='#6366f1'; this.style.color='white'; this.style.transform='translateX(-5px)'"
+                               onmouseout="this.style.background='white'; this.style.color='#4f46e5'; this.style.transform='translateX(0)'">
+                                <i class="fas fa-chevron-left mr-2"></i>
+                                <span>Semana Anterior</span>
+                            </a>
+
+                            <div class="text-center" style="background: white; padding: 1rem 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                                <div style="color: #64748b; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem;">
+                                    <i class="fas fa-calendar-week" style="color: #6366f1;"></i> Semana Actual
+                                </div>
+                                <h4 class="mb-0" style="color: #4f46e5; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.5px;">
+                                    {{ $inicioSemana->format('d/m/Y') }} - {{ $finSemana->format('d/m/Y') }}
+                                </h4>
+                                <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.25rem;">
+                                    {{ $inicioSemana->locale('es')->isoFormat('MMMM YYYY') }}
+                                </div>
+                            </div>
+
+                            <a href="{{ route('control.produccion.index', ['semana' => ($semana ?? 0) + 1]) }}"
+                               class="btn"
+                               style="background: white; color: #4f46e5; border: 2px solid #6366f1; border-radius: 12px; padding: 0.75rem 1.5rem; font-weight: 600; box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2); transition: all 0.3s ease;"
+                               onmouseover="this.style.background='#6366f1'; this.style.color='white'; this.style.transform='translateX(5px)'"
+                               onmouseout="this.style.background='white'; this.style.color='#4f46e5'; this.style.transform='translateX(0)'">
+                                <span>Semana Siguiente</span>
+                                <i class="fas fa-chevron-right ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
                     <div class="d-flex justify-content-end mb-3">
                         <a href="{{ route('control.produccion.create') }}" class="btn-modern btn-success">
                             <i class="fas fa-plus-circle"></i>
@@ -333,10 +367,6 @@
                             </div>
                         </div>
                         @endforeach
-
-                        <div class="mt-4">
-                            {{ $producciones->links() }}
-                        </div>
                     @else
                         <div class="text-center py-5">
                             <i class="fas fa-industry text-gray-300" style="font-size: 4rem;"></i>

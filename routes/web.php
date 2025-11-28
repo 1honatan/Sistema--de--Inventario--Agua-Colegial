@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductoController;
 use App\Http\Controllers\Admin\TipoProductoController;
 use App\Http\Controllers\Admin\VehiculoController;
 use App\Http\Controllers\Admin\ReporteController;
 use App\Http\Controllers\Admin\ConfiguracionController;
-use App\Http\Controllers\Produccion\ProduccionController;
-use App\Http\Controllers\Produccion\DashboardProduccionController;
+// use App\Http\Controllers\Produccion\ProduccionController; // Sistema antiguo - deshabilitado
+// use App\Http\Controllers\Produccion\DashboardProduccionController; // Sistema antiguo - deshabilitado
 use App\Http\Controllers\Inventario\InventarioController;
 use App\Http\Controllers\Inventario\DashboardInventarioController;
 use App\Http\Controllers\Admin\AsistenciaController as AdminAsistenciaController;
@@ -48,16 +46,6 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'login'])
         ->name('login.post')
         ->middleware('throttle:5,1'); // 5 intentos por minuto
-
-    // Recuperación de contraseña
-    Route::get('/password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])
-        ->name('password.request');
-    Route::post('/password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])
-        ->name('password.email');
-    Route::get('/password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])
-        ->name('password.reset');
-    Route::post('/password/reset', [ResetPasswordController::class, 'reset'])
-        ->name('password.update');
 });
 
 Route::post('/logout', [LoginController::class, 'logout'])
@@ -75,35 +63,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/data', [DashboardController::class, 'getData'])->name('dashboard.data');
 
-    // Gestión de Productos (sin catálogo - solo crear/editar/eliminar)
-    Route::resource('productos', ProductoController::class)->except(['show', 'index']);
-
-    // Gestión de Tipos de Producto
-    Route::resource('tipos-producto', TipoProductoController::class)->except(['show'])->parameters(['tipos-producto' => 'tiposProducto']);
-    Route::post('tipos-producto/{tiposProducto}/activar', [TipoProductoController::class, 'activar'])->name('tipos-producto.activar');
-
     // Gestión de Vehículos
     Route::resource('vehiculos', VehiculoController::class)->except(['show']);
     Route::post('vehiculos/{vehiculo}/toggle-estado', [VehiculoController::class, 'toggleEstado'])->name('vehiculos.toggle-estado');
-
-    // Reportes
-    Route::prefix('reportes')->name('reportes.')->group(function () {
-        Route::get('/', [ReporteController::class, 'index'])->name('index');
-        Route::get('/produccion', [ReporteController::class, 'produccion'])->name('produccion');
-        Route::get('/inventario', [ReporteController::class, 'inventario'])->name('inventario');
-        Route::get('/salidas', [ReporteController::class, 'salidas'])->name('salidas');
-        Route::get('/mantenimiento', [ReporteController::class, 'mantenimiento'])->name('mantenimiento');
-        Route::get('/fumigacion', [ReporteController::class, 'fumigacion'])->name('fumigacion');
-        Route::get('/fosa-septica', [ReporteController::class, 'fosaSeptica'])->name('fosa-septica');
-        Route::get('/tanques', [ReporteController::class, 'tanques'])->name('tanques');
-        Route::get('/insumos', [ReporteController::class, 'insumos'])->name('insumos');
-        Route::get('/asistencia', [ReporteController::class, 'asistencia'])->name('asistencia');
-        Route::get('/despachos', [ReporteController::class, 'salidas'])->name('despachos'); // Alias para salidas
-
-        // Exportar a PDF
-        Route::get('/produccion/pdf', [ReporteController::class, 'produccionPDF'])->name('produccion.pdf');
-        Route::get('/inventario/pdf', [ReporteController::class, 'inventarioPDF'])->name('inventario.pdf');
-    });
 
     // Configuración del Sistema
     Route::prefix('configuracion')->name('configuracion.')->group(function () {
@@ -123,21 +85,49 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
 /*
 |--------------------------------------------------------------------------
+| Módulo de Reportes (roles: admin, produccion)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'role:admin,produccion'])->prefix('admin')->name('admin.')->group(function () {
+    // Reportes
+    Route::prefix('reportes')->name('reportes.')->group(function () {
+        Route::get('/', [ReporteController::class, 'index'])->name('index');
+        Route::get('/produccion', [ReporteController::class, 'produccion'])->name('produccion');
+        Route::get('/inventario', [ReporteController::class, 'inventario'])->name('inventario');
+        Route::get('/salidas', [ReporteController::class, 'salidas'])->name('salidas');
+        Route::get('/mantenimiento', [ReporteController::class, 'mantenimiento'])->name('mantenimiento');
+        Route::get('/fumigacion', [ReporteController::class, 'fumigacion'])->name('fumigacion');
+        Route::get('/fosa-septica', [ReporteController::class, 'fosaSeptica'])->name('fosa-septica');
+        Route::get('/tanques', [ReporteController::class, 'tanques'])->name('tanques');
+        Route::get('/insumos', [ReporteController::class, 'insumos'])->name('insumos');
+        Route::get('/asistencia', [ReporteController::class, 'asistencia'])->name('asistencia');
+        Route::get('/despachos', [ReporteController::class, 'salidas'])->name('despachos'); // Alias para salidas
+
+        // Exportar a PDF
+        Route::get('/produccion/pdf', [ReporteController::class, 'produccionPDF'])->name('produccion.pdf');
+        Route::get('/inventario/pdf', [ReporteController::class, 'inventarioPDF'])->name('inventario.pdf');
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
 | Módulo de Producción (roles: admin, produccion)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:admin,produccion'])->prefix('produccion')->name('produccion.')->group(function () {
-    // Dashboard de Producción
-    Route::get('/dashboard', [DashboardProduccionController::class, 'index'])->name('dashboard');
-
-    // Gestión de Producción
-    Route::get('/', [ProduccionController::class, 'index'])->name('index');
-    Route::get('/crear', [ProduccionController::class, 'create'])->name('create');
-    Route::post('/', [ProduccionController::class, 'store'])->name('store');
-    Route::get('/{produccion}', [ProduccionController::class, 'show'])->name('show');
-    Route::get('/reporte/generar', [ProduccionController::class, 'reporte'])->name('reporte');
-});
+// SISTEMA ANTIGUO DE PRODUCCIÓN - DESHABILITADO (reemplazado por control_produccion_diaria)
+// Route::middleware(['auth', 'role:admin,produccion'])->prefix('produccion')->name('produccion.')->group(function () {
+//     // Dashboard de Producción
+//     Route::get('/dashboard', [DashboardProduccionController::class, 'index'])->name('dashboard');
+//
+//     // Gestión de Producción
+//     Route::get('/', [ProduccionController::class, 'index'])->name('index');
+//     Route::get('/crear', [ProduccionController::class, 'create'])->name('create');
+//     Route::post('/', [ProduccionController::class, 'store'])->name('store');
+//     Route::get('/{produccion}', [ProduccionController::class, 'show'])->name('show');
+//     Route::get('/reporte/generar', [ProduccionController::class, 'reporte'])->name('reporte');
+// });
 
 /*
 |--------------------------------------------------------------------------
@@ -178,6 +168,13 @@ Route::middleware(['auth', 'role:admin,inventario,produccion'])->prefix('inventa
     Route::post('/movimiento/exportar-excel', [InventarioController::class, 'exportarMovimientosExcel'])->name('movimiento.exportar-excel');
     Route::get('/producto/{producto}/historial', [InventarioController::class, 'historial'])->name('historial');
 
+    // Gestión de Productos
+    Route::get('/productos/crear', [InventarioController::class, 'createProducto'])->name('productos.create');
+    Route::post('/productos', [InventarioController::class, 'storeProducto'])->name('productos.store');
+    Route::get('/productos/{producto}/editar', [InventarioController::class, 'editProducto'])->name('productos.edit');
+    Route::put('/productos/{producto}', [InventarioController::class, 'updateProducto'])->name('productos.update');
+    Route::delete('/productos/{producto}', [InventarioController::class, 'destroyProducto'])->name('productos.destroy');
+
     // API para verificar alertas de stock (AJAX)
     Route::get('/api/verificar-alertas', [InventarioController::class, 'verificarAlertasStock'])->name('api.verificar-alertas');
 
@@ -214,11 +211,11 @@ Route::middleware(['auth'])->prefix('mi-asistencia')->name('personal.asistencia.
 
 /*
 |--------------------------------------------------------------------------
-| Módulos de Control (solo rol: admin)
+| Módulos de Control (roles: admin, produccion)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:admin'])->prefix('control')->name('control.')->group(function () {
+Route::middleware(['auth', 'role:admin,produccion'])->prefix('control')->name('control.')->group(function () {
 
     // 1. Control de Salidas de Productos "Colegial"
     Route::prefix('salidas')->name('salidas.')->group(function () {
@@ -315,6 +312,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('control')->name('control.')->
     Route::prefix('empleados')->name('empleados.')->group(function () {
         Route::get('/crear', [\App\Http\Controllers\Control\EmpleadoController::class, 'create'])->name('create');
         Route::post('/', [\App\Http\Controllers\Control\EmpleadoController::class, 'store'])->name('store');
+        Route::get('/{id}/editar', [\App\Http\Controllers\Control\EmpleadoController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [\App\Http\Controllers\Control\EmpleadoController::class, 'update'])->name('update');
+        Route::get('/{id}', [\App\Http\Controllers\Control\EmpleadoController::class, 'show'])->name('show');
         Route::delete('/{id}', [\App\Http\Controllers\Control\EmpleadoController::class, 'destroy'])->name('destroy');
     });
 });

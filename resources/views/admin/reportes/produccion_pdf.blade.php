@@ -125,7 +125,7 @@
     <div class="header">
         <h1>REPORTE DE PRODUCCIÓN</h1>
         <p>Sistema de Gestión - Agua Colegial</p>
-        <p>Generado el: {{ now()->format('d/m/Y H:i:s') }}</p>
+        <p>Generado el: {{ now()->format('d/m/Y') }}</p>
     </div>
 
     {{-- Información del Filtro --}}
@@ -157,34 +157,82 @@
     @endif
 
     {{-- Tabla de Producciones --}}
-    <table>
-        <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Lote</th>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Responsable</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($producciones as $produccion)
+    @forelse($producciones as $produccion)
+    <div style="margin-bottom: 20px; page-break-inside: avoid;">
+        <table style="margin-bottom: 10px;">
+            <thead>
                 <tr>
-                    <td>{{ \Carbon\Carbon::parse($produccion->fecha_produccion)->format('d/m/Y') }}</td>
-                    <td>{{ $produccion->lote }}</td>
-                    <td>{{ $produccion->producto->nombre }}</td>
-                    <td style="text-align: right; font-weight: bold;">{{ number_format($produccion->cantidad) }}</td>
-                    <td>{{ $produccion->personal->nombre_completo ?? 'N/A' }}</td>
+                    <th colspan="4" style="background-color: #4f46e5; text-align: left;">
+                        Producción #{{ $produccion->id }} - {{ \Carbon\Carbon::parse($produccion->fecha)->format('d/m/Y') }}
+                    </th>
                 </tr>
-            @empty
+            </thead>
+            <tbody>
                 <tr>
-                    <td colspan="5" style="text-align: center; padding: 20px; color: #666;">
+                    <td style="width: 25%; font-weight: bold;">Responsable:</td>
+                    <td style="width: 25%;">{{ $produccion->responsable ?? '-' }}</td>
+                    <td style="width: 25%; font-weight: bold;">Turno:</td>
+                    <td style="width: 25%;">{{ $produccion->turno ?? '-' }}</td>
+                </tr>
+                @if($produccion->observaciones)
+                <tr>
+                    <td style="font-weight: bold;">Observaciones:</td>
+                    <td colspan="3">{{ $produccion->observaciones }}</td>
+                </tr>
+                @endif
+            </tbody>
+        </table>
+
+        @if($produccion->productos->count() > 0)
+        <table style="margin-bottom: 5px;">
+            <thead>
+                <tr style="background-color: #818cf8;">
+                    <th style="text-align: left;">Producto</th>
+                    <th style="text-align: right;">Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($produccion->productos as $prod)
+                <tr>
+                    <td>{{ $prod->producto->nombre ?? 'Producto' }}</td>
+                    <td style="text-align: right; font-weight: bold;">{{ number_format($prod->cantidad) }} unidades</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        @endif
+
+        @if($produccion->materiales->count() > 0)
+        <table>
+            <thead>
+                <tr style="background-color: #a78bfa;">
+                    <th style="text-align: left;">Material</th>
+                    <th style="text-align: right;">Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($produccion->materiales as $material)
+                <tr>
+                    <td>{{ $material->nombre_material }}</td>
+                    <td style="text-align: right;">{{ number_format($material->cantidad, 2) }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        @endif
+    </div>
+    @empty
+        <table>
+            <tbody>
+                <tr>
+                    <td style="text-align: center; padding: 40px; color: #666; font-size: 14px;">
+                        <i style="font-style: normal; font-size: 48px; display: block; margin-bottom: 10px;">📋</i>
                         No hay registros de producción para los filtros seleccionados
                     </td>
                 </tr>
-            @endforelse
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    @endforelse
 
     {{-- Resumen --}}
     <div class="summary">
@@ -204,7 +252,7 @@
     {{-- Pie de página --}}
     <div class="footer">
         <p>Sistema de Gestión Integral - Agua Colegial</p>
-        <p>Documento generado automáticamente - {{ now()->format('d/m/Y H:i:s') }}</p>
+        <p>Documento generado automáticamente - {{ now()->format('d/m/Y') }}</p>
     </div>
 </body>
 </html>

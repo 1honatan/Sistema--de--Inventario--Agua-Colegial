@@ -403,6 +403,35 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="input-group">
+                                <div class="d-flex align-items-center p-3" style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 10px;">
+                                    <div class="form-check form-switch" style="flex-grow: 1;">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               name="acceso_sistema"
+                                               id="acceso_sistema"
+                                               value="1"
+                                               {{ old('acceso_sistema') ? 'checked' : '' }}
+                                               style="width: 3rem; height: 1.5rem; cursor: pointer;">
+                                        <label class="form-check-label" for="acceso_sistema" style="font-weight: 700; font-size: 1rem; color: #1e40af; margin-left: 0.5rem; cursor: pointer;">
+                                            <i class="fas fa-key mr-2"></i>
+                                            Acceder al Sistema
+                                        </label>
+                                        <p class="text-muted mb-0 mt-1" style="font-size: 0.85rem; margin-left: 3.5rem;">
+                                            <i class="fas fa-info-circle mr-1"></i>
+                                            Permite al empleado iniciar sesión en el sistema
+                                        </p>
+                                    </div>
+                                </div>
+                                @error('acceso_sistema')
+                                    <div class="text-danger mt-2">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Sección Licencia de Conducir (solo para Chofer) -->

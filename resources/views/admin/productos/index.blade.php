@@ -23,13 +23,14 @@
     <div class="bg-white rounded-lg shadow-md p-6">
         <form method="GET" action="{{ route('admin.productos.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-                <label for="tipo" class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
-                <select name="tipo" id="tipo" class="select2-no-search">
+                <label for="tipo_producto" class="block text-sm font-medium text-gray-700 mb-2">Tipo de Producto</label>
+                <select name="tipo_producto" id="tipo_producto" class="select2-no-search">
                     <option value="">Todos los tipos</option>
-                    <option value="botellón" {{ request('tipo') == 'botellón' ? 'selected' : '' }}>Botellón</option>
-                    <option value="bolsa" {{ request('tipo') == 'bolsa' ? 'selected' : '' }}>Bolsa</option>
-                    <option value="agua_saborizada" {{ request('tipo') == 'agua_saborizada' ? 'selected' : '' }}>Agua Saborizada</option>
-                    <option value="otros" {{ request('tipo') == 'otros' ? 'selected' : '' }}>Otros</option>
+                    @foreach(\App\Models\TipoProducto::where('estado', 'activo')->orderBy('nombre')->get() as $tipo)
+                        <option value="{{ $tipo->id }}" {{ request('tipo_producto') == $tipo->id ? 'selected' : '' }}>
+                            {{ $tipo->nombre }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
 
@@ -63,9 +64,15 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse($productos as $producto)
             <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition">
-                <!-- Header with Estado Badge -->
-                <div class="relative h-32 bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
-                    <i class="fas fa-box text-6xl text-blue-300"></i>
+                <!-- Header with Image or Icon -->
+                <div class="relative h-48 bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center overflow-hidden">
+                    @if($producto->imagen && file_exists(public_path($producto->imagen)))
+                        <img src="{{ asset($producto->imagen) }}"
+                             alt="{{ $producto->nombre }}"
+                             class="w-full h-full object-cover">
+                    @else
+                        <i class="fas fa-box text-7xl text-blue-300"></i>
+                    @endif
 
                     <div class="absolute top-3 right-3">
                         @if($producto->estado === 'activo')
@@ -92,10 +99,18 @@
                     <div class="space-y-2 mb-4">
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-gray-600">
-                                <i class="fas fa-tag mr-1"></i>
-                                Tipo:
+                                <i class="fas fa-tags mr-1"></i>
+                                Categoría:
                             </span>
-                            <span class="font-semibold text-gray-900">{{ ucfirst($producto->tipo) }}</span>
+                            <span class="font-semibold text-gray-900">
+                                @if($producto->tipoProducto)
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        {{ $producto->tipoProducto->nombre }}
+                                    </span>
+                                @else
+                                    <span class="text-gray-400">Sin categoría</span>
+                                @endif
+                            </span>
                         </div>
 
                         <div class="flex items-center justify-between text-sm">

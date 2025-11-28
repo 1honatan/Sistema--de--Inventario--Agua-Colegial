@@ -28,7 +28,7 @@
     <div class="header">
         <h1>REPORTE DE SALIDAS DE PRODUCTOS</h1>
         <p>Sistema de Gestión - Agua Colegial</p>
-        <p>Generado el: {{ now()->format('d/m/Y H:i:s') }}</p>
+        <p>Generado el: {{ now()->format('d/m/Y') }}</p>
     </div>
 
     <div class="info-section">
@@ -59,7 +59,7 @@
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($salida->fecha)->format('d/m/Y') }}</td>
                     <td>{{ $salida->nombre_distribuidor }}</td>
-                    <td>{{ $salida->vehiculo_placa ?? 'N/A' }}</td>
+                    <td>{{ $salida->vehiculo_placa ?? '-' }}</td>
                     <td style="text-align: right; font-weight: bold;">{{ number_format($salida->botellones) }}</td>
                     <td style="text-align: right;">{{ number_format($salida->retornos) }}</td>
                     <td>{{ $salida->hora_llegada ? \Carbon\Carbon::parse($salida->hora_llegada)->format('H:i') : 'Sin registrar' }}</td>
@@ -88,7 +88,7 @@
 
     <div class="footer">
         <p>Sistema de Gestión Integral - Agua Colegial</p>
-        <p>Documento generado automáticamente - {{ now()->format('d/m/Y H:i:s') }}</p>
+        <p>Documento generado automáticamente - {{ now()->format('d/m/Y') }}</p>
     </div>
 </body>
 </html>

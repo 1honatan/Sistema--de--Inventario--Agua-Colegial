@@ -56,17 +56,22 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="fecha" class="form-label required-mark">
-                                            <i class="fas fa-calendar-alt"></i> Fecha
+                                            <i class="fas fa-calendar-alt"></i> Fecha de Registro
                                         </label>
                                         <input type="date"
                                                name="fecha"
                                                id="fecha"
                                                class="modern-input @error('fecha') is-invalid @enderror"
-                                               value="{{ old('fecha', date('Y-m-d')) }}"
+                                               value="{{ date('Y-m-d') }}"
+                                               readonly
+                                               style="background-color: #f3f4f6; cursor: not-allowed;"
                                                required>
                                         @error('fecha')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle"></i> Fecha automática (hoy)
+                                        </small>
                                     </div>
                                 </div>
 

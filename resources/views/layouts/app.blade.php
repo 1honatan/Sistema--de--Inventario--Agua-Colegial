@@ -39,6 +39,11 @@
     <link rel="stylesheet" href="{{ asset('css/global-styles.css') }}">
 
     <style>
+        /* Tamaño de fuente base reducido al 80% */
+        html {
+            font-size: 80%;
+        }
+
         /* Variables Institucionales Agua Colegial */
         :root {
             --azul-oscuro-institucional: #073d71;
@@ -50,10 +55,10 @@
 
         /* Sidebar Institucional - Estático */
         .sidebar {
-            width: 280px;
+            width: 220px;
             background: var(--azul-oscuro-institucional);
-            border-right: 3px solid #0a4d8f;
-            box-shadow: 6px 0 30px rgba(0, 0, 0, 0.3);
+            border-right: 2px solid #0a4d8f;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
             position: fixed;
             left: 0;
             top: 0;
@@ -361,7 +366,7 @@
 
         /* Main Content */
         .main-content {
-            margin-left: 280px;
+            margin-left: 220px;
         }
 
         /* ==========================================
@@ -1593,19 +1598,110 @@
 
                     <!-- Menú Rol Producción -->
                     @if($rol === 'produccion')
-                        <!-- Sección: Inventario -->
-                        <li class="sidebar-section-header">
-                            <p class="sidebar-section-title">
-                                <i class="fas fa-boxes text-xs"></i>
-                                <span class="sidebar-text">Inventario</span>
-                            </p>
+                        <!-- 1. Inicio -->
+                        <li>
+                            <a href="{{ route('control.produccion.index') }}"
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.produccion.index') ? 'active' : '' }}">
+                                <i class="fas fa-home w-5"></i>
+                                <span class="ml-3 sidebar-text">Inicio</span>
+                            </a>
                         </li>
 
+                        <!-- 2. Inventario General -->
                         <li>
                             <a href="{{ route('inventario.index') }}"
                                class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'inventario.index') ? 'active' : '' }}">
                                 <i class="fas fa-warehouse w-5"></i>
-                                <span class="ml-3 sidebar-text">Inventario General</span>
+                                <span class="ml-3 sidebar-text">Inventario</span>
+                            </a>
+                        </li>
+
+                        <!-- 3. Registro del Personal -->
+                        <li>
+                            <a href="{{ route('control.asistencia-semanal.registro-rapido') }}"
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_contains($currentRoute, 'registro-rapido') ? 'active' : '' }}">
+                                <i class="fas fa-user-clock w-5"></i>
+                                <span class="ml-3 sidebar-text">Historia de su Registro</span>
+                            </a>
+                        </li>
+
+                        <!-- Sección: Controles -->
+                        <li class="sidebar-section-header">
+                            <p class="sidebar-section-title">
+                                <i class="fas fa-clipboard-check text-xs"></i>
+                                <span class="sidebar-text">Controles</span>
+                            </p>
+                        </li>
+
+                        <!-- 4. Productos Producidos Diarios -->
+                        <li>
+                            <a href="{{ route('control.produccion.index') }}"
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.produccion') ? 'active' : '' }}">
+                                <i class="fas fa-industry w-5"></i>
+                                <span class="ml-3 sidebar-text">Productos Producidos Diarios</span>
+                            </a>
+                        </li>
+
+                        <!-- 5. Salidas Productos Diarios -->
+                        <li>
+                            <a href="{{ route('control.salidas.index') }}"
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.salidas') ? 'active' : '' }}">
+                                <i class="fas fa-truck-loading w-5"></i>
+                                <span class="ml-3 sidebar-text">Salidas Productos Diarios</span>
+                            </a>
+                        </li>
+
+                        <!-- 6. Control de Insumos -->
+                        <li>
+                            <a href="{{ route('control.insumos.index') }}"
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.insumos') ? 'active' : '' }}">
+                                <i class="fas fa-box-open w-5"></i>
+                                <span class="ml-3 sidebar-text">Control de Insumos</span>
+                            </a>
+                        </li>
+
+                        <!-- 7. Mantenimiento de Equipo -->
+                        <li>
+                            <a href="{{ route('control.mantenimiento.index') }}"
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.mantenimiento') ? 'active' : '' }}">
+                                <i class="fas fa-tools w-5"></i>
+                                <span class="ml-3 sidebar-text">Mantenimiento de Equipo</span>
+                            </a>
+                        </li>
+
+                        <!-- 8. Limpieza de Tanques de Agua -->
+                        <li>
+                            <a href="{{ route('control.tanques.index') }}"
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.tanques') ? 'active' : '' }}">
+                                <i class="fas fa-water w-5"></i>
+                                <span class="ml-3 sidebar-text">Limpieza Tanques de Agua</span>
+                            </a>
+                        </li>
+
+                        <!-- 9. Limpieza de Fosa Séptica -->
+                        <li>
+                            <a href="{{ route('control.fosa-septica.index') }}"
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.fosa-septica') ? 'active' : '' }}">
+                                <i class="fas fa-toilet w-5"></i>
+                                <span class="ml-3 sidebar-text">Limpieza Fosa Séptica</span>
+                            </a>
+                        </li>
+
+                        <!-- 10. Control de Fumigación -->
+                        <li>
+                            <a href="{{ route('control.fumigacion.index') }}"
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.fumigacion') ? 'active' : '' }}">
+                                <i class="fas fa-spray-can w-5"></i>
+                                <span class="ml-3 sidebar-text">Control de Fumigación</span>
+                            </a>
+                        </li>
+
+                        <!-- 11. Reportes -->
+                        <li>
+                            <a href="{{ route('admin.reportes.index') }}"
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'admin.reportes') ? 'active' : '' }}">
+                                <i class="fas fa-file-chart-line w-5"></i>
+                                <span class="ml-3 sidebar-text">Reportes</span>
                             </a>
                         </li>
 

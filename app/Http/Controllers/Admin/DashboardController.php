@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Produccion;
+// use App\Models\Produccion; // SISTEMA ANTIGUO - DESHABILITADO
+// use App\Models\Producto; // ELIMINADO - Solo se usa INVENTARIO
 use App\Models\Inventario;
-use App\Models\Producto;
 use App\Models\Personal;
 use App\Models\Control\SalidaProducto;
 use App\Models\Control\MantenimientoEquipo;
 use App\Models\Control\ProduccionDiaria;
+use App\Models\Control\ProduccionProducto;
 use App\Models\Control\Fumigacion;
 use App\Models\Control\FosaSeptica;
 use App\Models\Control\TanqueAgua;
@@ -32,24 +33,22 @@ class DashboardController extends Controller
      */
     public function index(): View
     {
-        // Total de productos activos
-        $totalProductos = Producto::where('estado', 'activo')->count();
-
-        // Producción del mes actual
-        $produccionMes = Produccion::whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
+        // Producción del mes actual (desde control_produccion_productos)
+        $produccionMes = ProduccionProducto::whereHas('produccion', function($query) {
+                $query->whereMonth('fecha', now()->month)
+                      ->whereYear('fecha', now()->year);
+            })
             ->sum('cantidad') ?? 0;
 
-        // Producción de hoy
-        $produccionHoy = Produccion::whereDate('created_at', today())
+        // Producción de hoy (desde control_produccion_productos)
+        $produccionHoy = ProduccionProducto::whereHas('produccion', function($query) {
+                $query->whereDate('fecha', today());
+            })
             ->sum('cantidad') ?? 0;
 
-        // Stock total del sistema
-        $stockTotal = 0;
-        $productos = Producto::where('estado', 'activo')->get();
-        foreach ($productos as $producto) {
-            $stockTotal += Inventario::stockDisponible($producto->id);
-        }
+        // Stock total del sistema (desde inventario)
+        $stockTotal = Inventario::where('tipo_movimiento', 'entrada')->sum('cantidad')
+                    - Inventario::where('tipo_movimiento', 'salida')->sum('cantidad');
 
         // Entradas del mes
         $entradasMes = Inventario::where('tipo_movimiento', 'entrada')
@@ -71,23 +70,9 @@ class DashboardController extends Controller
             ->where('estado', 'activo')
             ->count();
 
-        // Productos con stock bajo
-        $productosStockBajo = $this->obtenerProductosStockBajo(50);
-
-        // Últimos movimientos
-        $ultimosMovimientos = Inventario::with(['producto', 'usuario'])
-            ->orderBy('created_at', 'desc')
+        // Últimos movimientos de inventario
+        $ultimosMovimientos = Inventario::orderBy('created_at', 'desc')
             ->limit(8)
-            ->get();
-
-        // Productos más producidos este mes
-        $productosMasProducidos = Produccion::select('id_producto', DB::raw('SUM(cantidad) as total'))
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->groupBy('id_producto')
-            ->orderBy('total', 'desc')
-            ->with('producto')
-            ->limit(5)
             ->get();
 
         // Últimas salidas de productos
@@ -116,16 +101,6 @@ class DashboardController extends Controller
         $totalInsumos = Insumo::count();
         $totalAsistencias = DB::table('asistencias_semanales')->count();
 
-        // Listado de productos con stock
-        $listaProductos = Producto::where('estado', 'activo')
-            ->orderBy('nombre')
-            ->limit(8)
-            ->get()
-            ->map(function ($producto) {
-                $producto->stock_actual = Inventario::stockDisponible($producto->id);
-                return $producto;
-            });
-
         // Listado de personal activo
         $listaPersonal = Personal::where('estado', 'activo')
             ->orderBy('nombre_completo')
@@ -133,13 +108,11 @@ class DashboardController extends Controller
             ->get();
 
         // Listado de inventario (últimos movimientos)
-        $listaInventario = Inventario::with(['producto', 'usuario'])
-            ->orderBy('created_at', 'desc')
+        $listaInventario = Inventario::orderBy('created_at', 'desc')
             ->limit(8)
             ->get();
 
         return view('admin.dashboard', compact(
-            'totalProductos',
             'produccionMes',
             'produccionHoy',
             'stockTotal',
@@ -147,9 +120,7 @@ class DashboardController extends Controller
             'salidasMes',
             'personalActivo',
             'vehiculosActivos',
-            'productosStockBajo',
             'ultimosMovimientos',
-            'productosMasProducidos',
             'ultimasSalidas',
             'mantenimientosPendientes',
             'totalSalidas',
@@ -160,7 +131,6 @@ class DashboardController extends Controller
             'totalTanques',
             'totalInsumos',
             'totalAsistencias',
-            'listaProductos',
             'listaPersonal',
             'listaInventario'
         ));
@@ -222,15 +192,6 @@ class DashboardController extends Controller
                 ];
             });
 
-        // Productos con stock bajo
-        $productosStockBajo = $this->obtenerProductosStockBajo(50)->take(6)->map(function ($producto) {
-            return [
-                'nombre' => $producto->nombre,
-                'tipo' => $producto->tipo ?? 'General',
-                'stock_actual' => $producto->stock_actual,
-            ];
-        })->values();
-
         return response()->json([
             'totales' => [
                 'salidas' => $totalSalidas,
@@ -244,27 +205,7 @@ class DashboardController extends Controller
             ],
             'ultimas_salidas' => $ultimasSalidas,
             'mantenimientos_pendientes' => $mantenimientosPendientes,
-            'productos_stock_bajo' => $productosStockBajo,
             'timestamp' => now()->format('H:i:s'),
         ]);
-    }
-
-    /**
-     * Obtener productos con stock bajo.
-     *
-     * @param  int  $umbral  Umbral de stock bajo
-     * @return \Illuminate\Support\Collection
-     */
-    protected function obtenerProductosStockBajo(int $umbral)
-    {
-        $productos = Producto::where('estado', 'activo')->get();
-
-        return $productos->filter(function ($producto) use ($umbral) {
-            $stock = Inventario::stockDisponible($producto->id);
-            return $stock < $umbral && $stock >= 0;
-        })->map(function ($producto) {
-            $producto->stock_actual = Inventario::stockDisponible($producto->id);
-            return $producto;
-        });
     }
 }

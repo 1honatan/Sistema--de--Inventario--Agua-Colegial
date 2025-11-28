@@ -17,10 +17,27 @@ class SalidasController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $salidas = SalidaProducto::orderBy('fecha', 'desc')->paginate(15);
-        return view('control.salidas.index', compact('salidas'));
+        // Obtener la semana actual o la semana solicitada
+        $semana = (int) $request->get('semana', 0); // 0 = semana actual, -1 = anterior, 1 = siguiente
+
+        $inicioSemana = now()->addWeeks($semana)->startOfWeek(); // Lunes
+        $finSemana = now()->addWeeks($semana)->endOfWeek(); // Domingo
+
+        // Construir la consulta
+        $query = SalidaProducto::whereBetween('fecha', [$inicioSemana->format('Y-m-d'), $finSemana->format('Y-m-d')]);
+
+        // Aplicar filtro de tipo de salida si existe
+        if ($request->filled('tipo_salida')) {
+            $query->where('tipo_salida', $request->tipo_salida);
+        }
+
+        $salidas = $query->orderBy('fecha', 'desc')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return view('control.salidas.index', compact('salidas', 'inicioSemana', 'finSemana', 'semana'));
     }
 
     /**
@@ -28,8 +45,15 @@ class SalidasController extends Controller
      */
     public function create()
     {
-        // Obtener empleados activos como distribuidores (con cargo para mostrar)
+        // Obtener solo Choferes activos
+        $choferes = Personal::where('estado', 'activo')
+            ->where('cargo', 'Chofer')
+            ->orderBy('nombre_completo')
+            ->get();
+
+        // Obtener solo Distribuidores activos
         $distribuidores = Personal::where('estado', 'activo')
+            ->where('cargo', 'Distribuidor')
             ->orderBy('nombre_completo')
             ->get();
 
@@ -63,7 +87,7 @@ class SalidasController extends Controller
                 ];
             });
 
-        return view('control.salidas.create', compact('distribuidores', 'responsablesVenta', 'vehiculos', 'personal', 'productos'));
+        return view('control.salidas.create', compact('choferes', 'distribuidores', 'responsablesVenta', 'vehiculos', 'personal', 'productos'));
     }
 
     /**
@@ -98,6 +122,7 @@ class SalidasController extends Controller
 
         // Agregar validaciones específicas según el tipo
         if ($request->tipo_salida === 'Despacho Interno') {
+            $rules['chofer'] = 'required|string|max:255';
             $rules['nombre_distribuidor'] = 'required|string|max:255';
             $rules['vehiculo_placa'] = 'nullable|string|max:255';
             $rules['hora_llegada'] = 'nullable|date_format:H:i';
@@ -106,6 +131,10 @@ class SalidasController extends Controller
             $rules['nombre_cliente'] = 'required|string|max:255';
             $rules['direccion_entrega'] = 'required|string|max:500';
             $rules['telefono_cliente'] = 'nullable|string|max:20';
+            $rules['chofer'] = 'nullable|string|max:255';
+            $rules['nombre_distribuidor'] = 'nullable|string|max:255';
+            $rules['vehiculo_placa'] = 'nullable|string|max:255';
+            $rules['hora_llegada'] = 'nullable|date_format:H:i';
             $rules['fecha'] = 'required|date';
         } elseif ($request->tipo_salida === 'Venta Directa') {
             $rules['nombre_cliente'] = 'required|string|max:255';
@@ -126,15 +155,19 @@ class SalidasController extends Controller
             'productos.*' => 'nullable|integer|min:0',
             'retornos' => 'nullable|array',
             'retornos.*' => 'nullable|integer|min:0',
-            'choreados_retorno' => 'nullable|integer|min:0',
             'observaciones' => 'nullable|string',
         ]);
 
         $validated = $request->validate($rules);
 
         // Normalizar nombre_distribuidor según el tipo de salida
-        if ($request->tipo_salida === 'Pedido Cliente' || $request->tipo_salida === 'Venta Directa') {
+        if ($request->tipo_salida === 'Venta Directa') {
             $validated['nombre_distribuidor'] = $validated['nombre_cliente'] ?? '';
+        } elseif ($request->tipo_salida === 'Pedido Cliente') {
+            // Si no hay distribuidor seleccionado, usar el nombre del cliente
+            if (empty($validated['nombre_distribuidor'])) {
+                $validated['nombre_distribuidor'] = $validated['nombre_cliente'] ?? '';
+            }
         }
 
         // Obtener productos enviados
@@ -172,18 +205,15 @@ class SalidasController extends Controller
             // Mapear retornos a campos específicos
             $retornosRecibidos = $validated['retornos'] ?? [];
             $productosMap = [
-                12 => 'retorno_botellones',     // botellon de 20 litros
-                9 => 'retorno_botellones',      // Botellón Grande
-                10 => 'retorno_botellones',     // Botellón Mediano
-                4 => 'retorno_bolo_grande',     // Bolo Grande
-                5 => 'retorno_bolo_pequeno',    // Bolo Pequeño
+                1 => 'retorno_botellones',      // Botellón 20L
+                3 => 'retorno_agua_natural',    // Agua Natural
+                4 => 'retorno_agua_saborizada', // Agua Saborizada
                 6 => 'retorno_gelatina',        // Gelatina
-                3 => 'retorno_agua_saborizada', // Agua de Sabor
-                2 => 'retorno_agua_limon',      // Agua de Limón
-                1 => 'retorno_agua_natural',    // Agua Natural
-                7 => 'retorno_hielo',           // Bolsa de Hielo Grande
-                8 => 'retorno_hielo',           // Bolsa de Hielo Pequeño
-                11 => 'retorno_dispenser',      // dispenser
+                8 => 'retorno_hielo',           // Hielo en Bolsa 3kg
+                9 => 'retorno_bolo_grande',     // Bolo Grande
+                10 => 'retorno_bolo_pequeno',   // Bolo Pequeño
+                11 => 'retorno_dispenser',      // Dispenser
+                12 => 'retorno_agua_limon',     // Agua De Limon
             ];
 
             // Inicializar campos de retorno
@@ -217,6 +247,39 @@ class SalidasController extends Controller
                 $datosBasicos['retorno_hielo'],
                 $datosBasicos['retorno_dispenser'],
             ]);
+
+            // Mapear productos enviados a campos específicos
+            $productosEnviadosMap = [
+                1 => 'botellones',           // Botellón 20L
+                3 => 'agua_natural',         // Agua Natural
+                4 => 'agua_saborizada',      // Agua Saborizada
+                6 => 'gelatina',             // Gelatina
+                8 => 'hielo',                // Hielo en Bolsa 3kg
+                9 => 'bolo_grande',          // Bolo Grande
+                10 => 'bolo_pequeño',        // Bolo Pequeño
+                11 => 'dispenser',           // Dispenser
+                12 => 'agua_limon',          // Agua De Limon
+            ];
+
+            // Inicializar campos de productos enviados
+            $datosBasicos['botellones'] = 0;
+            $datosBasicos['bolo_grande'] = 0;
+            $datosBasicos['bolo_pequeño'] = 0;
+            $datosBasicos['gelatina'] = 0;
+            $datosBasicos['agua_saborizada'] = 0;
+            $datosBasicos['agua_limon'] = 0;
+            $datosBasicos['agua_natural'] = 0;
+            $datosBasicos['hielo'] = 0;
+            $datosBasicos['dispenser'] = 0;
+            $datosBasicos['choreados'] = 0;
+
+            // Sumar productos enviados por tipo
+            foreach ($productosEnviados as $productoId => $cantidad) {
+                if ($cantidad > 0 && isset($productosEnviadosMap[$productoId])) {
+                    $campo = $productosEnviadosMap[$productoId];
+                    $datosBasicos[$campo] += $cantidad;
+                }
+            }
 
             // Crear el registro de salida
             $salida = SalidaProducto::create($datosBasicos);
@@ -290,8 +353,15 @@ class SalidasController extends Controller
      */
     public function edit(SalidaProducto $salida)
     {
-        // Obtener empleados activos como distribuidores (con cargo para mostrar)
+        // Obtener solo Choferes activos
+        $choferes = Personal::where('estado', 'activo')
+            ->where('cargo', 'Chofer')
+            ->orderBy('nombre_completo')
+            ->get();
+
+        // Obtener solo Distribuidores activos
         $distribuidores = Personal::where('estado', 'activo')
+            ->where('cargo', 'Distribuidor')
             ->orderBy('nombre_completo')
             ->get();
 
@@ -306,7 +376,7 @@ class SalidasController extends Controller
             ->orderBy('placa')
             ->get();
 
-        return view('control.salidas.edit', compact('salida', 'distribuidores', 'responsablesVenta', 'vehiculos'));
+        return view('control.salidas.edit', compact('salida', 'choferes', 'distribuidores', 'responsablesVenta', 'vehiculos'));
     }
 
     /**
@@ -322,6 +392,7 @@ class SalidasController extends Controller
 
         // Agregar validaciones específicas según el tipo
         if ($request->tipo_salida === 'Despacho Interno') {
+            $rules['chofer'] = 'required|string|max:255';
             $rules['nombre_distribuidor'] = 'required|string|max:255';
             $rules['vehiculo_placa'] = 'nullable|string|max:255';
             $rules['hora_llegada'] = 'nullable|date_format:H:i';
@@ -330,6 +401,10 @@ class SalidasController extends Controller
             $rules['nombre_cliente'] = 'required|string|max:255';
             $rules['direccion_entrega'] = 'required|string|max:500';
             $rules['telefono_cliente'] = 'nullable|string|max:20';
+            $rules['chofer'] = 'nullable|string|max:255';
+            $rules['nombre_distribuidor'] = 'nullable|string|max:255';
+            $rules['vehiculo_placa'] = 'nullable|string|max:255';
+            $rules['hora_llegada'] = 'nullable|date_format:H:i';
             $rules['fecha'] = 'required|date';
         } elseif ($request->tipo_salida === 'Venta Directa') {
             $rules['nombre_cliente'] = 'required|string|max:255';
@@ -350,15 +425,19 @@ class SalidasController extends Controller
             'productos.*' => 'nullable|integer|min:0',
             'retornos' => 'nullable|array',
             'retornos.*' => 'nullable|integer|min:0',
-            'choreados_retorno' => 'nullable|integer|min:0',
             'observaciones' => 'nullable|string',
         ]);
 
         $validated = $request->validate($rules);
 
         // Normalizar nombre_distribuidor según el tipo de salida
-        if ($request->tipo_salida === 'Pedido Cliente' || $request->tipo_salida === 'Venta Directa') {
+        if ($request->tipo_salida === 'Venta Directa') {
             $validated['nombre_distribuidor'] = $validated['nombre_cliente'] ?? '';
+        } elseif ($request->tipo_salida === 'Pedido Cliente') {
+            // Si no hay distribuidor seleccionado, usar el nombre del cliente
+            if (empty($validated['nombre_distribuidor'])) {
+                $validated['nombre_distribuidor'] = $validated['nombre_cliente'] ?? '';
+            }
         }
 
         DB::beginTransaction();
@@ -372,11 +451,90 @@ class SalidasController extends Controller
             // Preparar datos para actualizar (sin el array de productos)
             $datosBasicos = array_diff_key($validated, ['productos' => '', 'retornos' => '']);
 
+            // Obtener productos enviados y retornos
+            $productosEnviados = $validated['productos'] ?? [];
+            $retornosRecibidos = $validated['retornos'] ?? [];
+
+            // Mapear productos enviados a campos específicos
+            $productosEnviadosMap = [
+                1 => 'botellones',           // Botellón 20L
+                3 => 'agua_natural',         // Agua Natural
+                4 => 'agua_saborizada',      // Agua Saborizada
+                6 => 'gelatina',             // Gelatina
+                8 => 'hielo',                // Hielo en Bolsa 3kg
+                9 => 'bolo_grande',          // Bolo Grande
+                10 => 'bolo_pequeño',        // Bolo Pequeño
+                11 => 'dispenser',           // Dispenser
+                12 => 'agua_limon',          // Agua De Limon
+            ];
+
+            // Mapear retornos a campos específicos
+            $retornosMap = [
+                1 => 'retorno_botellones',      // Botellón 20L
+                3 => 'retorno_agua_natural',    // Agua Natural
+                4 => 'retorno_agua_saborizada', // Agua Saborizada
+                6 => 'retorno_gelatina',        // Gelatina
+                8 => 'retorno_hielo',           // Hielo en Bolsa 3kg
+                9 => 'retorno_bolo_grande',     // Bolo Grande
+                10 => 'retorno_bolo_pequeno',   // Bolo Pequeño
+                11 => 'retorno_dispenser',      // Dispenser
+                12 => 'retorno_agua_limon',     // Agua De Limon
+            ];
+
+            // Inicializar campos de productos enviados
+            $datosBasicos['botellones'] = 0;
+            $datosBasicos['bolo_grande'] = 0;
+            $datosBasicos['bolo_pequeño'] = 0;
+            $datosBasicos['gelatina'] = 0;
+            $datosBasicos['agua_saborizada'] = 0;
+            $datosBasicos['agua_limon'] = 0;
+            $datosBasicos['agua_natural'] = 0;
+            $datosBasicos['hielo'] = 0;
+            $datosBasicos['dispenser'] = 0;
+            $datosBasicos['choreados'] = 0;
+
+            // Sumar productos enviados por tipo
+            foreach ($productosEnviados as $productoId => $cantidad) {
+                if ($cantidad > 0 && isset($productosEnviadosMap[$productoId])) {
+                    $campo = $productosEnviadosMap[$productoId];
+                    $datosBasicos[$campo] += $cantidad;
+                }
+            }
+
+            // Inicializar campos de retornos
+            $datosBasicos['retorno_botellones'] = 0;
+            $datosBasicos['retorno_bolo_grande'] = 0;
+            $datosBasicos['retorno_bolo_pequeno'] = 0;
+            $datosBasicos['retorno_gelatina'] = 0;
+            $datosBasicos['retorno_agua_saborizada'] = 0;
+            $datosBasicos['retorno_agua_limon'] = 0;
+            $datosBasicos['retorno_agua_natural'] = 0;
+            $datosBasicos['retorno_hielo'] = 0;
+            $datosBasicos['retorno_dispenser'] = 0;
+
+            // Sumar retornos por tipo
+            foreach ($retornosRecibidos as $productoId => $cantidad) {
+                if ($cantidad > 0 && isset($retornosMap[$productoId])) {
+                    $campo = $retornosMap[$productoId];
+                    $datosBasicos[$campo] += $cantidad;
+                }
+            }
+
+            // Calcular total de retornos
+            $datosBasicos['retornos'] = array_sum([
+                $datosBasicos['retorno_botellones'],
+                $datosBasicos['retorno_bolo_grande'],
+                $datosBasicos['retorno_bolo_pequeno'],
+                $datosBasicos['retorno_gelatina'],
+                $datosBasicos['retorno_agua_saborizada'],
+                $datosBasicos['retorno_agua_limon'],
+                $datosBasicos['retorno_agua_natural'],
+                $datosBasicos['retorno_hielo'],
+                $datosBasicos['retorno_dispenser'],
+            ]);
+
             // Actualizar el registro de salida
             $salida->update($datosBasicos);
-
-            // Obtener productos enviados
-            $productosEnviados = $validated['productos'] ?? [];
 
             // Registrar cada producto en el inventario como SALIDA
             foreach ($productosEnviados as $productoId => $cantidad) {
@@ -400,7 +558,6 @@ class SalidasController extends Controller
             }
 
             // Registrar RETORNOS en el inventario como ENTRADA
-            $retornosRecibidos = $validated['retornos'] ?? [];
             foreach ($retornosRecibidos as $productoId => $cantidad) {
                 if ($cantidad > 0) {
                     $producto = Producto::find($productoId);

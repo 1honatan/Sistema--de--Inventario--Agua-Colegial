@@ -347,42 +347,6 @@
 
     <!-- Secciones Informativas - Primera Fila -->
     <div class="row g-3 mb-4">
-        <!-- Listado de Productos -->
-        <div class="col-lg-4">
-            <div class="info-section">
-                <div class="section-header">
-                    <i class="fas fa-boxes"></i>
-                    <h4>Productos</h4>
-                </div>
-                @if($listaProductos->count() > 0)
-                    @foreach($listaProductos as $producto)
-                    <div class="movement-item">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div style="font-weight: 600; color: #1e293b; font-size: 0.85rem;">{{ $producto->nombre }}</div>
-                                <small class="text-muted">{{ $producto->tipo ?? 'General' }}</small>
-                            </div>
-                            <div class="text-end">
-                                <div style="font-weight: 800; color: {{ $producto->stock_actual < 50 ? '#dc2626' : '#16a34a' }}; font-size: 1rem;">{{ number_format($producto->stock_actual) }}</div>
-                                <small class="text-muted">stock</small>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                    <div class="text-center mt-3">
-                        <a href="{{ route('inventario.index') }}" class="btn-view">
-                            Ver Todos <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </div>
-                @else
-                    <div class="empty-state">
-                        <i class="fas fa-box-open"></i>
-                        <p>No hay productos registrados</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-
         <!-- Listado de Personal -->
         <div class="col-lg-4">
             <div class="info-section">
@@ -508,42 +472,6 @@
 
     </div>
 
-    <!-- Alertas de Stock Bajo -->
-    <div class="row" id="stock-bajo-section" style="{{ $productosStockBajo->count() > 0 ? '' : 'display: none;' }}">
-        <div class="col-12">
-            <div class="info-section">
-                <div class="section-header">
-                    <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
-                    <h4>Productos con Stock Bajo</h4>
-                </div>
-                <div class="row g-3" id="stock-bajo-container">
-                    @foreach($productosStockBajo->take(6) as $producto)
-                    <div class="col-md-6 col-lg-4">
-                        <div class="alert-card">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <div class="alert-card-title">{{ $producto->nombre }}</div>
-                                    <small style="color: #92400e;">{{ $producto->tipo ?? 'General' }}</small>
-                                </div>
-                                <div class="text-end">
-                                    <div class="alert-card-stock">{{ $producto->stock_actual }}</div>
-                                    <small style="color: #92400e;">unidades</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-                @if($productosStockBajo->count() > 6)
-                <div class="text-center mt-3">
-                    <a href="{{ route('inventario.index') }}" class="btn-view">
-                        Ver Todos ({{ $productosStockBajo->count() }}) <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-                @endif
-            </div>
-        </div>
-    </div>
 </div>
 @endsection
 
@@ -572,9 +500,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Actualizar mantenimientos pendientes
                 actualizarMantenimientos(data.mantenimientos_pendientes);
-
-                // Actualizar productos con stock bajo
-                actualizarStockBajo(data.productos_stock_bajo);
             })
             .catch(error => console.error('Error actualizando dashboard:', error));
     }
@@ -657,37 +582,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p>No hay mantenimientos pendientes</p>
                 </div>
             `;
-        }
-    }
-
-    function actualizarStockBajo(productos) {
-        const section = document.getElementById('stock-bajo-section');
-        const container = document.getElementById('stock-bajo-container');
-
-        if (productos.length > 0) {
-            section.style.display = '';
-            let html = '';
-            productos.forEach(producto => {
-                html += `
-                    <div class="col-md-6 col-lg-4">
-                        <div class="alert-card">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <div class="alert-card-title">${producto.nombre}</div>
-                                    <small style="color: #92400e;">${producto.tipo}</small>
-                                </div>
-                                <div class="text-end">
-                                    <div class="alert-card-stock">${producto.stock_actual}</div>
-                                    <small style="color: #92400e;">unidades</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        } else {
-            section.style.display = 'none';
         }
     }
 

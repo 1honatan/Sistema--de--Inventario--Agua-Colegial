@@ -13,12 +13,20 @@ use Illuminate\Support\Facades\DB;
 
 class ProduccionDiariaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        // Obtener la semana actual o la semana solicitada
+        $semana = (int) $request->get('semana', 0); // 0 = semana actual, -1 = anterior, 1 = siguiente
+
+        $inicioSemana = now()->addWeeks($semana)->startOfWeek(); // Lunes
+        $finSemana = now()->addWeeks($semana)->endOfWeek(); // Domingo
+
         $producciones = ProduccionDiaria::with(['productos', 'materiales'])
+            ->whereBetween('fecha', [$inicioSemana->format('Y-m-d'), $finSemana->format('Y-m-d')])
             ->orderBy('fecha', 'desc')
-            ->paginate(15);
-        return view('control.produccion.index', compact('producciones'));
+            ->get();
+
+        return view('control.produccion.index', compact('producciones', 'inicioSemana', 'finSemana', 'semana'));
     }
 
     public function create()
@@ -47,7 +55,6 @@ class ProduccionDiariaController extends Controller
             'productos' => 'required|array|min:1',
             'productos.*.producto' => 'required|string',
             'productos.*.cantidad' => 'required|numeric|min:1',
-            'productos.*.unidad_medida' => 'nullable|string',
             'materiales' => 'nullable|array',
             'materiales.*.material' => 'nullable|string',
             'materiales.*.cantidad' => 'nullable|numeric|min:0',
@@ -78,7 +85,6 @@ class ProduccionDiariaController extends Controller
                     $produccion->productos()->create([
                         'producto_id' => $producto->id,
                         'cantidad' => $productoData['cantidad'],
-                        'unidad_medida' => $productoData['unidad_medida'] ?? null,
                     ]);
 
                     // Registrar entrada en el inventario general
@@ -151,7 +157,6 @@ class ProduccionDiariaController extends Controller
             'productos' => 'required|array|min:1',
             'productos.*.producto' => 'required|string',
             'productos.*.cantidad' => 'required|numeric|min:1',
-            'productos.*.unidad_medida' => 'nullable|string',
             'materiales' => 'nullable|array',
             'materiales.*.material' => 'nullable|string',
             'materiales.*.cantidad' => 'nullable|numeric|min:0',
@@ -183,7 +188,6 @@ class ProduccionDiariaController extends Controller
                     $produccion->productos()->create([
                         'producto_id' => $producto->id,
                         'cantidad' => $productoData['cantidad'],
-                        'unidad_medida' => $productoData['unidad_medida'] ?? null,
                     ]);
 
                     // Registrar entrada en el inventario general

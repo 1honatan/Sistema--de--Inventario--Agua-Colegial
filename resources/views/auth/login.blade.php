@@ -8,6 +8,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <style>
+        /* Tamaño de fuente base reducido al 80% */
+        html {
+            font-size: 80%;
+        }
+
         body {
             background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #14b8a6 100%);
             min-height: 100vh;
@@ -133,21 +138,6 @@
             color: #16a34a;
         }
 
-        .forgot-password {
-            text-align: center;
-            margin-top: 1rem;
-        }
-
-        .forgot-password a {
-            color: #64748b;
-            text-decoration: none;
-            font-size: 0.85rem;
-            transition: color 0.2s;
-        }
-
-        .forgot-password a:hover {
-            color: #0ea5e9;
-        }
     </style>
 </head>
 <body>
@@ -224,14 +214,6 @@
                         <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
                     </button>
                 </form>
-
-                @if(Route::has('password.request'))
-                <div class="forgot-password">
-                    <a href="{{ route('password.request') }}">
-                        <i class="fas fa-key me-1"></i>¿Olvidaste tu contraseña?
-                    </a>
-                </div>
-                @endif
             </div>
         </div>
     </div>

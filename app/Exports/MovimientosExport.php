@@ -60,7 +60,7 @@ class MovimientosExport implements FromCollection, WithHeadings, WithMapping, Wi
             $movimiento->fecha_movimiento->format('d/m/Y'),
             $movimiento->fecha_movimiento->format('H:i:s'),
             $movimiento->producto->nombre ?? '-',
-            $movimiento->producto->tipoProducto->nombre ?? '-',
+            $movimiento->producto->tipo ?? '-',
             ucfirst($movimiento->tipo_movimiento),
             $movimiento->cantidad,
             $movimiento->producto->unidad_medida ?? 'unidades',

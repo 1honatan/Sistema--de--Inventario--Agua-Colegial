@@ -350,7 +350,7 @@
                                     <i class="fas fa-calendar-alt"></i>
                                     Fecha
                                 </div>
-                                <input type="date" name="fecha" id="fecha_despacho" class="form-input @error('fecha') is-invalid @enderror" value="{{ old('fecha', $salida->fecha->format('Y-m-d')) }}">
+                                <input type="date" name="fecha" id="fecha_despacho" class="form-input @error('fecha') is-invalid @enderror" value="{{ old('fecha', $salida->fecha->format('Y-m-d')) }}" readonly style="background-color: #f3f4f6; cursor: not-allowed;">
                                 @error('fecha')
                                     <div class="text-danger mt-2">{{ $message }}</div>
                                 @enderror
@@ -374,7 +374,7 @@
 
                 <!-- Campos para PEDIDO CLIENTE -->
                 <div id="campos-pedido-cliente" class="tipo-salida-fields" style="display: none;">
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col-md-4">
                             <div class="input-group">
                                 <div class="input-label required">
@@ -420,8 +420,83 @@
                                     <i class="fas fa-calendar-alt"></i>
                                     Fecha
                                 </div>
-                                <input type="date" name="fecha" id="fecha_pedido" class="form-input @error('fecha') is-invalid @enderror" value="{{ old('fecha', $salida->fecha->format('Y-m-d')) }}">
+                                <input type="date" name="fecha" id="fecha_pedido" class="form-input @error('fecha') is-invalid @enderror" value="{{ old('fecha', $salida->fecha->format('Y-m-d')) }}" readonly style="background-color: #f3f4f6; cursor: not-allowed;">
                                 @error('fecha')
+                                    <div class="text-danger mt-2">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <div class="input-label">
+                                    <i class="fas fa-user"></i>
+                                    Chofer
+                                </div>
+                                <select name="chofer" id="chofer_pedido" class="form-select @error('chofer') is-invalid @enderror">
+                                    <option value="">Seleccione...</option>
+                                    @foreach($choferes ?? [] as $chofer)
+                                        <option value="{{ $chofer->nombre_completo }}" {{ old('chofer', $salida->chofer) == $chofer->nombre_completo ? 'selected' : '' }}>
+                                            {{ $chofer->nombre_completo }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('chofer')
+                                    <div class="text-danger mt-2">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="input-group">
+                                <div class="input-label">
+                                    <i class="fas fa-user-tie"></i>
+                                    Distribuidor
+                                </div>
+                                <select name="nombre_distribuidor" id="distribuidor_pedido" class="form-select @error('nombre_distribuidor') is-invalid @enderror">
+                                    <option value="">Seleccione...</option>
+                                    @foreach($distribuidores ?? [] as $distribuidor)
+                                        <option value="{{ $distribuidor->nombre_completo }}" {{ old('nombre_distribuidor', $salida->nombre_distribuidor) == $distribuidor->nombre_completo ? 'selected' : '' }}>
+                                            {{ $distribuidor->nombre_completo }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('nombre_distribuidor')
+                                    <div class="text-danger mt-2">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <div class="input-label">
+                                    <i class="fas fa-car"></i>
+                                    Vehículo
+                                </div>
+                                <select name="vehiculo_placa" id="vehiculo_pedido" class="form-select @error('vehiculo_placa') is-invalid @enderror">
+                                    <option value="">Seleccione...</option>
+                                    @foreach($vehiculos ?? [] as $vehiculo)
+                                        <option value="{{ $vehiculo->placa }}" {{ old('vehiculo_placa', $salida->vehiculo_placa) == $vehiculo->placa ? 'selected' : '' }}>
+                                            {{ $vehiculo->placa }} - {{ $vehiculo->marca }} {{ $vehiculo->modelo }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('vehiculo_placa')
+                                    <div class="text-danger mt-2">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="input-group">
+                                <div class="input-label">
+                                    <i class="fas fa-clock"></i>
+                                    Hora de Llegada
+                                </div>
+                                <input type="time" name="hora_llegada" id="hora_llegada_pedido" class="form-input @error('hora_llegada') is-invalid @enderror" value="{{ old('hora_llegada', $salida->hora_llegada ? \Carbon\Carbon::parse($salida->hora_llegada)->format('H:i') : '') }}">
+                                @error('hora_llegada')
                                     <div class="text-danger mt-2">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -454,7 +529,13 @@
                                 <select name="responsable_venta" id="responsable_venta" class="form-select @error('responsable_venta') is-invalid @enderror">
                                     <option value="">Seleccione un responsable...</option>
                                     @foreach($responsablesVenta ?? [] as $responsable)
-                                        <option value="{{ $responsable->nombre_completo }}" {{ old('responsable_venta', $salida->responsable_venta) == $responsable->nombre_completo ? 'selected' : '' }}>
+                                        @php
+                                            $isCurrentUser = auth()->check() &&
+                                                             auth()->user()->personal &&
+                                                             auth()->user()->personal->id === $responsable->id;
+                                            $shouldAutoSelect = $isCurrentUser && auth()->user()->rol->nombre === 'produccion';
+                                        @endphp
+                                        <option value="{{ $responsable->nombre_completo }}" {{ old('responsable_venta', $salida->responsable_venta) == $responsable->nombre_completo || (!old('responsable_venta') && !$salida->responsable_venta && $shouldAutoSelect) ? 'selected' : '' }}>
                                             {{ $responsable->nombre_completo }} ({{ $responsable->cargo }})
                                         </option>
                                     @endforeach
@@ -556,19 +637,6 @@
                                            style="border-color: #fbbf24;">
                                 </div>
                                 @endforeach
-
-                                <div class="product-box" style="border-color: #fbbf24;">
-                                    <label style="color: #92400e;">
-                                        <i class="fas fa-tint" style="color: #f59e0b;"></i> Chorreados Retorno
-                                    </label>
-                                    <input type="number"
-                                           name="choreados_retorno"
-                                           id="choreados_retorno"
-                                           value="{{ old('choreados_retorno', $salida->choreados_retorno ?? 0) }}"
-                                           min="0"
-                                           data-retorno-input
-                                           style="border-color: #fbbf24;">
-                                </div>
                             </div>
                         </div>
                     </div>

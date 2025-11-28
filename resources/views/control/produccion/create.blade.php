@@ -122,6 +122,8 @@
                                                id="fecha"
                                                class="modern-input @error('fecha') is-invalid @enderror"
                                                value="{{ old('fecha', date('Y-m-d')) }}"
+                                               readonly
+                                               style="background-color: #e5e7eb; cursor: not-allowed;"
                                                required>
                                         @error('fecha')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -140,7 +142,14 @@
                                                 required>
                                             <option value="">Seleccione un responsable...</option>
                                             @foreach($personal ?? [] as $persona)
-                                                <option value="{{ $persona->nombre_completo }}" {{ old('responsable') == $persona->nombre_completo ? 'selected' : '' }}>
+                                                @php
+                                                    $isCurrentUser = auth()->check() &&
+                                                                     auth()->user()->personal &&
+                                                                     auth()->user()->personal->id === $persona->id;
+                                                    $shouldAutoSelect = $isCurrentUser && auth()->user()->rol->nombre === 'produccion';
+                                                @endphp
+                                                <option value="{{ $persona->nombre_completo }}"
+                                                        {{ old('responsable') == $persona->nombre_completo || $shouldAutoSelect ? 'selected' : '' }}>
                                                     {{ $persona->nombre_completo }} ({{ $persona->cargo }})
                                                 </option>
                                             @endforeach
@@ -198,23 +207,6 @@
                                                        value="0"
                                                        data-product-qty
                                                        required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label class="form-label">
-                                                    <i class="fas fa-ruler"></i> Unidad
-                                                </label>
-                                                <select name="productos[0][unidad_medida]" class="modern-select">
-                                                    <option value="">Seleccione...</option>
-                                                    <option value="10 unidades">10 unidades</option>
-                                                    <option value="25 unidades">25 unidades</option>
-                                                    <option value="50 unidades">50 unidades</option>
-                                                    <option value="100 unidades">100 unidades</option>
-                                                    <option value="20 litros">20 litros</option>
-                                                    <option value="bolsa">Bolsa</option>
-                                                    <option value="unidad">Unidad</option>
-                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-md-1">
@@ -402,23 +394,6 @@
                             <input type="number" name="productos[${productoIndex}][cantidad]" class="modern-input text-center" min="0" value="0" data-product-qty required>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-ruler"></i> Unidad
-                            </label>
-                            <select name="productos[${productoIndex}][unidad_medida]" class="modern-select">
-                                <option value="">Seleccione...</option>
-                                <option value="10 unidades">10 unidades</option>
-                                <option value="25 unidades">25 unidades</option>
-                                <option value="50 unidades">50 unidades</option>
-                                <option value="100 unidades">100 unidades</option>
-                                <option value="20 litros">20 litros</option>
-                                <option value="bolsa">Bolsa</option>
-                                <option value="unidad">Unidad</option>
-                            </select>
-                        </div>
-                    </div>
                     <div class="col-md-1">
                         <button type="button" class="btn-remove-item w-100" onclick="eliminarItem(this)" title="Eliminar">
                             <i class="fas fa-trash"></i>
@@ -429,7 +404,6 @@
         `;
         $('#productos-container').append(html);
         ModernComponents.initModernSelect2(`select[name="productos[${productoIndex}][producto]"]`);
-        ModernComponents.initModernSelect2(`select[name="productos[${productoIndex}][unidad_medida]"]`);
         productoIndex++;
     }
 

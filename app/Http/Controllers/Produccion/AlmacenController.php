@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Produccion;
 
 use App\Http\Controllers\Controller;
 use App\Models\Producto;
-use App\Models\TipoProducto;
+// use App\Models\TipoProducto; // ELIMINADO
 use App\Models\Inventario;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -30,7 +30,7 @@ class AlmacenController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Producto::with('tipoProducto');
+        $query = Producto::query();
 
         // Filtrar por tipo si se proporciona
         if ($request->filled('tipo')) {
@@ -59,8 +59,7 @@ class AlmacenController extends Controller
      */
     public function create(): View
     {
-        $tiposProducto = TipoProducto::all();
-        return view('produccion.almacen.create', compact('tiposProducto'));
+        return view('produccion.almacen.create');
     }
 
     /**
@@ -101,10 +100,9 @@ class AlmacenController extends Controller
      */
     public function edit(Producto $producto): View
     {
-        $tiposProducto = TipoProducto::all();
         $producto->stock_disponible = Inventario::stockDisponible($producto->id);
 
-        return view('produccion.almacen.edit', compact('producto', 'tiposProducto'));
+        return view('produccion.almacen.edit', compact('producto'));
     }
 
     /**

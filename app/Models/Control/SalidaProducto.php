@@ -11,11 +11,11 @@ class SalidaProducto extends Model
     protected $fillable = [
         'tipo_salida',
         'nombre_distribuidor',
+        'chofer',
         'nombre_cliente',
         'direccion_entrega',
         'telefono_cliente',
-        'monto_total',
-        'metodo_pago',
+        'responsable',
         'responsable_venta',
         'vehiculo_placa',
         'fecha',
@@ -46,7 +46,6 @@ class SalidaProducto extends Model
         'hielo',
         'dispenser',
         'choreados',
-        'choreados_retorno',
         'hora_llegada',
         'observaciones',
     ];

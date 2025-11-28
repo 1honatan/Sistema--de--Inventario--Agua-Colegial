@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProductoRequest;
 use App\Http\Requests\UpdateProductoRequest;
 use App\Models\Producto;
-use App\Models\TipoProducto;
+// use App\Models\TipoProducto; // ELIMINADO
 use App\Models\Inventario;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -22,46 +22,36 @@ use Illuminate\View\View;
 class ProductoController extends Controller
 {
     /**
-     * Redirigir al inventario general (catálogo deshabilitado).
+     * Listar todos los productos con filtros.
      */
-    public function index(Request $request): RedirectResponse
-    {
-        // El catálogo de productos ha sido deshabilitado
-        // Redirigir al inventario general donde se pueden ver todos los productos
-        return redirect()->route('inventario.index')
-            ->with('info', 'El catálogo de productos se ha movido al Inventario General');
-    }
-
-    /**
-     * MÉTODO DESHABILITADO - Listar todos los productos.
-     */
-    private function index_OLD(Request $request): View
+    public function index(Request $request): View
     {
         $query = Producto::query();
 
-        // Filtrar por tipo si se proporciona
+        // Filtrar por tipo
         if ($request->filled('tipo')) {
             $query->where('tipo', $request->tipo);
         }
 
-        // Filtrar por estado si se proporciona
+        // Filtrar por estado
         if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
         }
 
-        $productos = $query->orderBy('tipo')
-            ->orderBy('nombre')
-            ->paginate(20);
+        // Buscar por nombre
+        if ($request->filled('buscar')) {
+            $query->where('nombre', 'like', '%' . $request->buscar . '%');
+        }
+
+        $productos = $query->orderBy('nombre')
+            ->paginate(12);
 
         // Calcular stock para cada producto
         foreach ($productos as $producto) {
             $producto->stock_actual = Inventario::stockDisponible($producto->id);
         }
 
-        // Obtener tipos únicos para filtro
-        $tipos = Producto::distinct()->pluck('tipo');
-
-        return view('admin.productos.index', compact('productos', 'tipos'));
+        return view('admin.productos.index', compact('productos'));
     }
 
     /**
@@ -69,8 +59,7 @@ class ProductoController extends Controller
      */
     public function create(): View
     {
-        $tiposProducto = TipoProducto::activos()->ordenadoPorNombre()->get();
-        return view('admin.productos.create', compact('tiposProducto'));
+        return view('admin.productos.create');
     }
 
     /**
@@ -91,8 +80,7 @@ class ProductoController extends Controller
      */
     public function edit(Producto $producto): View
     {
-        $tiposProducto = TipoProducto::activos()->ordenadoPorNombre()->get();
-        return view('admin.productos.edit', compact('producto', 'tiposProducto'));
+        return view('admin.productos.edit', compact('producto'));
     }
 
     /**
