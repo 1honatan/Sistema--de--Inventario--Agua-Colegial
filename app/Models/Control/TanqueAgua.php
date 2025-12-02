@@ -3,6 +3,8 @@
 namespace App\Models\Control;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Personal;
 
 class TanqueAgua extends Model
 {
@@ -25,4 +27,24 @@ class TanqueAgua extends Model
         'proxima_limpieza' => 'date',
         'capacidad_litros' => 'decimal:2',
     ];
+
+    /**
+     * Relación: Responsable de la limpieza del tanque
+     * Nota: Actualmente 'responsable' es un string.
+     * TODO: Migrar a responsable_id (foreignId a personal)
+     */
+    // public function responsablePersonal(): BelongsTo
+    // {
+    //     return $this->belongsTo(Personal::class, 'responsable_id');
+    // }
+
+    /**
+     * Relación: Supervisor de la limpieza
+     * Nota: Actualmente 'supervisado_por' es un string.
+     * TODO: Migrar a supervisado_por_id (foreignId a personal)
+     */
+    // public function supervisor(): BelongsTo
+    // {
+    //     return $this->belongsTo(Personal::class, 'supervisado_por_id');
+    // }
 }

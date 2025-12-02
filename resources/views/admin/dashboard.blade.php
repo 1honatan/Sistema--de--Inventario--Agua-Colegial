@@ -238,6 +238,16 @@
 
 @section('content')
 <div class="container-fluid px-4 py-4">
+    <!-- Título de Acceso Rápido -->
+    <div class="mb-3" style="text-align: center;">
+        <h2 style="font-size: 1.75rem; font-weight: 800; color: #0c4a6e; text-transform: uppercase; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-bolt" style="color: #0ea5e9; font-size: 1.5rem;"></i>
+            Acceso Rápido
+            <i class="fas fa-bolt" style="color: #0ea5e9; font-size: 1.5rem;"></i>
+        </h2>
+        <div style="height: 3px; background: linear-gradient(to right, transparent, #0ea5e9, transparent); margin-top: 0.5rem; border-radius: 2px;"></div>
+    </div>
+
     <!-- Tarjetas en Fila Horizontal -->
     <div class="cards-row mb-4">
         <a href="{{ route('control.salidas.index') }}" style="text-decoration: none;">

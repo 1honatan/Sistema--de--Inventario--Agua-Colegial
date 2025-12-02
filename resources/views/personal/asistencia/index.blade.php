@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Mi Asistencia')
-@section('page-title', 'Control de Asistencia')
-@section('page-subtitle', 'Registra tu entrada, salida o ausencia')
+@section('page-title', 'Mi Historial de Asistencia')
+@section('page-subtitle', 'Asistencias registradas por el administrador')
 
 @section('content')
 <div class="max-w-7xl mx-auto space-y-6">
@@ -92,146 +92,21 @@
         </div>
     </div>
 
-    <!-- Estado de hoy -->
-    <div class="bg-white rounded-lg shadow-md p-8">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">
-            <i class="fas fa-calendar-day text-green-600 mr-2"></i>
-            Asistencia de Hoy - {{ today()->format('d/m/Y') }}
-        </h2>
-
-        @if($asistenciaHoy)
-            <!-- Ya registró asistencia -->
-            <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <p class="text-sm text-gray-600">Estado</p>
-                        <p class="text-lg font-bold text-green-700 uppercase">{{ $asistenciaHoy->estado }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-600">Hora de Entrada</p>
-                        <p class="text-lg font-bold text-gray-800">
-                            {{ $asistenciaHoy->hora_entrada ? \Carbon\Carbon::parse($asistenciaHoy->hora_entrada)->format('H:i') : 'N/A' }}
-                        </p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-600">Hora de Salida</p>
-                        <p class="text-lg font-bold text-gray-800">
-                            {{ $asistenciaHoy->hora_salida ? \Carbon\Carbon::parse($asistenciaHoy->hora_salida)->format('H:i') : 'Pendiente' }}
-                        </p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-600">Horas Trabajadas</p>
-                        <p class="text-lg font-bold text-gray-800">
-                            {{ $asistenciaHoy->horasTrabajadas() ? number_format($asistenciaHoy->horasTrabajadas(), 2) . ' hrs' : 'N/A' }}
-                        </p>
-                    </div>
-                </div>
-                @if($asistenciaHoy->observaciones)
-                    <div class="mt-4">
-                        <p class="text-sm text-gray-600">Observaciones</p>
-                        <p class="text-gray-800">{{ $asistenciaHoy->observaciones }}</p>
-                    </div>
-                @endif
-            </div>
-
-            @if($asistenciaHoy->estado === 'entrada' && !$asistenciaHoy->hora_salida)
-                <!-- Puede registrar salida -->
-                <form action="{{ route('personal.asistencia.salida') }}" method="POST" class="space-y-4">
-                    @csrf
-                    <div>
-                        <label for="observaciones" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Observaciones (Opcional)
-                        </label>
-                        <textarea
-                            name="observaciones"
-                            id="observaciones"
-                            rows="3"
-                            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500"
-                            placeholder="Ingrese cualquier observación sobre su salida..."
-                        ></textarea>
-                    </div>
-                    <button
-                        type="submit"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition shadow-md hover:shadow-lg"
-                    >
-                        <i class="fas fa-sign-out-alt mr-2"></i>
-                        Registrar Salida
-                    </button>
-                </form>
-            @endif
-        @else
-            <!-- No ha registrado asistencia hoy -->
-            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded mb-6">
-                <p class="text-blue-900">
-                    <i class="fas fa-info-circle mr-2"></i>
-                    No has registrado tu asistencia el día de hoy. Por favor, registra tu entrada, salida o ausencia.
+    <!-- Información para el personal -->
+    <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg">
+        <div class="flex items-start">
+            <i class="fas fa-info-circle text-blue-600 text-2xl mr-4 mt-1"></i>
+            <div>
+                <h3 class="text-lg font-bold text-blue-900 mb-2">Información Importante</h3>
+                <p class="text-blue-800">
+                    Su asistencia es registrada únicamente por el administrador del sistema.
+                    Aquí puede consultar su historial de asistencias, entradas, salidas y ausencias.
+                </p>
+                <p class="text-blue-800 mt-2">
+                    Para cualquier corrección o consulta sobre su asistencia, por favor contacte al administrador.
                 </p>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Registrar Entrada -->
-                <form action="{{ route('personal.asistencia.entrada') }}" method="POST" class="space-y-4">
-                    @csrf
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-6">
-                        <h3 class="text-xl font-bold text-green-800 mb-4">
-                            <i class="fas fa-sign-in-alt mr-2"></i>
-                            Registrar Entrada
-                        </h3>
-                        <div>
-                            <label for="observaciones_entrada" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Observaciones (Opcional)
-                            </label>
-                            <textarea
-                                name="observaciones"
-                                id="observaciones_entrada"
-                                rows="3"
-                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500"
-                                placeholder="Ej: Llegué temprano para preparar..."
-                            ></textarea>
-                        </div>
-                        <button
-                            type="submit"
-                            class="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition shadow-md hover:shadow-lg mt-4"
-                        >
-                            <i class="fas fa-check mr-2"></i>
-                            Registrar Entrada
-                        </button>
-                    </div>
-                </form>
-
-                <!-- Registrar Ausencia -->
-                <form action="{{ route('personal.asistencia.ausencia') }}" method="POST" class="space-y-4">
-                    @csrf
-                    <div class="bg-red-50 border border-red-200 rounded-lg p-6">
-                        <h3 class="text-xl font-bold text-red-800 mb-4">
-                            <i class="fas fa-user-times mr-2"></i>
-                            Registrar Ausencia
-                        </h3>
-                        <div>
-                            <label for="observaciones_ausencia" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Motivo de Ausencia <span class="text-red-500">*</span>
-                            </label>
-                            <textarea
-                                name="observaciones"
-                                id="observaciones_ausencia"
-                                rows="3"
-                                required
-                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500"
-                                placeholder="Ej: Permiso médico, emergencia familiar..."
-                            ></textarea>
-                        </div>
-                        <button
-                            type="submit"
-                            class="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition shadow-md hover:shadow-lg mt-4"
-                            onclick="return confirm('¿Está seguro de registrar su ausencia?')"
-                        >
-                            <i class="fas fa-exclamation-triangle mr-2"></i>
-                            Registrar Ausencia
-                        </button>
-                    </div>
-                </form>
-            </div>
-        @endif
+        </div>
     </div>
 
     <!-- Historial reciente -->
@@ -266,25 +141,33 @@
                                     {{ $asistencia->fecha->format('d/m/Y') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($asistencia->estado === 'entrada')
+                                    @if($asistencia->estado === 'presente')
                                         <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                            <i class="fas fa-sign-in-alt mr-1"></i>Entrada
+                                            <i class="fas fa-check-circle mr-1"></i>Presente
                                         </span>
-                                    @elseif($asistencia->estado === 'salida')
-                                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                                            <i class="fas fa-sign-out-alt mr-1"></i>Salida
-                                        </span>
-                                    @else
+                                    @elseif($asistencia->estado === 'ausente')
                                         <span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
                                             <i class="fas fa-user-times mr-1"></i>Ausente
+                                        </span>
+                                    @elseif($asistencia->estado === 'permiso')
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                            <i class="fas fa-file-signature mr-1"></i>Permiso
+                                        </span>
+                                    @elseif($asistencia->estado === 'tardanza')
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">
+                                            <i class="fas fa-clock mr-1"></i>Tardanza
+                                        </span>
+                                    @else
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                            {{ ucfirst($asistencia->estado) }}
                                         </span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $asistencia->hora_entrada ? \Carbon\Carbon::parse($asistencia->hora_entrada)->format('H:i') : '-' }}
+                                    {{ $asistencia->entrada_hora ? \Carbon\Carbon::parse($asistencia->entrada_hora)->format('H:i') : '-' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $asistencia->hora_salida ? \Carbon\Carbon::parse($asistencia->hora_salida)->format('H:i') : '-' }}
+                                    {{ $asistencia->salida_hora ? \Carbon\Carbon::parse($asistencia->salida_hora)->format('H:i') : '-' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ $asistencia->horasTrabajadas() ? number_format($asistencia->horasTrabajadas(), 2) : '-' }}

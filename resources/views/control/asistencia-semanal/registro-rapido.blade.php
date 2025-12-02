@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('title', 'Registro Rápido de Asistencia')
-@section('page-subtitle', 'Marcar entrada y salida del personal - ' . $hoy->format('d/m/Y'))
 
 @push('styles')
 <style>

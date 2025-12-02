@@ -87,25 +87,33 @@
                                     {{ $asistencia->fecha->format('d/m/Y') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($asistencia->estado === 'entrada')
+                                    @if($asistencia->estado === 'presente')
                                         <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                            <i class="fas fa-sign-in-alt mr-1"></i>Entrada
+                                            <i class="fas fa-check-circle mr-1"></i>Presente
                                         </span>
-                                    @elseif($asistencia->estado === 'salida')
-                                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                                            <i class="fas fa-sign-out-alt mr-1"></i>Salida
-                                        </span>
-                                    @else
+                                    @elseif($asistencia->estado === 'ausente')
                                         <span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
                                             <i class="fas fa-user-times mr-1"></i>Ausente
+                                        </span>
+                                    @elseif($asistencia->estado === 'permiso')
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                            <i class="fas fa-file-signature mr-1"></i>Permiso
+                                        </span>
+                                    @elseif($asistencia->estado === 'tardanza')
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">
+                                            <i class="fas fa-clock mr-1"></i>Tardanza
+                                        </span>
+                                    @else
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                            {{ ucfirst($asistencia->estado) }}
                                         </span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $asistencia->hora_entrada ? \Carbon\Carbon::parse($asistencia->hora_entrada)->format('H:i') : '-' }}
+                                    {{ $asistencia->entrada_hora ? \Carbon\Carbon::parse($asistencia->entrada_hora)->format('H:i') : '-' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $asistencia->hora_salida ? \Carbon\Carbon::parse($asistencia->hora_salida)->format('H:i') : '-' }}
+                                    {{ $asistencia->salida_hora ? \Carbon\Carbon::parse($asistencia->salida_hora)->format('H:i') : '-' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">
                                     @if($asistencia->horasTrabajadas())

@@ -59,6 +59,19 @@ class MantenimientoController extends Controller
             'supervisado_por' => 'required|string',
         ]);
 
+        // Validar duplicados: Evitar múltiples mantenimientos del mismo equipo en la misma fecha
+        $equiposTextoValidacion = implode(', ', $validated['equipo']);
+        $existeDuplicado = MantenimientoEquipo::whereDate('fecha', $validated['fecha'])
+            ->where('id_personal', $validated['id_personal'])
+            ->whereRaw("JSON_CONTAINS(equipo, ?)", [json_encode($validated['equipo'][0])])
+            ->exists();
+
+        if ($existeDuplicado) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Ya existe un registro de mantenimiento para este equipo en la fecha ' . date('d/m/Y', strtotime($validated['fecha'])) . '. Por favor, verifique los registros existentes.']);
+        }
+
         // El campo detalle_mantenimiento ahora es generado automáticamente
         $equiposTexto = implode(', ', $validated['equipo']);
         $productosTexto = implode(', ', $validated['productos_limpieza']);

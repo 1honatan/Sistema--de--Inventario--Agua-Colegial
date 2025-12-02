@@ -23,8 +23,6 @@ class AsistenciaSemanal extends Model
 
     protected $casts = [
         'fecha' => 'date',
-        'entrada_hora' => 'datetime:H:i',
-        'salida_hora' => 'datetime:H:i',
     ];
 
     /**
@@ -93,5 +91,97 @@ class AsistenciaSemanal extends Model
     public function scopePorPersonal($query, $personalId)
     {
         return $query->where('personal_id', $personalId);
+    }
+
+    /**
+     * Scope para filtrar por mes actual
+     */
+    public function scopeDelMes($query)
+    {
+        return $query->whereBetween('fecha', [
+            now()->startOfMonth(),
+            now()->endOfMonth()
+        ]);
+    }
+
+    /**
+     * Calcular horas trabajadas total
+     */
+    public function horasTrabajadas(): float
+    {
+        if (!$this->entrada_hora || !$this->salida_hora) {
+            return 0;
+        }
+
+        // Parsear entrada y salida directamente
+        $entrada = Carbon::parse($this->entrada_hora);
+        $salida = Carbon::parse($this->salida_hora);
+
+        return $entrada->diffInHours($salida, true);
+    }
+
+    /**
+     * Obtener asistencia de hoy para un personal específico
+     */
+    public static function obtenerAsistenciaHoy($personalId)
+    {
+        return self::where('personal_id', $personalId)
+            ->whereDate('fecha', today())
+            ->first();
+    }
+
+    /**
+     * Registrar entrada de asistencia
+     */
+    public static function registrarEntrada($personalId, $observaciones = null)
+    {
+        return self::updateOrCreate(
+            [
+                'personal_id' => $personalId,
+                'fecha' => today(),
+            ],
+            [
+                'dia_semana' => self::obtenerDiaSemana(now()),
+                'entrada_hora' => now()->format('H:i'),
+                'observaciones' => $observaciones,
+                'estado' => 'presente',
+            ]
+        );
+    }
+
+    /**
+     * Registrar salida de asistencia
+     */
+    public static function registrarSalida($personalId)
+    {
+        $asistencia = self::where('personal_id', $personalId)
+            ->whereDate('fecha', today())
+            ->first();
+
+        if ($asistencia) {
+            $asistencia->update([
+                'salida_hora' => now()->format('H:i'),
+            ]);
+        }
+
+        return $asistencia;
+    }
+
+    /**
+     * Registrar ausencia
+     */
+    public static function registrarAusencia($personalId, $tipo, $observaciones = null)
+    {
+        return self::updateOrCreate(
+            [
+                'personal_id' => $personalId,
+                'fecha' => today(),
+            ],
+            [
+                'dia_semana' => self::obtenerDiaSemana(now()),
+                'estado' => $tipo, // 'ausencia', 'permiso', 'enfermedad'
+                'observaciones' => $observaciones,
+            ]
+        );
     }
 }

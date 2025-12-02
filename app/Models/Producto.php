@@ -42,6 +42,7 @@ class Producto extends Model
         'tipo',
         'imagen',
         'unidad_medida',
+        'unidades_por_paquete',
         'stock_minimo',
         'estado',
     ];
@@ -78,6 +79,16 @@ class Producto extends Model
     public function alertasStock(): HasMany
     {
         return $this->hasMany(AlertaStock::class, 'id_producto');
+    }
+
+    /**
+     * Relación: Un producto pertenece a un tipo de producto.
+     * Nota: La tabla productos tiene el campo id_tipo_producto.
+     * TODO: Actualizar controladores para usar esta relación en lugar de 'tipo' (string)
+     */
+    public function tipoProducto(): BelongsTo
+    {
+        return $this->belongsTo(TipoProducto::class, 'id_tipo_producto');
     }
 
     /**

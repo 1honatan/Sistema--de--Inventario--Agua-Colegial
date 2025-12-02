@@ -3,6 +3,8 @@
 namespace App\Models\Control;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Personal;
 
 class Insumo extends Model
 {
@@ -34,4 +36,14 @@ class Insumo extends Model
         'stock_actual' => 0,
         'stock_minimo' => 0,
     ];
+
+    /**
+     * Relación: Responsable del registro de insumo
+     * Nota: Actualmente 'responsable' es un string.
+     * TODO: Migrar a responsable_id (foreignId a personal)
+     */
+    // public function responsablePersonal(): BelongsTo
+    // {
+    //     return $this->belongsTo(Personal::class, 'responsable_id');
+    // }
 }

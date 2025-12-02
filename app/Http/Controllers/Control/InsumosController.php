@@ -35,6 +35,20 @@ class InsumosController extends Controller
             'observaciones' => 'nullable|string',
         ]);
 
+        // Validar duplicados: Evitar registro del mismo insumo con el mismo lote en la misma fecha
+        if ($request->filled('numero_lote')) {
+            $existeDuplicado = Insumo::where('producto_insumo', $validated['producto_insumo'])
+                ->where('numero_lote', $validated['numero_lote'])
+                ->whereDate('fecha', $validated['fecha'])
+                ->exists();
+
+            if ($existeDuplicado) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['error' => 'Ya existe un registro de ' . $validated['producto_insumo'] . ' con el lote ' . $validated['numero_lote'] . ' en la fecha ' . date('d/m/Y', strtotime($validated['fecha'])) . '. Por favor, verifique los registros existentes.']);
+            }
+        }
+
         // Asignar la cantidad como stock_actual inicial
         $validated['stock_actual'] = $validated['cantidad'];
         $validated['stock_minimo'] = 0;

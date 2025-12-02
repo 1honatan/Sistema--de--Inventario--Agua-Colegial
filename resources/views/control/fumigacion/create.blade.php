@@ -43,7 +43,7 @@
 
                 <!-- Cuerpo del Formulario -->
                 <div class="modern-card-body">
-                    <form action="{{ route('control.fumigacion.store') }}" method="POST" id="fumigacionForm">
+                    <form action="{{ route('control.fumigacion.store') }}" method="POST" id="fumigacionForm" data-confirm="true">
                         @csrf
 
                         <!-- Información de la Fumigación -->

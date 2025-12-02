@@ -328,7 +328,7 @@
         </div>
 
         <div class="form-body">
-            <form action="{{ route('control.salidas.store') }}" method="POST" id="salidaForm">
+            <form action="{{ route('control.salidas.store') }}" method="POST" id="salidaForm" data-confirm="true">
                 @csrf
 
                 <!-- Tipo de Salida -->
@@ -659,7 +659,7 @@
                                    style="{{ $producto['stock'] <= 0 ? 'background: #fcc; cursor: not-allowed;' : '' }}">
                             <small style="font-size: 0.7rem; color: {{ $producto['stock'] <= 0 ? '#dc2626' : '#059669' }}; font-weight: 700; display: block; margin-top: 0.3rem;">
                                 <i class="fas {{ $producto['stock'] <= 0 ? 'fa-times-circle' : 'fa-box' }}"></i>
-                                Stock: {{ number_format($producto['stock']) }} unidades ({{ $producto['unidad_medida'] }})
+                                Stock: {{ number_format($producto['stock']) }}{{ $producto['unidades_por_paquete'] ? ' (' . $producto['unidades_por_paquete'] . ' unidades en cada ' . strtolower($producto['unidad_medida']) . ')' : ' unidades (' . $producto['unidad_medida'] . ')' }}
                                 @if($producto['stock'] <= 0)
                                     <br><span style="color: #dc2626;">⚠️ Sin stock disponible</span>
                                 @endif

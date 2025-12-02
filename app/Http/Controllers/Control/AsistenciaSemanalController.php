@@ -234,7 +234,7 @@ class AsistenciaSemanalController extends Controller
         ]);
 
         $hoy = Carbon::today();
-        $horaEntrada = '06:00'; // Hora fija de entrada: 6:00 AM
+        $horaEntrada = Carbon::now()->format('H:i'); // Hora actual del sistema
 
         // Verificar si ya tiene entrada hoy
         $asistenciaExistente = AsistenciaSemanal::where('personal_id', $validated['personal_id'])
@@ -342,7 +342,7 @@ class AsistenciaSemanalController extends Controller
         }
 
         $hoy = Carbon::today();
-        $horaEntrada = '06:00'; // Hora fija de entrada: 6:00 AM
+        $horaEntrada = Carbon::now()->format('H:i'); // Hora actual del sistema
 
         // Verificar si ya tiene entrada hoy sin salida
         $asistenciaExistente = AsistenciaSemanal::where('personal_id', $usuario->personal_id)

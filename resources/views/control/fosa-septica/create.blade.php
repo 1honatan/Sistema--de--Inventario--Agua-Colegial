@@ -43,7 +43,7 @@
 
                 <!-- Cuerpo del Formulario -->
                 <div class="modern-card-body">
-                    <form action="{{ route('control.fosa-septica.store') }}" method="POST" id="fosaForm">
+                    <form action="{{ route('control.fosa-septica.store') }}" method="POST" id="fosaForm" data-confirm="true">
                         @csrf
 
                         <!-- Información de la Limpieza -->

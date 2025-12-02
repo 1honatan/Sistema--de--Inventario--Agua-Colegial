@@ -6,6 +6,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Control\SalidaProducto;
 
 /**
  * Modelo de vehículo.
@@ -93,4 +95,24 @@ class Vehiculo extends Model
     {
         return $query->where('estado', 'mantenimiento');
     }
+
+    /**
+     * Relación: Responsable del vehículo
+     * Nota: Actualmente 'responsable' es un string.
+     * TODO: Migrar a responsable_id (foreignId a personal)
+     */
+    // public function responsablePersonal(): BelongsTo
+    // {
+    //     return $this->belongsTo(Personal::class, 'responsable_id');
+    // }
+
+    /**
+     * Relación: Salidas de productos que usaron este vehículo
+     * Nota: Requiere que SalidaProducto tenga vehiculo_id
+     * TODO: Requiere migración en control_salidas_productos
+     */
+    // public function salidas(): HasMany
+    // {
+    //     return $this->hasMany(SalidaProducto::class, 'vehiculo_id');
+    // }
 }

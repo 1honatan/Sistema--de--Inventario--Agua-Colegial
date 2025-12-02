@@ -48,11 +48,8 @@ class Personal extends Model
         'salario',
         'foto',
         'documento_garantia',
-        'foto_documento',
         'foto_licencia',
-        'foto_id_chofer',
         'observaciones',
-        'es_chofer',
         'estado',
         'tiene_acceso',
     ];
@@ -61,7 +58,6 @@ class Personal extends Model
      * Conversión de tipos de atributos.
      */
     protected $casts = [
-        'es_chofer' => 'boolean',
         'tiene_acceso' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="card"><div class="card-header bg-gradient-to-r from-blue-900 to-blue-800 text-white"><h3 class="text-xl font-bold">Nueva Limpieza de Tanque</h3></div>
         <div class="card-body">
-            <form action="{{ route('control.tanques.store') }}" method="POST">@csrf
+            <form action="{{ route('control.tanques.store') }}" method="POST" data-confirm="true">@csrf
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div><label class="form-label font-bold">Fecha Limpieza *</label><input type="date" name="fecha_limpieza" class="form-control" value="{{ old('fecha_limpieza', date('Y-m-d')) }}" required></div>
                     <div><label class="form-label font-bold">Tipo de Tanque *</label><input type="text" name="nombre_tanque" class="form-control" value="{{ old('nombre_tanque') }}" required></div>

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Personal;
 
 use App\Http\Controllers\Controller;
-use App\Models\Asistencia;
+use App\Models\AsistenciaSemanal;
 use App\Models\Personal;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -41,17 +41,14 @@ class AsistenciaController extends Controller
             abort(403, 'No se encontró información del personal asociado.');
         }
 
-        // Obtener asistencia de hoy
-        $asistenciaHoy = Asistencia::obtenerAsistenciaHoy($personal->id);
-
-        // Obtener historial reciente (últimos 30 días)
-        $historial = Asistencia::where('id_personal', $personal->id)
+        // Obtener historial reciente (últimos 30 días) - solo los registrados por el admin
+        $historial = AsistenciaSemanal::where('personal_id', $personal->id)
             ->whereBetween('fecha', [today()->subDays(30), today()])
             ->orderBy('fecha', 'desc')
             ->get();
 
         // Estadísticas del mes actual
-        $asistenciasDelMes = Asistencia::where('id_personal', $personal->id)
+        $asistenciasDelMes = AsistenciaSemanal::where('personal_id', $personal->id)
             ->delMes()
             ->get();
 
@@ -67,7 +64,6 @@ class AsistenciaController extends Controller
 
         return view('personal.asistencia.index', compact(
             'personal',
-            'asistenciaHoy',
             'historial',
             'estadisticas'
         ));
@@ -94,14 +90,14 @@ class AsistenciaController extends Controller
 
         try {
             // Verificar si ya registró entrada hoy
-            $asistenciaHoy = Asistencia::obtenerAsistenciaHoy($personal->id);
+            $asistenciaHoy = AsistenciaSemanal::obtenerAsistenciaHoy($personal->id);
 
             if ($asistenciaHoy) {
                 return back()->with('warning', 'Ya registró su asistencia el día de hoy.');
             }
 
             // Registrar entrada
-            Asistencia::registrarEntrada(
+            AsistenciaSemanal::registrarEntrada(
                 $personal->id,
                 $request->input('observaciones')
             );
@@ -135,7 +131,7 @@ class AsistenciaController extends Controller
 
         try {
             // Verificar si ya registró entrada hoy
-            $asistenciaHoy = Asistencia::obtenerAsistenciaHoy($personal->id);
+            $asistenciaHoy = AsistenciaSemanal::obtenerAsistenciaHoy($personal->id);
 
             if (!$asistenciaHoy) {
                 return back()->with('error', 'Debe registrar su entrada primero.');
@@ -182,14 +178,14 @@ class AsistenciaController extends Controller
 
         try {
             // Verificar si ya registró asistencia hoy
-            $asistenciaHoy = Asistencia::obtenerAsistenciaHoy($personal->id);
+            $asistenciaHoy = AsistenciaSemanal::obtenerAsistenciaHoy($personal->id);
 
             if ($asistenciaHoy) {
                 return back()->with('warning', 'Ya registró su asistencia el día de hoy.');
             }
 
             // Registrar ausencia
-            Asistencia::registrarAusencia(
+            AsistenciaSemanal::registrarAusencia(
                 $personal->id,
                 $request->input('observaciones')
             );
@@ -221,7 +217,7 @@ class AsistenciaController extends Controller
             abort(403, 'No se encontró información del personal asociado.');
         }
 
-        $query = Asistencia::where('id_personal', $personal->id);
+        $query = AsistenciaSemanal::where('personal_id', $personal->id);
 
         // Filtrar por rango de fechas si se proporciona
         if ($request->filled('fecha_inicio') && $request->filled('fecha_fin')) {

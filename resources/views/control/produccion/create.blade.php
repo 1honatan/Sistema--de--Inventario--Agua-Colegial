@@ -102,7 +102,7 @@
 
                 <!-- Cuerpo del Formulario -->
                 <div class="modern-card-body">
-                    <form action="{{ route('control.produccion.store') }}" method="POST" id="produccionForm">
+                    <form action="{{ route('control.produccion.store') }}" method="POST" id="produccionForm" data-confirm="true">
                         @csrf
 
                         <!-- Información General -->
@@ -190,7 +190,9 @@
                                                 <select name="productos[0][producto]" class="modern-select" required>
                                                     <option value="">Seleccione un producto...</option>
                                                     @foreach($productos ?? [] as $producto)
-                                                        <option value="{{ $producto->nombre }}">{{ $producto->nombre }}</option>
+                                                        <option value="{{ $producto->nombre }}">
+                                                            {{ $producto->nombre }}{{ $producto->unidades_por_paquete ? ' (' . $producto->unidades_por_paquete . ' unidades por paquete)' : '' }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -381,7 +383,9 @@
                             <select name="productos[${productoIndex}][producto]" class="modern-select" required>
                                 <option value="">Seleccione un producto...</option>
                                 @foreach($productos ?? [] as $producto)
-                                    <option value="{{ $producto->nombre }}">{{ $producto->nombre }}</option>
+                                    <option value="{{ $producto->nombre }}">
+                                        {{ $producto->nombre }}{{ $producto->unidades_por_paquete ? ' (' . $producto->unidades_por_paquete . ' unidades por paquete)' : '' }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>

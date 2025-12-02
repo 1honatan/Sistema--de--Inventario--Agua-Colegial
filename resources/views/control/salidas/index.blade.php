@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Control de Salidas de Productos')
+@section('page-title', 'Control de Salidas de Productos')
 
 @push('styles')
 <style>
@@ -209,15 +210,29 @@
                     <div class="mb-4">
                         <form method="GET" action="{{ route('control.salidas.index') }}" class="d-flex align-items-center gap-3">
                             <input type="hidden" name="semana" value="{{ $semana ?? 0 }}">
-                            <div class="flex-grow-1" style="max-width: 300px;">
-                                <label class="form-label mb-2" style="font-weight: 600; color: #0284c7;">
-                                    <i class="fas fa-filter mr-2"></i>Filtrar por Tipo de Salida
+                            <div class="flex-grow-1" style="max-width: 350px;">
+                                <label class="form-label mb-2" style="font-weight: 700; color: #0c4a6e; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-filter" style="color: #0ea5e9; font-size: 1rem;"></i>
+                                    Filtrar por Tipo de Salida
                                 </label>
-                                <select name="tipo_salida" class="form-select" style="border: 2px solid #0ea5e9; border-radius: 8px; padding: 0.5rem;" onchange="this.form.submit()">
-                                    <option value="">Todos los tipos</option>
-                                    <option value="Despacho Interno" {{ request('tipo_salida') == 'Despacho Interno' ? 'selected' : '' }}>Despacho Interno</option>
-                                    <option value="Pedido Cliente" {{ request('tipo_salida') == 'Pedido Cliente' ? 'selected' : '' }}>Pedido Cliente</option>
-                                    <option value="Venta Directa" {{ request('tipo_salida') == 'Venta Directa' ? 'selected' : '' }}>Venta Directa</option>
+                                <select name="tipo_salida"
+                                        class="form-select"
+                                        style="border: 2px solid #0ea5e9;
+                                               border-radius: 12px;
+                                               padding: 0.75rem 1rem;
+                                               font-weight: 600;
+                                               color: #0c4a6e;
+                                               background: linear-gradient(to right, #ffffff, #f0f9ff);
+                                               box-shadow: 0 2px 8px rgba(14, 165, 233, 0.15);
+                                               transition: all 0.3s ease;
+                                               cursor: pointer;"
+                                        onchange="this.form.submit()"
+                                        onfocus="this.style.borderColor='#0284c7'; this.style.boxShadow='0 4px 12px rgba(14, 165, 233, 0.25)';"
+                                        onblur="this.style.borderColor='#0ea5e9'; this.style.boxShadow='0 2px 8px rgba(14, 165, 233, 0.15)';">
+                                    <option value="">📋 Todos los tipos</option>
+                                    <option value="Despacho Interno" {{ request('tipo_salida') == 'Despacho Interno' ? 'selected' : '' }}>🏭 Despacho Interno</option>
+                                    <option value="Pedido Cliente" {{ request('tipo_salida') == 'Pedido Cliente' ? 'selected' : '' }}>📦 Pedido Cliente</option>
+                                    <option value="Venta Directa" {{ request('tipo_salida') == 'Venta Directa' ? 'selected' : '' }}>💰 Venta Directa</option>
                                 </select>
                             </div>
                         </form>

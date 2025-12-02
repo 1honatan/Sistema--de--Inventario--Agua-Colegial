@@ -43,7 +43,7 @@
 
                 <!-- Cuerpo del Formulario -->
                 <div class="modern-card-body">
-                    <form action="{{ route('control.insumos.store') }}" method="POST" id="insumoForm">
+                    <form action="{{ route('control.insumos.store') }}" method="POST" id="insumoForm" data-confirm="true">
                         @csrf
 
                         <!-- Información del Insumo -->

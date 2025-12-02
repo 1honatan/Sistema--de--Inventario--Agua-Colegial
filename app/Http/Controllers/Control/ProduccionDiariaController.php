@@ -60,6 +60,17 @@ class ProduccionDiariaController extends Controller
             'materiales.*.cantidad' => 'nullable|numeric|min:0',
         ]);
 
+        // Validar duplicados: Evitar múltiples registros de producción del mismo responsable en la misma fecha
+        $existeDuplicado = ProduccionDiaria::where('fecha', $validated['fecha'])
+            ->where('responsable', $validated['responsable'])
+            ->exists();
+
+        if ($existeDuplicado) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Ya existe un registro de producción para ' . $validated['responsable'] . ' en la fecha ' . date('d/m/Y', strtotime($validated['fecha'])) . '. Por favor, verifique los registros existentes o edite el registro anterior.']);
+        }
+
         // Usar transacción para asegurar consistencia de datos
         DB::beginTransaction();
 

@@ -6,6 +6,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Agua Colegial') - Sistema de Gestión</title>
 
+    <!-- Favicon - Gota de Agua -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%230ea5e9' d='M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z'/%3E%3C/svg%3E" type="image/svg+xml">
+
     <!-- Tailwind CSS -->
     {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1572,7 +1575,7 @@
                         <li>
                             <a href="{{ route('admin.reportes.index') }}"
                                class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'admin.reportes') ? 'active' : '' }}">
-                                <i class="fas fa-file-chart-line w-5"></i>
+                                <i class="fas fa-chart-line w-5"></i>
                                 <span class="ml-3 sidebar-text">Reportes</span>
                             </a>
                         </li>
@@ -1598,30 +1601,12 @@
 
                     <!-- Menú Rol Producción -->
                     @if($rol === 'produccion')
-                        <!-- 1. Inicio -->
-                        <li>
-                            <a href="{{ route('control.produccion.index') }}"
-                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.produccion.index') ? 'active' : '' }}">
-                                <i class="fas fa-home w-5"></i>
-                                <span class="ml-3 sidebar-text">Inicio</span>
-                            </a>
-                        </li>
-
-                        <!-- 2. Inventario General -->
+                        <!-- Inventario General -->
                         <li>
                             <a href="{{ route('inventario.index') }}"
                                class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'inventario.index') ? 'active' : '' }}">
                                 <i class="fas fa-warehouse w-5"></i>
                                 <span class="ml-3 sidebar-text">Inventario</span>
-                            </a>
-                        </li>
-
-                        <!-- 3. Registro del Personal -->
-                        <li>
-                            <a href="{{ route('control.asistencia-semanal.registro-rapido') }}"
-                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_contains($currentRoute, 'registro-rapido') ? 'active' : '' }}">
-                                <i class="fas fa-user-clock w-5"></i>
-                                <span class="ml-3 sidebar-text">Historia de su Registro</span>
                             </a>
                         </li>
 
@@ -1700,7 +1685,7 @@
                         <li>
                             <a href="{{ route('admin.reportes.index') }}"
                                class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'admin.reportes') ? 'active' : '' }}">
-                                <i class="fas fa-file-chart-line w-5"></i>
+                                <i class="fas fa-chart-line w-5"></i>
                                 <span class="ml-3 sidebar-text">Reportes</span>
                             </a>
                         </li>
@@ -1782,14 +1767,6 @@
                         </li>
 
                         <li>
-                            <a href="{{ route('personal.asistencia.index') }}"
-                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'personal.asistencia') ? 'active' : '' }}">
-                                <i class="fas fa-clock w-5"></i>
-                                <span class="ml-3 sidebar-text">Registro de Asistencia</span>
-                            </a>
-                        </li>
-
-                        <li>
                             <a href="{{ route('personal.asistencia.historial') }}"
                                class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ $currentRoute === 'personal.asistencia.historial' ? 'active' : '' }}">
                                 <i class="fas fa-history w-5"></i>
@@ -1840,7 +1817,7 @@
             <header class="bg-white shadow-sm border-b">
                 <div class="flex items-center justify-between px-6 py-4">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-800">@yield('page-title', 'Dashboard')</h1>
+                        <h1 class="text-2xl font-bold text-gray-800">@yield('page-title', '')</h1>
                         <p class="text-sm text-gray-600">@yield('page-subtitle', '')</p>
                     </div>
 
@@ -2388,6 +2365,57 @@
                 }
             });
         })();
+    </script>
+
+    <!-- Sistema de Confirmación Global -->
+    <script>
+        // Confirmación antes de guardar formularios
+        document.addEventListener('DOMContentLoaded', function() {
+            // Agregar confirmación a todos los formularios que no sean de búsqueda/filtro
+            const forms = document.querySelectorAll('form[data-confirm="true"]');
+
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const formAction = this.getAttribute('action');
+                    const formMethod = this.querySelector('input[name="_method"]')?.value || this.method;
+
+                    // Determinar el tipo de acción
+                    let actionText = 'guardar este registro';
+                    let actionIcon = 'question';
+                    let actionColor = '#0ea5e9';
+
+                    if (formMethod === 'DELETE' || formAction.includes('destroy')) {
+                        actionText = 'eliminar este registro';
+                        actionIcon = 'warning';
+                        actionColor = '#dc2626';
+                    } else if (formMethod === 'PUT' || formMethod === 'PATCH' || formAction.includes('edit')) {
+                        actionText = 'actualizar este registro';
+                        actionIcon = 'question';
+                        actionColor = '#f59e0b';
+                    }
+
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: `¿Deseas ${actionText}?`,
+                        icon: actionIcon,
+                        showCancelButton: true,
+                        confirmButtonColor: actionColor,
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Sí, continuar',
+                        cancelButtonText: 'Cancelar',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Remover el listener para evitar loop infinito
+                            this.removeEventListener('submit', arguments.callee);
+                            this.submit();
+                        }
+                    });
+                });
+            });
+        });
     </script>
 
     @stack('scripts')

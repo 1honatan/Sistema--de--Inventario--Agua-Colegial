@@ -3,6 +3,8 @@
 namespace App\Models\Control;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Personal;
 
 class Fumigacion extends Model
 {
@@ -24,4 +26,14 @@ class Fumigacion extends Model
         'proxima_fumigacion' => 'date',
         'cantidad_producto' => 'decimal:2',
     ];
+
+    /**
+     * Relación: Responsable de la fumigación
+     * Nota: Actualmente 'responsable' es un string.
+     * TODO: Migrar a responsable_id (foreignId a personal)
+     */
+    // public function responsablePersonal(): BelongsTo
+    // {
+    //     return $this->belongsTo(Personal::class, 'responsable_id');
+    // }
 }

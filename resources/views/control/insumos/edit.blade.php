@@ -64,6 +64,8 @@
                                                id="fecha"
                                                class="modern-input @error('fecha') is-invalid @enderror"
                                                value="{{ old('fecha', $insumo->fecha->format('Y-m-d')) }}"
+                                               readonly
+                                               style="background-color: #e9ecef; cursor: not-allowed;"
                                                required>
                                         @error('fecha')
                                             <div class="invalid-feedback">{{ $message }}</div>

@@ -82,7 +82,7 @@
 
                 <!-- Cuerpo del Formulario -->
                 <div class="modern-card-body">
-                    <form action="{{ route('control.mantenimiento.store') }}" method="POST" id="mantenimientoForm">
+                    <form action="{{ route('control.mantenimiento.store') }}" method="POST" id="mantenimientoForm" data-confirm="true">
                         @csrf
 
                         <!-- Información del Equipo -->

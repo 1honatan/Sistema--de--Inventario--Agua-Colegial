@@ -425,6 +425,7 @@
                                                id="acceso_sistema"
                                                value="1"
                                                {{ old('acceso_sistema', $empleado->acceso_sistema ?? false) ? 'checked' : '' }}
+                                               onchange="toggleCredencialesSection(this.checked)"
                                                style="width: 3rem; height: 1.5rem; cursor: pointer;">
                                         <label class="form-check-label" for="acceso_sistema" style="font-weight: 700; font-size: 1rem; color: #1e40af; margin-left: 0.5rem; cursor: pointer;">
                                             <i class="fas fa-key mr-2"></i>
@@ -441,6 +442,80 @@
                                 @enderror
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Credenciales de Acceso -->
+                    <div id="credencialesSection" style="display: none; margin-top: 1.5rem;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <div class="input-label required">
+                                        <i class="fas fa-envelope"></i>
+                                        Correo Electrónico
+                                    </div>
+                                    <input type="email"
+                                           name="email_acceso"
+                                           id="email_acceso"
+                                           class="form-input @error('email_acceso') is-invalid @enderror"
+                                           value="{{ old('email_acceso', $empleado->usuario->email ?? '') }}"
+                                           placeholder="Ej: juan.perez@aguacolegial.com">
+                                    <small class="text-muted d-block mt-2">
+                                        <i class="fas fa-info-circle"></i>
+                                        El empleado usará este correo para iniciar sesión
+                                    </small>
+                                    @error('email_acceso')
+                                        <div class="text-danger mt-2">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <div class="input-label">
+                                        <i class="fas fa-lock"></i>
+                                        Contraseña
+                                    </div>
+                                    <input type="password"
+                                           name="password_acceso"
+                                           id="password_acceso"
+                                           class="form-input @error('password_acceso') is-invalid @enderror"
+                                           placeholder="Dejar vacío para mantener la actual">
+                                    <small class="text-muted d-block mt-2">
+                                        <i class="fas fa-info-circle"></i>
+                                        {{ $empleado->usuario ? 'Dejar vacío para mantener la contraseña actual' : 'Mínimo 6 caracteres' }}
+                                    </small>
+                                    @error('password_acceso')
+                                        <div class="text-danger mt-2">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mostrar credenciales actuales si existen -->
+                        @if($empleado->usuario)
+                        <div class="alert alert-info mt-3" style="background: #dbeafe; border: 2px solid #3b82f6; border-radius: 10px;">
+                            <h6 class="font-bold mb-2" style="color: #1e40af;">
+                                <i class="fas fa-user-check mr-2"></i>
+                                Credenciales Actuales de Acceso
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1" style="color: #1e40af;">
+                                        <strong>Correo:</strong> {{ $empleado->usuario->email }}
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1" style="color: #1e40af;">
+                                        <strong>Rol:</strong> {{ ucfirst($empleado->usuario->rol->nombre ?? 'No asignado') }}
+                                    </p>
+                                </div>
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="fas fa-lightbulb mr-1"></i>
+                                El empleado puede iniciar sesión con estas credenciales
+                            </small>
+                        </div>
+                        @endif
                     </div>
                 </div>
 
@@ -492,45 +567,6 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <div class="input-label">
-                                    <i class="fas fa-camera"></i>
-                                    Foto del ID / DUI
-                                </div>
-                                @if($empleado->foto_id_chofer)
-                                    <div class="mb-2">
-                                        <p class="text-sm font-semibold mb-2" style="color: #92400e;">
-                                            <i class="fas fa-image"></i> Imagen actual:
-                                        </p>
-                                        <img src="{{ asset($empleado->foto_id_chofer) }}" alt="ID actual" class="current-image">
-                                    </div>
-                                @endif
-                                <div class="custom-file-upload" style="position: relative;">
-                                    <input type="file"
-                                           name="foto_id_chofer"
-                                           id="foto_id_chofer"
-                                           class="form-input @error('foto_id_chofer') is-invalid @enderror"
-                                           accept="image/*"
-                                           onchange="previewIdChofer(this)"
-                                           style="padding: 0.5rem;">
-                                    <small class="text-muted d-block mt-2">
-                                        <i class="fas fa-info-circle"></i>
-                                        Formatos: JPG, PNG, GIF. Max: 5MB {{ $empleado->foto_id_chofer ? '(Dejar vacío para mantener la actual)' : '' }}
-                                    </small>
-                                    @error('foto_id_chofer')
-                                        <div class="text-danger mt-2">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div id="idChoferPreview" style="display: none; margin-top: 1rem;">
-                                    <p class="text-sm font-semibold mb-2" style="color: #92400e;">
-                                        <i class="fas fa-eye"></i> Vista previa:
-                                    </p>
-                                    <img id="previewIdChofer" src="" alt="Vista previa ID"
-                                         style="max-width: 250px; max-height: 150px; border-radius: 10px; border: 3px solid #f59e0b; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);">
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -629,6 +665,19 @@ function toggleLicenciaSection(cargo) {
     }
 }
 
+// Toggle sección de credenciales según checkbox
+function toggleCredencialesSection(checked) {
+    if (checked) {
+        $('#credencialesSection').slideDown();
+        // Hacer email requerido
+        $('#email_acceso').prop('required', true);
+    } else {
+        $('#credencialesSection').slideUp();
+        // Quitar requerido del email
+        $('#email_acceso').prop('required', false);
+    }
+}
+
 // Vista previa de imagen documento
 function previewImage(input) {
     if (input.files && input.files[0]) {
@@ -676,6 +725,13 @@ $(document).ready(function() {
     const cargoActual = $('#cargo').val();
     if (cargoActual === 'Chofer') {
         $('#licenciaSection').show();
+    }
+
+    // Verificar si acceso_sistema está marcado al cargar
+    const accesoSistema = $('#acceso_sistema').is(':checked');
+    if (accesoSistema) {
+        $('#credencialesSection').show();
+        $('#email_acceso').prop('required', true);
     }
 
     // Atajos de teclado
