@@ -5,7 +5,7 @@ Esta carpeta contiene la documentación completa del sistema de inventario Agua 
 
 **Fecha de creación**: 2 de Diciembre de 2025
 **Sistema**: Laravel 8+ - Gestión de Inventario y Producción de Agua Purificada
-**Total de archivos documentados**: 11 archivos (6 controladores + 5 grupos de modelos)
+**Total de archivos documentados**: 13 archivos + resumen completo de app/
 
 ---
 
