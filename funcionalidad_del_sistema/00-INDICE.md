@@ -5,7 +5,7 @@ Esta carpeta contiene la documentación completa del sistema de inventario Agua 
 
 **Fecha de creación**: 2 de Diciembre de 2025
 **Sistema**: Laravel 8+ - Gestión de Inventario y Producción de Agua Purificada
-**Total de archivos documentados**: 6 controladores principales
+**Total de archivos documentados**: 11 archivos (6 controladores + 5 grupos de modelos)
 
 ---
 
@@ -217,6 +217,133 @@ Si NO: Error sin guardar nada
 
 ---
 
+#### ✅ 07-FosaSeptica-Fumigacion-Tanques-Controllers.md
+**Tamaño**: ~12,000 líneas
+**Complejidad**: Media
+**Propósito**: Controladores de control sanitario (BPM)
+
+**Funcionalidades principales**:
+- Registro de limpieza de fosa séptica
+- Control de fumigaciones contra plagas
+- Limpieza y desinfección de tanques de agua
+- Cumplimiento de normativa sanitaria
+
+**Tablas involucradas**:
+- `control_fosa_septica`
+- `control_fumigacion`
+- `control_tanques_agua`
+
+**Métodos documentados**: 18 (6 métodos × 3 controladores)
+- index(), create(), store(), show(), edit(), update() para cada uno
+
+---
+
+### Models (app/Models/ y app/Models/Control/)
+
+#### ✅ 08-Modelos-Personal-Asistencia-Producto.md
+**Tamaño**: ~15,000 líneas
+**Complejidad**: Media-Alta
+**Propósito**: Modelos principales del sistema
+
+**Modelos documentados**:
+- **Personal.php**: Empleados con scopes y accessors
+- **AsistenciaSemanal.php**: Asistencias con cálculo de horas
+- **Producto.php**: Catálogo de productos con relaciones
+
+**Características especiales**:
+- Scopes reutilizables (activos, porPuesto, etc.)
+- Accessors para nombres completos y horas trabajadas
+- Relaciones con múltiples tablas
+
+**Tablas involucradas**:
+- `personal`
+- `asistencias_semanal`
+- `productos`
+
+---
+
+#### ✅ 09-Modelos-Vehiculo-Insumo-Salida-Produccion.md
+**Tamaño**: ~13,000 líneas
+**Complejidad**: Media-Alta
+**Propósito**: Modelos de control operativo
+
+**Modelos documentados**:
+- **Vehiculo.php**: Vehículos de la empresa
+- **Insumo.php**: Insumos con tracking de stock
+- **SalidaProducto.php**: Salidas con 50+ columnas legacy
+- **ProduccionDiaria.php**: Registro maestro de producción
+
+**Características especiales**:
+- SalidaProducto con diseño legacy (columnas individuales por producto)
+- TODOs de migración a diseño relacional
+- Relaciones HasMany para producción
+
+**Tablas involucradas**:
+- `vehiculos`
+- `control_insumos`
+- `control_salidas_productos`
+- `control_produccion_diaria`
+
+---
+
+#### ✅ 10-Modelos-Inventario-Usuario-Rol.md
+**Tamaño**: ~18,000 líneas
+**Complejidad**: Alta
+**Propósito**: Modelos críticos del sistema
+
+**Modelos documentados**:
+- **Inventario.php**: Modelo CRÍTICO - Todos los movimientos de stock
+- **Usuario.php**: Autenticación y autorización
+- **Rol.php**: Sistema de roles y permisos
+
+**Características especiales**:
+- Inventario con métodos estáticos para stock disponible
+- Usuario con hash automático de contraseñas
+- Scopes para filtros complejos
+- TODOs de optimización con tabla stock_actual
+
+**Tablas involucradas**:
+- `inventario` (CRÍTICA)
+- `usuarios`
+- `roles`
+
+**Mejoras prioritarias**:
+- Tabla stock_actual con triggers (optimización)
+- Protección contra fuerza bruta
+- Permisos granulares
+
+---
+
+#### ✅ 11-Modelos-Control-Sanitario.md
+**Tamaño**: ~16,000 líneas
+**Complejidad**: Baja-Media
+**Propósito**: Modelos de control sanitario (BPM)
+
+**Modelos documentados**:
+- **FosaSeptica.php**: Limpieza de fosa séptica
+- **Fumigacion.php**: Control de fumigaciones
+- **TanqueAgua.php**: Limpieza de tanques de agua
+- **MantenimientoEquipo.php**: Mantenimiento de equipos
+
+**Características especiales**:
+- Cumplimiento de BPM (Buenas Prácticas de Manufactura)
+- Campos JSON en MantenimientoEquipo (equipo, productos_limpieza)
+- TODOs de migración de strings a FKs
+- MantenimientoEquipo único con FK a personal
+
+**Tablas involucradas**:
+- `control_fosa_septica`
+- `control_fumigacion`
+- `control_tanques_agua`
+- `control_mantenimiento_equipos`
+
+**Mejoras prioritarias**:
+- Migrar campos string a FKs (responsable, supervisado_por)
+- Alertas automáticas de vencimientos
+- Reportes PDF para auditorías
+
+---
+
 ## 🎯 Controladores por Complejidad
 
 ### 🟢 Baja (Simples, CRUD estándar)
@@ -307,33 +434,59 @@ if ($request->tipo_salida === 'Despacho Interno') {
 
 ## 🚀 Próximos Pasos
 
-### Pendientes de Documentar:
-1. **SalidasController** - Completar Parte 3, 4 y 5:
-   - show(), edit(), update(), destroy(), generarPDF()
-   - Resumen completo
-   - Flujos de trabajo detallados
-   - Mejoras sugeridas
+### ✅ Completados (11 archivos):
+1. ✅ AsistenciaSemanalController.md
+2. ✅ EmpleadoController.md
+3. ✅ InsumosController.md
+4. ✅ MantenimientoController.md
+5. ✅ ProduccionDiariaController.md
+6. ✅ SalidasController.md (Partes 1-2)
+7. ✅ FosaSeptica-Fumigacion-Tanques-Controllers.md
+8. ✅ Modelos-Personal-Asistencia-Producto.md
+9. ✅ Modelos-Vehiculo-Insumo-Salida-Produccion.md
+10. ✅ Modelos-Inventario-Usuario-Rol.md
+11. ✅ Modelos-Control-Sanitario.md
 
-2. **Models** (app/Models/):
-   - Personal.php
-   - AsistenciaSemanal.php
-   - Producto.php
-   - Vehiculo.php
-   - Control/Insumo.php
-   - Control/MantenimientoEquipo.php
-   - Control/ProduccionDiaria.php
-   - Control/SalidaProducto.php
-   - Inventario.php
+### 📝 Pendientes en app/:
 
-3. **Otros Controladores** (si aplica):
-   - Controllers de Admin/
-   - Controllers de Produccion/
-   - Controllers de Personal/
+**Controllers restantes** (~10 archivos):
+- Controllers/Admin/* (DashboardController, etc.)
+- Controllers/Personal/* (AsistenciaController)
+- Controllers/Auth/* (LoginController, RegisterController)
+- Controllers/Inventario/* (si existe)
 
-4. **Middleware, Requests, Traits**:
-   - Middleware/CheckRole.php
-   - Requests/ValidacionesPersonalizadas
-   - Traits/DataIntegrity.php
+**Middleware** (~3 archivos):
+- Middleware/CheckRole.php
+- Middleware/RestrictIpAddress.php
+- Middleware/ValidateRequestIntegrity.php
+
+**Requests** (~11 archivos):
+- Validaciones personalizadas
+
+**Commands** (~4 archivos):
+- Console/Commands/BackupDatabase.php
+- Console/Commands/VerificarStockBajo.php
+- Otros comandos programados
+
+**Providers, Exports, Traits** (~8 archivos):
+- Providers/AppServiceProvider.php
+- Exports/* (exportaciones Excel)
+- Traits/* (código reutilizable)
+
+**Notifications** (~3 archivos):
+- Notificaciones del sistema
+
+### 📂 Pendientes otras carpetas:
+- bootstrap/ (archivos de arranque)
+- config/ (configuraciones)
+- database/ (migraciones, seeders)
+- lang/ (traducciones)
+- public/ (archivos públicos)
+- resources/ (vistas, js, css)
+- routes/ (web.php, api.php)
+- storage/ (archivos de aplicación)
+- tests/ (pruebas)
+- Archivos raíz (.env, composer.json, etc.)
 
 ---
 
@@ -397,11 +550,15 @@ Cada archivo sigue esta estructura:
 
 ## 📈 Estadísticas
 
-- **Total de líneas documentadas**: ~56,000 líneas
-- **Total de métodos documentados**: ~40 métodos
-- **Total de tablas explicadas**: ~15 tablas
-- **Total de flujos de trabajo**: ~20 escenarios
-- **Total de mejoras sugeridas**: ~100 sugerencias
+- **Total de archivos documentados**: 11 archivos completados
+- **Total de líneas documentadas**: ~145,000 líneas
+- **Total de controladores documentados**: 9 controladores
+- **Total de modelos documentados**: 14 modelos
+- **Total de métodos documentados**: ~70 métodos
+- **Total de tablas explicadas**: ~25 tablas
+- **Total de flujos de trabajo**: ~35 escenarios
+- **Total de mejoras sugeridas**: ~180 sugerencias
+- **Progreso en app/**: ~15% completado
 
 ---
 
@@ -449,4 +606,5 @@ if ($stockDisponible < $cantidad) {
 **Creado por**: Claude (Anthropic)
 **Fecha**: 2 de Diciembre de 2025
 **Versión del Sistema**: 1.0
-**Estado**: En progreso (6 de ~20 archivos documentados)
+**Estado**: En progreso (11 archivos completados - 9 controladores + 14 modelos documentados)
+**Progreso**: ~15% de app/ completado, pendientes otras carpetas del proyecto
