@@ -26,21 +26,29 @@ public function handle(Request $request, Closure $next): Response
 }
 ```
 
-### 3. Middleware Registrado Globalmente
+### 3. Middleware Registrado en Grupo Web
 **Archivo**: `bootstrap/app.php`
 
 ```php
 ->withMiddleware(function (Middleware $middleware) {
-    // Middleware global para refrescar token CSRF
-    $middleware->append(\App\Http\Middleware\RefreshCsrfToken::class);
+    // Middleware para refrescar token CSRF en grupo web
+    // Se ejecuta DESPUÉS de que Laravel inicialice la sesión
+    $middleware->web(append: [
+        \App\Http\Middleware\RefreshCsrfToken::class,
+    ]);
 });
 ```
 
-### 4. .env.example Actualizado
+**IMPORTANTE**: El middleware se aplica al grupo `web` para que se ejecute DESPUÉS del middleware de sesión de Laravel.
+
+### 4. Archivos .env Actualizados
+**.env.example** y tu **.env** personal:
 ```env
 SESSION_DRIVER=file
 SESSION_LIFETIME=720  # 12 horas
 ```
+
+**IMPORTANTE**: Verifica que tu archivo `.env` (NO .env.example) tenga estos valores.
 
 ---
 
@@ -167,7 +175,30 @@ http://127.0.0.1:8000/control/salidas/create
 
 ---
 
-## 💡 SI AÚN OCURRE EL ERROR
+## 💡 SI APARECE "Session store not set on request"
+
+Este error significa que el middleware está intentando acceder a la sesión antes de que Laravel la inicialice.
+
+### Solución Aplicada:
+```php
+// En bootstrap/app.php
+// ❌ INCORRECTO (causa el error):
+$middleware->append(\App\Http\Middleware\RefreshCsrfToken::class);
+
+// ✅ CORRECTO (se ejecuta después de la sesión):
+$middleware->web(append: [
+    \App\Http\Middleware\RefreshCsrfToken::class,
+]);
+```
+
+### Pasos para Verificar:
+1. Asegúrate que `bootstrap/app.php` use `$middleware->web(append: [...])`
+2. Limpia cache: `php artisan cache:clear-all`
+3. Reinicia el servidor
+
+---
+
+## 💡 SI AÚN OCURRE EL ERROR 419
 
 ### Solución 1: Verificar .env Real
 ```env

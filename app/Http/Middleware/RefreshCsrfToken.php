@@ -23,12 +23,15 @@ class RefreshCsrfToken
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Regenerar el token CSRF en cada request GET
+        // Procesar el request primero (para que Laravel inicialice la sesión)
+        $response = $next($request);
+
+        // Regenerar el token CSRF DESPUÉS del request, solo en peticiones GET exitosas
         // Esto evita que expire cuando el usuario deja el formulario abierto
-        if ($request->isMethod('GET')) {
+        if ($request->isMethod('GET') && $request->hasSession() && $response->isSuccessful()) {
             $request->session()->regenerateToken();
         }
 
-        return $next($request);
+        return $response;
     }
 }

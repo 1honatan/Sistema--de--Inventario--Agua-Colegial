@@ -24,7 +24,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         // Middleware global para refrescar token CSRF y evitar error 419
-        $middleware->append(\App\Http\Middleware\RefreshCsrfToken::class);
+        // Se ejecuta DESPUÉS de que Laravel inicialice la sesión
+        $middleware->web(append: [
+            \App\Http\Middleware\RefreshCsrfToken::class,
+        ]);
 
         // Aplicar restricción de IP globalmente (opcional, puedes comentar si solo quieres aplicarlo en rutas específicas)
         // $middleware->append(\App\Http\Middleware\RestrictIpAddress::class);
