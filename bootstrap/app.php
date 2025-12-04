@@ -23,17 +23,26 @@ return Application::configure(basePath: dirname(__DIR__))
             'restrict.ip' => \App\Http\Middleware\RestrictIpAddress::class,
         ]);
 
-        // Middleware global para refrescar token CSRF y evitar error 419
-        // Se ejecuta DESPUÉS de que Laravel inicialice la sesión
-        $middleware->web(append: [
-            \App\Http\Middleware\RefreshCsrfToken::class,
-        ]);
-
         // Aplicar restricción de IP globalmente (opcional, puedes comentar si solo quieres aplicarlo en rutas específicas)
         // $middleware->append(\App\Http\Middleware\RestrictIpAddress::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Manejar error 419 (CSRF token expirado)
+        // En lugar de mostrar error, simplemente redirigir con mensaje amigable
+        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
+            // Si es AJAX, retornar JSON
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Tu sesión ha expirado. Por favor, recarga la página.',
+                    'reload' => true
+                ], 419);
+            }
+
+            // Si es formulario normal, redirigir atrás con mensaje
+            return redirect()->back()
+                ->withInput($request->except('_token', 'password', 'password_confirmation'))
+                ->with('warning', 'Tu sesión expiró. Por favor, intenta nuevamente. Los datos del formulario se han conservado.');
+        });
     })
     ->withProviders([
         \App\Providers\TimezoneServiceProvider::class,
