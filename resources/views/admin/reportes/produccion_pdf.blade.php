@@ -170,9 +170,7 @@
             <tbody>
                 <tr>
                     <td style="width: 25%; font-weight: bold;">Responsable:</td>
-                    <td style="width: 25%;">{{ $produccion->responsable ?? '-' }}</td>
-                    <td style="width: 25%; font-weight: bold;">Turno:</td>
-                    <td style="width: 25%;">{{ $produccion->turno ?? '-' }}</td>
+                    <td style="width: 75%;" colspan="3">{{ $produccion->responsable ?? '-' }}</td>
                 </tr>
                 @if($produccion->observaciones)
                 <tr>
