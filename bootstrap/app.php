@@ -23,6 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'restrict.ip' => \App\Http\Middleware\RestrictIpAddress::class,
         ]);
 
+        // Middleware global para refrescar token CSRF y evitar error 419
+        $middleware->append(\App\Http\Middleware\RefreshCsrfToken::class);
+
         // Aplicar restricción de IP globalmente (opcional, puedes comentar si solo quieres aplicarlo en rutas específicas)
         // $middleware->append(\App\Http\Middleware\RestrictIpAddress::class);
     })
