@@ -191,10 +191,12 @@
             </thead>
             <tbody>
                 @foreach($produccion->productos as $prod)
-                <tr>
-                    <td>{{ $prod->producto->nombre ?? 'Producto' }}</td>
-                    <td style="text-align: right; font-weight: bold;">{{ number_format($prod->cantidad) }} unidades</td>
-                </tr>
+                    @if(empty($validado['id_producto']) || $prod->producto_id == $validado['id_producto'])
+                    <tr>
+                        <td>{{ $prod->producto->nombre ?? 'Producto' }}</td>
+                        <td style="text-align: right; font-weight: bold;">{{ number_format($prod->cantidad) }} unidades</td>
+                    </tr>
+                    @endif
                 @endforeach
             </tbody>
         </table>

@@ -116,6 +116,34 @@
         <p>Generado el: {{ now()->format('d/m/Y') }}</p>
     </div>
 
+    {{-- Filtros Aplicados --}}
+    @if(isset($validado) && (!empty($validado['fecha_inicio']) || !empty($validado['fecha_fin']) || !empty($validado['tipo_movimiento'])))
+    <div style="background-color: #f0fdf4; padding: 12px; margin-bottom: 20px; border-radius: 5px; border-left: 4px solid #16a34a;">
+        <h3 style="color: #16a34a; margin-bottom: 10px; font-size: 14px;">Filtros Aplicados</h3>
+
+        @if(!empty($validado['fecha_inicio']))
+        <div style="display: inline-block; width: 48%; margin-bottom: 6px;">
+            <span style="font-weight: bold; color: #16a34a;">Fecha Inicio:</span>
+            {{ \Carbon\Carbon::parse($validado['fecha_inicio'])->format('d/m/Y') }}
+        </div>
+        @endif
+
+        @if(!empty($validado['fecha_fin']))
+        <div style="display: inline-block; width: 48%; margin-bottom: 6px;">
+            <span style="font-weight: bold; color: #16a34a;">Fecha Fin:</span>
+            {{ \Carbon\Carbon::parse($validado['fecha_fin'])->format('d/m/Y') }}
+        </div>
+        @endif
+
+        @if(!empty($validado['tipo_movimiento']))
+        <div style="display: inline-block; width: 48%; margin-bottom: 6px;">
+            <span style="font-weight: bold; color: #16a34a;">Tipo Movimiento:</span>
+            {{ ucfirst($validado['tipo_movimiento']) }}
+        </div>
+        @endif
+    </div>
+    @endif
+
     {{-- Tabla de Inventario --}}
     <table>
         <thead>

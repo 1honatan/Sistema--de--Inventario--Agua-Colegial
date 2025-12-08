@@ -68,12 +68,24 @@ class ReporteController extends Controller
             ->orderBy('fecha', 'desc')
             ->get();
 
+        // Filtrar por producto si se especifica
+        if (!empty($validado['id_producto'])) {
+            $producciones = $producciones->filter(function ($produccion) use ($validado) {
+                return $produccion->productos->contains('producto_id', $validado['id_producto']);
+            });
+        }
+
         // Calcular estadísticas
         $totalProducido = 0;
         $productosUnicos = [];
 
         foreach ($producciones as $produccion) {
             foreach ($produccion->productos as $prod) {
+                // Si hay filtro de producto, solo contar ese producto
+                if (!empty($validado['id_producto']) && $prod->producto_id != $validado['id_producto']) {
+                    continue;
+                }
+
                 $totalProducido += $prod->cantidad;
                 if ($prod->producto) {
                     $productosUnicos[$prod->producto_id] = true;
@@ -118,26 +130,137 @@ class ReporteController extends Controller
             'formato' => ['nullable', 'in:pdf,excel'],
         ]);
 
-        // Obtener productos con su stock actual desde la vista optimizada
-        $inventarios = DB::table('v_stock_actual')
-            ->where('estado', 'activo')
-            ->select('id', 'nombre', 'descripcion', 'tipo', 'unidad_medida', 'stock_actual')
-            ->orderBy('nombre')
-            ->get();
+        // Si hay filtros de fecha o tipo de movimiento, mostrar movimientos de inventario
+        if (!empty($validado['fecha_inicio']) || !empty($validado['fecha_fin']) || !empty($validado['tipo_movimiento'])) {
+            $movimientos = collect();
 
-        // Calcular estadísticas
-        $totalEntradas = DB::table('control_produccion_productos')->sum('cantidad');
-        $totalSalidas = SalidaProducto::sum('botellones');
-        $stockActual = $inventarios->sum('stock_actual');
-        $totalMovimientos = ($totalEntradas + $totalSalidas);
+            // Si se busca tipo "entrada" o sin especificar tipo, buscar en tabla inventario
+            if (empty($validado['tipo_movimiento']) || $validado['tipo_movimiento'] === 'entrada') {
+                $query = DB::table('inventario')
+                    ->join('productos', 'inventario.id_producto', '=', 'productos.id')
+                    ->select(
+                        'inventario.id',
+                        'inventario.fecha_movimiento',
+                        'inventario.tipo_movimiento',
+                        'inventario.cantidad',
+                        'inventario.origen',
+                        'inventario.observacion',
+                        'productos.id as producto_id',
+                        'productos.nombre as producto_nombre',
+                        'productos.unidad_medida'
+                    );
 
-        return view('admin.reportes.inventario', compact(
-            'inventarios',
-            'totalEntradas',
-            'totalSalidas',
-            'stockActual',
-            'totalMovimientos'
-        ));
+                // Aplicar filtros de fecha
+                if (!empty($validado['fecha_inicio'])) {
+                    $query->where('inventario.fecha_movimiento', '>=', $validado['fecha_inicio'] . ' 00:00:00');
+                }
+                if (!empty($validado['fecha_fin'])) {
+                    $query->where('inventario.fecha_movimiento', '<=', $validado['fecha_fin'] . ' 23:59:59');
+                }
+
+                // Aplicar filtro de tipo de movimiento
+                if (!empty($validado['tipo_movimiento'])) {
+                    $query->where('inventario.tipo_movimiento', $validado['tipo_movimiento']);
+                }
+
+                $movimientos = $query->orderBy('inventario.fecha_movimiento', 'desc')->get();
+            }
+
+            // Si se busca tipo "salida" o sin especificar tipo, buscar en control_salidas_productos
+            if (empty($validado['tipo_movimiento']) || $validado['tipo_movimiento'] === 'salida') {
+                $query = DB::table('control_salidas_productos');
+
+                // Aplicar filtros de fecha
+                if (!empty($validado['fecha_inicio'])) {
+                    $query->where('fecha', '>=', $validado['fecha_inicio']);
+                }
+                if (!empty($validado['fecha_fin'])) {
+                    $query->where('fecha', '<=', $validado['fecha_fin']);
+                }
+
+                $salidas = $query->orderBy('fecha', 'desc')->get();
+
+                // Mapeo de columnas a nombres de productos
+                $productosMap = [
+                    'botellones' => ['nombre' => 'Botellón 20 Litros', 'unidad' => 'unidad'],
+                    'bolo_grande' => ['nombre' => 'Bolo Grande', 'unidad' => 'bolsa'],
+                    'bolo_pequeño' => ['nombre' => 'Bolo Pequeño', 'unidad' => 'bolsa'],
+                    'gelatina' => ['nombre' => 'Gelatina', 'unidad' => 'unidad'],
+                    'agua_saborizada' => ['nombre' => 'Agua Saborizada', 'unidad' => 'bolsa'],
+                    'agua_limon' => ['nombre' => 'Agua De Limon', 'unidad' => 'bolsa'],
+                    'agua_natural' => ['nombre' => 'Agua Natural', 'unidad' => 'bolsa'],
+                    'hielo' => ['nombre' => 'Hielo', 'unidad' => 'bolsa'],
+                    'dispenser' => ['nombre' => 'Dispenser', 'unidad' => 'unidad'],
+                ];
+
+                // Convertir salidas a formato de movimientos
+                $movimientosSalidas = collect();
+                foreach ($salidas as $salida) {
+                    foreach ($productosMap as $columna => $producto) {
+                        $cantidad = $salida->$columna ?? 0;
+                        if ($cantidad > 0) {
+                            $movimientosSalidas->push((object)[
+                                'id' => $salida->id,
+                                'fecha_movimiento' => $salida->fecha,
+                                'tipo_movimiento' => 'salida',
+                                'cantidad' => $cantidad,
+                                'origen' => $salida->nombre_distribuidor ?? 'Control de Salidas',
+                                'observacion' => $salida->observaciones ?? '-',
+                                'producto_id' => null,
+                                'producto_nombre' => $producto['nombre'],
+                                'unidad_medida' => $producto['unidad'],
+                            ]);
+                        }
+                    }
+                }
+
+                // Combinar movimientos de entrada y salida
+                if ($movimientos->isEmpty()) {
+                    $movimientos = $movimientosSalidas;
+                } else {
+                    $movimientos = $movimientos->merge($movimientosSalidas);
+                }
+
+                // Ordenar por fecha descendente
+                $movimientos = $movimientos->sortByDesc('fecha_movimiento')->values();
+            }
+
+            // Calcular estadísticas de movimientos
+            $totalEntradas = $movimientos->where('tipo_movimiento', 'entrada')->sum('cantidad');
+            $totalSalidas = $movimientos->where('tipo_movimiento', 'salida')->sum('cantidad');
+            $stockActual = 0; // No aplica en vista de movimientos
+            $totalMovimientos = $movimientos->count();
+
+            return view('admin.reportes.inventario', compact(
+                'movimientos',
+                'validado',
+                'totalEntradas',
+                'totalSalidas',
+                'stockActual',
+                'totalMovimientos'
+            ));
+        } else {
+            // Si no hay filtros, mostrar stock actual (reporte normal)
+            $inventarios = DB::table('v_stock_actual')
+                ->where('estado', 'activo')
+                ->select('id', 'nombre', 'descripcion', 'tipo', 'unidad_medida', 'stock_actual')
+                ->orderBy('nombre')
+                ->get();
+
+            // Calcular estadísticas
+            $totalEntradas = DB::table('control_produccion_productos')->sum('cantidad');
+            $totalSalidas = SalidaProducto::sum('botellones');
+            $stockActual = $inventarios->sum('stock_actual');
+            $totalMovimientos = ($totalEntradas + $totalSalidas);
+
+            return view('admin.reportes.inventario', compact(
+                'inventarios',
+                'totalEntradas',
+                'totalSalidas',
+                'stockActual',
+                'totalMovimientos'
+            ));
+        }
     }
 
     /**
@@ -196,32 +319,148 @@ class ReporteController extends Controller
     /**
      * Exportar reporte de inventario a PDF.
      */
-    public function inventarioPDF(): Response
+    public function inventarioPDF(Request $request): Response
     {
-        $productos = Producto::where('estado', 'activo')->get();
-
-        $inventario = $productos->map(function ($producto) {
-            $stockActual = Inventario::stockDisponible($producto->id);
-            $stockMinimo = $producto->stock_minimo ?? 10; // Valor predeterminado de 10
-
-            return [
-                'producto' => $producto,
-                'stock_actual' => $stockActual,
-                'stock_minimo' => $stockMinimo,
-            ];
-        });
-
-        // Registrar en historial
-        HistorialReporte::create([
-            'tipo' => 'inventario',
-            'fecha_inicio' => null,
-            'fecha_fin' => null,
-            'id_usuario' => auth()->id(),
-            'formato' => 'pdf',
-            'filtros' => null,
+        $validado = $request->validate([
+            'fecha_inicio' => ['nullable', 'date'],
+            'fecha_fin' => ['nullable', 'date', 'after_or_equal:fecha_inicio'],
+            'tipo_movimiento' => ['nullable', 'in:entrada,salida'],
         ]);
 
-        $pdf = PDF::loadView('admin.reportes.inventario_pdf', compact('inventario'));
+        // Si hay filtros de fecha o tipo de movimiento, mostrar movimientos de inventario
+        if (!empty($validado['fecha_inicio']) || !empty($validado['fecha_fin']) || !empty($validado['tipo_movimiento'])) {
+            $movimientos = collect();
+
+            // Si se busca tipo "entrada" o sin especificar tipo, buscar en tabla inventario
+            if (empty($validado['tipo_movimiento']) || $validado['tipo_movimiento'] === 'entrada') {
+                $query = DB::table('inventario')
+                    ->join('productos', 'inventario.id_producto', '=', 'productos.id')
+                    ->select(
+                        'inventario.id',
+                        'inventario.fecha_movimiento',
+                        'inventario.tipo_movimiento',
+                        'inventario.cantidad',
+                        'inventario.origen',
+                        'inventario.observacion',
+                        'productos.id as producto_id',
+                        'productos.nombre as producto_nombre',
+                        'productos.unidad_medida'
+                    );
+
+                // Aplicar filtros de fecha
+                if (!empty($validado['fecha_inicio'])) {
+                    $query->where('inventario.fecha_movimiento', '>=', $validado['fecha_inicio'] . ' 00:00:00');
+                }
+                if (!empty($validado['fecha_fin'])) {
+                    $query->where('inventario.fecha_movimiento', '<=', $validado['fecha_fin'] . ' 23:59:59');
+                }
+
+                // Aplicar filtro de tipo de movimiento
+                if (!empty($validado['tipo_movimiento'])) {
+                    $query->where('inventario.tipo_movimiento', $validado['tipo_movimiento']);
+                }
+
+                $movimientos = $query->orderBy('inventario.fecha_movimiento', 'desc')->get();
+            }
+
+            // Si se busca tipo "salida" o sin especificar tipo, buscar en control_salidas_productos
+            if (empty($validado['tipo_movimiento']) || $validado['tipo_movimiento'] === 'salida') {
+                $query = DB::table('control_salidas_productos');
+
+                // Aplicar filtros de fecha
+                if (!empty($validado['fecha_inicio'])) {
+                    $query->where('fecha', '>=', $validado['fecha_inicio']);
+                }
+                if (!empty($validado['fecha_fin'])) {
+                    $query->where('fecha', '<=', $validado['fecha_fin']);
+                }
+
+                $salidas = $query->orderBy('fecha', 'desc')->get();
+
+                // Mapeo de columnas a nombres de productos
+                $productosMap = [
+                    'botellones' => ['nombre' => 'Botellón 20 Litros', 'unidad' => 'unidad'],
+                    'bolo_grande' => ['nombre' => 'Bolo Grande', 'unidad' => 'bolsa'],
+                    'bolo_pequeño' => ['nombre' => 'Bolo Pequeño', 'unidad' => 'bolsa'],
+                    'gelatina' => ['nombre' => 'Gelatina', 'unidad' => 'unidad'],
+                    'agua_saborizada' => ['nombre' => 'Agua Saborizada', 'unidad' => 'bolsa'],
+                    'agua_limon' => ['nombre' => 'Agua De Limon', 'unidad' => 'bolsa'],
+                    'agua_natural' => ['nombre' => 'Agua Natural', 'unidad' => 'bolsa'],
+                    'hielo' => ['nombre' => 'Hielo', 'unidad' => 'bolsa'],
+                    'dispenser' => ['nombre' => 'Dispenser', 'unidad' => 'unidad'],
+                ];
+
+                // Convertir salidas a formato de movimientos
+                $movimientosSalidas = collect();
+                foreach ($salidas as $salida) {
+                    foreach ($productosMap as $columna => $producto) {
+                        $cantidad = $salida->$columna ?? 0;
+                        if ($cantidad > 0) {
+                            $movimientosSalidas->push((object)[
+                                'id' => $salida->id,
+                                'fecha_movimiento' => $salida->fecha,
+                                'tipo_movimiento' => 'salida',
+                                'cantidad' => $cantidad,
+                                'origen' => $salida->nombre_distribuidor ?? 'Control de Salidas',
+                                'observacion' => $salida->observaciones ?? '-',
+                                'producto_id' => null,
+                                'producto_nombre' => $producto['nombre'],
+                                'unidad_medida' => $producto['unidad'],
+                            ]);
+                        }
+                    }
+                }
+
+                // Combinar movimientos de entrada y salida
+                if ($movimientos->isEmpty()) {
+                    $movimientos = $movimientosSalidas;
+                } else {
+                    $movimientos = $movimientos->merge($movimientosSalidas);
+                }
+
+                // Ordenar por fecha descendente
+                $movimientos = $movimientos->sortByDesc('fecha_movimiento')->values();
+            }
+
+            // Registrar en historial
+            HistorialReporte::create([
+                'tipo' => 'inventario_movimientos',
+                'fecha_inicio' => $validado['fecha_inicio'] ?? null,
+                'fecha_fin' => $validado['fecha_fin'] ?? null,
+                'id_usuario' => auth()->id(),
+                'formato' => 'pdf',
+                'filtros' => ['tipo_movimiento' => $validado['tipo_movimiento'] ?? null],
+            ]);
+
+            $pdf = PDF::loadView('admin.reportes.inventario_movimientos_pdf', compact('movimientos', 'validado'));
+
+        } else {
+            // Si no hay filtros, mostrar stock actual (reporte normal)
+            $productos = Producto::where('estado', 'activo')->get();
+
+            $inventario = $productos->map(function ($producto) {
+                $stockActual = Inventario::stockDisponible($producto->id);
+                $stockMinimo = $producto->stock_minimo ?? 10;
+
+                return [
+                    'producto' => $producto,
+                    'stock_actual' => $stockActual,
+                    'stock_minimo' => $stockMinimo,
+                ];
+            });
+
+            // Registrar en historial
+            HistorialReporte::create([
+                'tipo' => 'inventario',
+                'fecha_inicio' => null,
+                'fecha_fin' => null,
+                'id_usuario' => auth()->id(),
+                'formato' => 'pdf',
+                'filtros' => null,
+            ]);
+
+            $pdf = PDF::loadView('admin.reportes.inventario_pdf', compact('inventario', 'validado'));
+        }
 
         $nombreArchivo = 'reporte_inventario_' . date('Y-m-d') . '.pdf';
 

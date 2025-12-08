@@ -249,11 +249,6 @@
                     @endif
 
                     @if($salidas->count() > 0)
-                        <div class="alert alert-info mb-3">
-                            <i class="fas fa-info-circle mr-2"></i>
-                            Mostrando <strong>{{ $salidas->count() }}</strong> registro(s) de salida en esta semana
-                        </div>
-
                         @foreach($salidas as $salida)
                         <div class="salida-card">
                             <div class="salida-header">

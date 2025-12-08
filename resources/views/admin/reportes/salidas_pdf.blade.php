@@ -47,9 +47,9 @@
         <thead>
             <tr>
                 <th>Fecha</th>
+                <th>Chofer</th>
                 <th>Distribuidor</th>
                 <th>Vehículo</th>
-                <th>Botellones</th>
                 <th>Retornos</th>
                 <th>Hora Llegada</th>
             </tr>
@@ -58,9 +58,9 @@
             @forelse($salidas as $salida)
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($salida->fecha)->format('d/m/Y') }}</td>
+                    <td>{{ $salida->chofer ?? '-' }}</td>
                     <td>{{ $salida->nombre_distribuidor }}</td>
                     <td>{{ $salida->vehiculo_placa ?? '-' }}</td>
-                    <td style="text-align: right; font-weight: bold;">{{ number_format($salida->botellones) }}</td>
                     <td style="text-align: right;">{{ number_format($salida->retornos) }}</td>
                     <td>{{ $salida->hora_llegada ? \Carbon\Carbon::parse($salida->hora_llegada)->format('H:i') : 'Sin registrar' }}</td>
                 </tr>
@@ -79,10 +79,6 @@
         <div class="summary-item">
             <span class="summary-label">Total de Salidas:</span><br>
             <span class="summary-value">{{ number_format($totalRegistros) }}</span>
-        </div>
-        <div class="summary-item">
-            <span class="summary-label">Total Botellones:</span><br>
-            <span class="summary-value">{{ number_format($totalBotellones) }}</span>
         </div>
     </div>
 

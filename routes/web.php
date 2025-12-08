@@ -81,6 +81,20 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/personal/{personal}', [AdminAsistenciaController::class, 'verPorPersonal'])->name('ver-personal');
         Route::get('/reporte', [AdminAsistenciaController::class, 'reporte'])->name('reporte');
     });
+
+    // Gestión de Asignaciones de Personal (Control Centralizado)
+    Route::prefix('asignaciones')->name('asignaciones.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminAsignacionController::class, 'index'])->name('index');
+        Route::get('/crear', [\App\Http\Controllers\Admin\AdminAsignacionController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\AdminAsignacionController::class, 'store'])->name('store');
+        Route::get('/{asignacion}', [\App\Http\Controllers\Admin\AdminAsignacionController::class, 'show'])->name('show');
+        Route::get('/{asignacion}/editar', [\App\Http\Controllers\Admin\AdminAsignacionController::class, 'edit'])->name('edit');
+        Route::put('/{asignacion}', [\App\Http\Controllers\Admin\AdminAsignacionController::class, 'update'])->name('update');
+        Route::patch('/{asignacion}/suspender', [\App\Http\Controllers\Admin\AdminAsignacionController::class, 'suspend'])->name('suspend');
+        Route::patch('/{asignacion}/finalizar', [\App\Http\Controllers\Admin\AdminAsignacionController::class, 'finalize'])->name('finalize');
+        Route::patch('/{asignacion}/reactivar', [\App\Http\Controllers\Admin\AdminAsignacionController::class, 'reactivate'])->name('reactivate');
+        Route::delete('/{asignacion}', [\App\Http\Controllers\Admin\AdminAsignacionController::class, 'destroy'])->name('destroy');
+    });
 });
 
 /*

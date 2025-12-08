@@ -25,13 +25,14 @@
             Filtros de Búsqueda
         </h3>
 
-        <form action="{{ route('admin.reportes.produccion') }}" method="GET" class="space-y-4">
+        <form action="{{ route('admin.reportes.produccion') }}" method="GET" class="space-y-4" id="formFiltros">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 {{-- Fecha Inicio --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Fecha Inicio</label>
                     <input type="date"
                            name="fecha_inicio"
+                           id="fecha_inicio"
                            value="{{ request('fecha_inicio', now()->startOfMonth()->format('Y-m-d')) }}"
                            required
                            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
@@ -42,6 +43,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">Fecha Fin</label>
                     <input type="date"
                            name="fecha_fin"
+                           id="fecha_fin"
                            value="{{ request('fecha_fin', now()->format('Y-m-d')) }}"
                            required
                            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
@@ -50,7 +52,7 @@
                 {{-- Producto --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Producto</label>
-                    <select name="id_producto" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                    <select name="id_producto" id="id_producto" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500">
                         <option value="">Todos los productos</option>
                         @foreach($productos ?? [] as $producto)
                             <option value="{{ $producto->id }}" {{ request('id_producto') == $producto->id ? 'selected' : '' }}>
@@ -138,12 +140,12 @@
                 <i class="fas fa-industry mr-2 text-blue-600"></i>
                 Detalle de Producción Diaria
             </h3>
-            <a href="{{ route('admin.reportes.produccion.pdf', request()->all()) }}"
-               target="_blank"
-               class="btn btn-danger flex items-center gap-2">
+            <button type="button"
+                    onclick="exportarPDF()"
+                    class="btn btn-danger flex items-center gap-2">
                 <i class="fas fa-file-pdf"></i>
                 Exportar PDF
-            </a>
+            </button>
         </div>
 
         <div class="overflow-x-auto">
@@ -152,7 +154,6 @@
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsable</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turno</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Productos</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Materiales</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observaciones</th>
@@ -167,23 +168,16 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ $produccion->responsable ?? 'N/A' }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                @if($produccion->turno)
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full {{ str_contains($produccion->turno, 'Mañana') || str_contains($produccion->turno, 'Ma') ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800' }}">
-                                        {{ $produccion->turno }}
-                                    </span>
-                                @else
-                                    <span class="text-gray-400">N/A</span>
-                                @endif
-                            </td>
                             <td class="px-6 py-4 text-sm text-gray-900">
                                 @if($produccion->productos->count() > 0)
                                     <ul class="list-disc list-inside">
                                         @foreach($produccion->productos as $prod)
-                                            <li>
-                                                <strong>{{ $prod->producto->nombre ?? 'Producto' }}:</strong>
-                                                {{ number_format($prod->cantidad) }} unidades
-                                            </li>
+                                            @if(empty(request('id_producto')) || $prod->producto_id == request('id_producto'))
+                                                <li>
+                                                    <strong>{{ $prod->producto->nombre ?? 'Producto' }}:</strong>
+                                                    {{ number_format($prod->cantidad) }} unidades
+                                                </li>
+                                            @endif
                                         @endforeach
                                     </ul>
                                 @else
@@ -210,7 +204,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                            <td colspan="5" class="px-6 py-8 text-center text-gray-500">
                                 <i class="fas fa-inbox text-3xl mb-2"></i>
                                 <p>No hay registros de producción en el rango de fechas seleccionado</p>
                             </td>
@@ -225,6 +219,33 @@
 
 @push('scripts')
 <script>
+    function exportarPDF() {
+        // Obtener los valores actuales de los inputs del formulario usando IDs
+        const fechaInicio = document.getElementById('fecha_inicio').value;
+        const fechaFin = document.getElementById('fecha_fin').value;
+        const idProducto = document.getElementById('id_producto').value;
+
+        // Validar que las fechas existan
+        if (!fechaInicio || !fechaFin) {
+            alert('Por favor selecciona las fechas de inicio y fin');
+            return;
+        }
+
+        // Construir URL con los parámetros actuales
+        let url = "{{ route('admin.reportes.produccion.pdf') }}";
+        url += `?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`;
+
+        if (idProducto) {
+            url += `&id_producto=${idProducto}`;
+        }
+
+        // Mostrar URL en consola para debug
+        console.log('URL generada para PDF:', url);
+
+        // Abrir en nueva ventana
+        window.open(url, '_blank');
+    }
+
     $(document).ready(function() {
         @if(isset($producciones) && count($producciones) > 0)
         $('#tablaProduccion').DataTable({
