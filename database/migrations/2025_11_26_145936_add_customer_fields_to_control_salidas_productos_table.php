@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('control_salidas_productos', function (Blueprint $table) {
-            $table->string('nombre_cliente')->nullable()->after('tipo_salida');
-            $table->string('direccion_entrega')->nullable()->after('nombre_cliente');
-            $table->string('telefono_cliente', 20)->nullable()->after('direccion_entrega');
+            $table->string('nombre_cliente')->nullable();
+            $table->string('direccion_entrega')->nullable();
+            $table->string('telefono_cliente', 20)->nullable();
         });
     }
 

@@ -93,6 +93,25 @@
             margin-bottom: 1rem;
         }
 
+        .login-logo {
+            width: 100%;
+            height: auto;
+            margin: 0 0 1rem 0;
+            border-radius: 0;
+            overflow: hidden;
+            background: transparent;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .login-logo img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            max-height: 150px;
+        }
+
         .login-header h1 {
             font-size: 1.5rem;
             font-weight: 700;
@@ -176,7 +195,9 @@
     <div class="login-container">
         <div class="login-card">
             <div class="login-header">
-                <i class="fas fa-tint"></i>
+                <div class="login-logo">
+                    <img src="{{ asset('images/3.jpg') }}" alt="Agua Colegial Logo">
+                </div>
                 <h1>Agua Colegial</h1>
                 <p>Sistema de Gestión</p>
             </div>

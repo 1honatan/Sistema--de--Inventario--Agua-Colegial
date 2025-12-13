@@ -475,11 +475,17 @@ class ReporteController extends Controller
         $validado = $request->validate([
             'fecha_inicio' => ['required', 'date'],
             'fecha_fin' => ['required', 'date', 'after_or_equal:fecha_inicio'],
+            'tipo_salida' => ['nullable', 'string', 'in:Despacho Interno,Pedido Cliente,Venta Directa'],
         ]);
 
-        $salidas = SalidaProducto::whereBetween('fecha', [$validado['fecha_inicio'], $validado['fecha_fin']])
-            ->orderBy('fecha', 'desc')
-            ->get();
+        $query = SalidaProducto::whereBetween('fecha', [$validado['fecha_inicio'], $validado['fecha_fin']]);
+
+        // Filtrar por tipo de salida si se especifica
+        if (!empty($validado['tipo_salida'])) {
+            $query->where('tipo_salida', $validado['tipo_salida']);
+        }
+
+        $salidas = $query->orderBy('fecha', 'desc')->get();
 
         $totalBotellones = $salidas->sum('botellones');
         $totalRegistros = $salidas->count();

@@ -59,17 +59,77 @@ return [
             'strict' => true,
             'engine' => 'InnoDB',
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                // Configuraciones de seguridad y estabilidad
+                // ============================================
+                // CONFIGURACIÓN ANTI-CORRUPCIÓN MÁXIMA
+                // ============================================
+
+                // Errores: Lanzar excepciones para detectar problemas inmediatamente
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+
+                // Preparación: Usar prepared statements reales (previene SQL injection y corrupción)
                 PDO::ATTR_EMULATE_PREPARES => false,
+
+                // Tipos de datos: Preservar tipos originales (evita conversiones que corrompen datos)
                 PDO::ATTR_STRINGIFY_FETCHES => false,
-                PDO::ATTR_PERSISTENT => false, // Desactivar conexiones persistentes para evitar problemas
+
+                // Conexiones: NO usar persistentes (previene estados corruptos entre requests)
+                PDO::ATTR_PERSISTENT => false,
+
+                // Timeout: Tiempo razonable para operaciones (previene bloqueos eternos)
                 PDO::ATTR_TIMEOUT => 30,
 
-                // Configuraciones específicas de MySQL para prevenir corrupción
-                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci, sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'",
+                // Autocommit: Activado por defecto para commits inmediatos
+                PDO::ATTR_AUTOCOMMIT => true,
+
+                // Transacciones: Modo estricto
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+
+                // ============================================
+                // CONFIGURACIÓN ESPECÍFICA MYSQL
+                // ============================================
+
+                // Comandos de inicialización con máxima seguridad
+                PDO::MYSQL_ATTR_INIT_COMMAND => implode('; ', [
+                    // Charset y collation seguros
+                    "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci",
+
+                    // SQL Mode estricto - PREVIENE CORRUPCIÓN DE DATOS
+                    "SET sql_mode='STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'",
+
+                    // InnoDB en modo seguro
+                    "SET innodb_strict_mode=1",
+
+                    // Timeouts para prevenir bloqueos
+                    "SET wait_timeout=28800",
+                    "SET interactive_timeout=28800",
+
+                    // Prevenir deadlocks con timeout
+                    "SET innodb_lock_wait_timeout=50",
+
+                    // Transacciones: Nivel de aislamiento REPEATABLE READ (default InnoDB)
+                    "SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+
+                    // Zona horaria
+                    "SET time_zone='-04:00'"
+                ]),
+
+                // Buffer de consultas: Activado para estabilidad
                 PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-                PDO::MYSQL_ATTR_LOCAL_INFILE => false, // Seguridad: prevenir carga de archivos locales
+
+                // Seguridad: Desactivar carga de archivos locales (previene ataques)
+                PDO::MYSQL_ATTR_LOCAL_INFILE => false,
+
+                // Compresión: Desactivada para evitar problemas de corrupción en red
+                PDO::MYSQL_ATTR_COMPRESS => false,
+
+                // Direct query: Desactivado para usar prepared statements
+                PDO::MYSQL_ATTR_DIRECT_QUERY => false,
+
+                // Encontrar filas: Devolver filas encontradas en lugar de afectadas
+                PDO::MYSQL_ATTR_FOUND_ROWS => true,
+
+                // Múltiples statements: Desactivado por seguridad
+                PDO::MYSQL_ATTR_MULTI_STATEMENTS => false,
             ]) : [],
         ],
 

@@ -161,19 +161,6 @@ class SalidasController extends Controller
 
         $validated = $request->validate($rules);
 
-        // Validar duplicados: Evitar registros del mismo distribuidor en la misma fecha
-        if ($request->filled('nombre_distribuidor') && $request->filled('fecha')) {
-            $existeDuplicado = SalidaProducto::where('nombre_distribuidor', $request->nombre_distribuidor)
-                ->whereDate('fecha', $request->fecha)
-                ->exists();
-
-            if ($existeDuplicado) {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(['error' => 'Ya existe una salida registrada para ' . $request->nombre_distribuidor . ' en la fecha ' . date('d/m/Y', strtotime($request->fecha)) . '. Por favor, verifique los registros existentes o edite el registro anterior.']);
-            }
-        }
-
         // Normalizar nombre_distribuidor según el tipo de salida
         if ($request->tipo_salida === 'Venta Directa') {
             $validated['nombre_distribuidor'] = $validated['nombre_cliente'] ?? '';

@@ -22,7 +22,6 @@ class PersonalSeeder extends Seeder
                 'cargo' => 'Supervisor de Producción',
                 'area' => 'Producción',
                 'estado' => 'activo',
-                'es_chofer' => false,
                 'tiene_acceso' => true,
             ],
             [
@@ -32,7 +31,6 @@ class PersonalSeeder extends Seeder
                 'cargo' => 'Encargada de Inventario',
                 'area' => 'Almacén',
                 'estado' => 'activo',
-                'es_chofer' => false,
                 'tiene_acceso' => true,
             ],
             [
@@ -42,7 +40,6 @@ class PersonalSeeder extends Seeder
                 'cargo' => 'Chofer',
                 'area' => 'Distribución',
                 'estado' => 'activo',
-                'es_chofer' => true,
                 'tiene_acceso' => false,
             ],
             [
@@ -52,7 +49,6 @@ class PersonalSeeder extends Seeder
                 'cargo' => 'Operadora de Producción',
                 'area' => 'Producción',
                 'estado' => 'activo',
-                'es_chofer' => false,
                 'tiene_acceso' => false,
             ],
             [
@@ -62,7 +58,6 @@ class PersonalSeeder extends Seeder
                 'cargo' => 'Chofer',
                 'area' => 'Distribución',
                 'estado' => 'activo',
-                'es_chofer' => true,
                 'tiene_acceso' => false,
             ],
         ];

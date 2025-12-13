@@ -145,7 +145,7 @@ return new class extends Migration
         if (Schema::hasColumn('control_salidas_productos', 'responsable')) {
             if (!Schema::hasColumn('control_salidas_productos', 'id_responsable_salida')) {
                 Schema::table('control_salidas_productos', function (Blueprint $table) {
-                    $table->foreignId('id_responsable_salida')->nullable()->after('id_chofer');
+                    $table->foreignId('id_responsable_salida')->nullable();
                 });
 
                 Schema::table('control_salidas_productos', function (Blueprint $table) {

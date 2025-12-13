@@ -80,12 +80,13 @@
         .sidebar-logo {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            justify-content: center;
+            width: 100%;
         }
 
         .sidebar-logo-icon {
-            width: 80px;
-            height: 80px;
+            width: 100%;
+            height: auto;
             background: transparent;
             border-radius: 0;
             display: flex;
@@ -94,13 +95,14 @@
             box-shadow: none;
             flex-shrink: 0;
             padding: 0;
+            border: none;
         }
 
         .sidebar-logo-icon img {
             width: 100%;
-            height: 100%;
+            height: auto;
             object-fit: contain;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+            display: block;
         }
 
         .sidebar-logo-text {
@@ -1190,6 +1192,65 @@
         }
 
         /* ==========================================
+           Estilos para SweetAlert2 Personalizado
+           ========================================== */
+        .swal2-popup {
+            border-radius: 1rem !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
+            padding: 2rem !important;
+        }
+
+        .swal2-title {
+            font-size: 1.5rem !important;
+            font-weight: 700 !important;
+            color: #1f2937 !important;
+            margin-bottom: 0.5rem !important;
+        }
+
+        .swal2-html-container {
+            font-size: 1rem !important;
+            color: #6b7280 !important;
+            margin: 1rem 0 !important;
+        }
+
+        .swal2-actions {
+            gap: 0.75rem !important;
+            margin-top: 1.5rem !important;
+        }
+
+        .swal2-confirm.btn {
+            min-width: 120px !important;
+            padding: 0.75rem 1.5rem !important;
+            font-size: 0.95rem !important;
+            font-weight: 600 !important;
+            border-radius: 0.5rem !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .swal2-cancel.btn {
+            min-width: 120px !important;
+            padding: 0.75rem 1.5rem !important;
+            font-size: 0.95rem !important;
+            font-weight: 600 !important;
+            border-radius: 0.5rem !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .swal2-confirm.btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .swal2-cancel.btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .swal2-icon {
+            margin: 1rem auto !important;
+        }
+
+        /* ==========================================
            Badges y Tags personalizados
            ========================================== */
         .badge {
@@ -1432,9 +1493,8 @@
             <div class="sidebar-header">
                 <div class="sidebar-logo">
                     <div class="sidebar-logo-icon">
-                        <img src="{{ asset('images/logo.png') }}" alt="Agua Colegial Logo">
+                        <img src="{{ asset('images/3.jpg') }}" alt="Agua Colegial Logo">
                     </div>
-                    <span class="sidebar-logo-text">Agua Colegial</span>
                 </div>
             </div>
 
@@ -2367,52 +2427,166 @@
         })();
     </script>
 
-    <!-- Sistema de Confirmación Global -->
+    <!-- Sistema de Confirmación Global Mejorado -->
     <script>
-        // Confirmación antes de guardar formularios
+        // ==========================================
+        // Confirmación Global para TODAS las acciones
+        // ==========================================
         document.addEventListener('DOMContentLoaded', function() {
-            // Agregar confirmación a todos los formularios que no sean de búsqueda/filtro
-            const forms = document.querySelectorAll('form[data-confirm="true"]');
+            // Seleccionar TODOS los formularios excepto login y búsquedas
+            const forms = document.querySelectorAll('form:not([data-no-confirm])');
 
             forms.forEach(form => {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
+                // Evitar formularios de login, logout, búsqueda y filtros
+                const formAction = form.getAttribute('action') || '';
+                const formId = form.getAttribute('id') || '';
+                const formClass = form.getAttribute('class') || '';
 
-                    const formAction = this.getAttribute('action');
-                    const formMethod = this.querySelector('input[name="_method"]')?.value || this.method;
+                // Lista de excepciones (no mostrar confirmación)
+                const exceptions = [
+                    'login',
+                    'logout',
+                    'search',
+                    'filter',
+                    'buscar',
+                    'filtro'
+                ];
 
-                    // Determinar el tipo de acción
-                    let actionText = 'guardar este registro';
-                    let actionIcon = 'question';
-                    let actionColor = '#0ea5e9';
+                // Verificar si el formulario es una excepción
+                const isException = exceptions.some(ex =>
+                    formAction.toLowerCase().includes(ex) ||
+                    formId.toLowerCase().includes(ex) ||
+                    formClass.toLowerCase().includes(ex)
+                );
 
-                    if (formMethod === 'DELETE' || formAction.includes('destroy')) {
-                        actionText = 'eliminar este registro';
-                        actionIcon = 'warning';
-                        actionColor = '#dc2626';
-                    } else if (formMethod === 'PUT' || formMethod === 'PATCH' || formAction.includes('edit')) {
-                        actionText = 'actualizar este registro';
-                        actionIcon = 'question';
-                        actionColor = '#f59e0b';
+                // Si es logout, no confirmar (ya tiene su propia confirmación)
+                if (formAction.includes('logout')) {
+                    return;
+                }
+
+                // Si no es excepción, agregar confirmación
+                if (!isException) {
+                    // Marcar que ya tiene listener para evitar duplicados
+                    if (form.dataset.confirmListenerAdded) {
+                        return;
+                    }
+                    form.dataset.confirmListenerAdded = 'true';
+
+                    form.addEventListener('submit', function(e) {
+                        // Si ya fue confirmado, permitir envío
+                        if (this.dataset.confirmed === 'true') {
+                            return true;
+                        }
+
+                        e.preventDefault();
+
+                        const formMethod = this.querySelector('input[name="_method"]')?.value || this.method;
+
+                        // Determinar el tipo de acción
+                        let actionText = 'guardar este registro';
+                        let actionIcon = 'question';
+                        let actionColor = '#0ea5e9';
+                        let actionTitle = '¿Estás seguro?';
+
+                        if (formMethod === 'DELETE' || formAction.includes('destroy')) {
+                            actionText = 'eliminar este registro';
+                            actionTitle = '¿Eliminar registro?';
+                            actionIcon = 'warning';
+                            actionColor = '#dc2626';
+                        } else if (formMethod === 'PUT' || formMethod === 'PATCH' || formAction.includes('edit') || formAction.includes('update')) {
+                            actionText = 'actualizar este registro';
+                            actionTitle = '¿Actualizar registro?';
+                            actionIcon = 'question';
+                            actionColor = '#f59e0b';
+                        } else if (formMethod === 'POST' || formAction.includes('store') || formAction.includes('create')) {
+                            actionText = 'guardar este registro';
+                            actionTitle = '¿Guardar registro?';
+                            actionIcon = 'question';
+                            actionColor = '#10b981';
+                        }
+
+                        Swal.fire({
+                            title: actionTitle,
+                            text: `¿Deseas ${actionText}?`,
+                            icon: actionIcon,
+                            showCancelButton: true,
+                            confirmButtonColor: actionColor,
+                            cancelButtonColor: '#6b7280',
+                            confirmButtonText: 'Sí, continuar',
+                            cancelButtonText: 'Cancelar',
+                            reverseButtons: true,
+                            customClass: {
+                                popup: 'animate__animated animate__fadeIn animate__faster',
+                                confirmButton: 'btn btn-primary',
+                                cancelButton: 'btn btn-secondary'
+                            },
+                            buttonsStyling: false,
+                            focusCancel: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Marcar como confirmado y enviar
+                                this.dataset.confirmed = 'true';
+                                this.submit();
+                            }
+                        });
+
+                        return false;
+                    });
+                }
+            });
+
+            // ==========================================
+            // Confirmación para enlaces de eliminación
+            // ==========================================
+            const deleteLinks = document.querySelectorAll('a[href*="destroy"], a.btn-danger[onclick*="submit"], button[onclick*="delete"]');
+
+            deleteLinks.forEach(link => {
+                if (link.dataset.confirmListenerAdded) {
+                    return;
+                }
+                link.dataset.confirmListenerAdded = 'true';
+
+                link.addEventListener('click', function(e) {
+                    // Si ya fue confirmado, permitir
+                    if (this.dataset.confirmed === 'true') {
+                        return true;
                     }
 
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const href = this.getAttribute('href');
+                    const onclick = this.getAttribute('onclick');
+
                     Swal.fire({
-                        title: '¿Estás seguro?',
-                        text: `¿Deseas ${actionText}?`,
-                        icon: actionIcon,
+                        title: '¿Eliminar registro?',
+                        text: '¿Deseas eliminar este registro? Esta acción no se puede deshacer.',
+                        icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonColor: actionColor,
+                        confirmButtonColor: '#dc2626',
                         cancelButtonColor: '#6b7280',
-                        confirmButtonText: 'Sí, continuar',
+                        confirmButtonText: 'Sí, eliminar',
                         cancelButtonText: 'Cancelar',
-                        reverseButtons: true
+                        reverseButtons: true,
+                        customClass: {
+                            popup: 'animate__animated animate__fadeIn animate__faster',
+                            confirmButton: 'btn btn-danger',
+                            cancelButton: 'btn btn-secondary'
+                        },
+                        buttonsStyling: false
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            // Remover el listener para evitar loop infinito
-                            this.removeEventListener('submit', arguments.callee);
-                            this.submit();
+                            this.dataset.confirmed = 'true';
+
+                            if (onclick) {
+                                eval(onclick);
+                            } else if (href) {
+                                window.location.href = href;
+                            }
                         }
                     });
+
+                    return false;
                 });
             });
         });

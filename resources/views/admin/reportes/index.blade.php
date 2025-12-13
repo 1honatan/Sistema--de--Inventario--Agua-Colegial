@@ -54,6 +54,15 @@
                 <div class="p-4">
                     <form action="{{ route('admin.reportes.salidas') }}" method="GET" class="space-y-3">
                         <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Tipo de Salida</label>
+                            <select name="tipo_salida" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+                                <option value="">Todos los tipos</option>
+                                <option value="Despacho Interno">Despacho Interno</option>
+                                <option value="Pedido Cliente">Pedido Cliente</option>
+                                <option value="Venta Directa">Venta Directa</option>
+                            </select>
+                        </div>
+                        <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Fecha Inicio</label>
                             <input type="date" name="fecha_inicio" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
                         </div>
