@@ -1,281 +1,222 @@
 @extends('layouts.app')
 
 @section('title', 'Nuevo Control de Insumo')
-
-@push('styles')
-<style>
-    body {
-        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #14b8a6 100%);
-        min-height: 100vh;
-        position: relative;
-    }
-
-    body::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        pointer-events: none;
-        z-index: 0;
-    }
-</style>
-@endpush
+@section('page-title', 'Nuevo Control de Insumo')
+@section('page-subtitle', 'Complete el formulario para registrar un nuevo insumo')
 
 @section('content')
-<div class="container-fluid px-4">
-    <div class="row">
-        <div class="col-xl-10 col-lg-11 mx-auto">
-            <!-- Tarjeta Principal -->
-            <div class="modern-card">
-                <!-- Encabezado con Gradiente -->
-                <div class="modern-card-header">
-                    <h3 class="modern-card-title">
-                        <i class="fas fa-box-open mr-2"></i>
-                        Nuevo Control de Insumo
-                    </h3>
-                    <p class="modern-card-subtitle">
-                        Complete el formulario para registrar un nuevo insumo
-                    </p>
+<div class="max-w-3xl mx-auto">
+    {{-- Breadcrumb --}}
+    <div class="mb-6">
+        <nav class="text-sm">
+            <a href="{{ route('admin.dashboard') }}" class="text-cyan-600 hover:text-cyan-800">Dashboard</a>
+            <span class="mx-2 text-gray-500">/</span>
+            <a href="{{ route('control.insumos.index') }}" class="text-cyan-600 hover:text-cyan-800">Insumos</a>
+            <span class="mx-2 text-gray-500">/</span>
+            <span class="text-gray-600">Nuevo Insumo</span>
+        </nav>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <form action="{{ route('control.insumos.store') }}" method="POST" id="insumoForm">
+            @csrf
+
+            <div class="space-y-6">
+                {{-- Información Básica --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {{-- Fecha --}}
+                    <div>
+                        <label for="fecha" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-calendar-alt text-cyan-600 mr-1"></i>
+                            Fecha de Registro
+                        </label>
+                        <input type="date"
+                               name="fecha"
+                               id="fecha"
+                               value="{{ date('Y-m-d') }}"
+                               readonly
+                               class="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-100 cursor-not-allowed">
+                        <p class="mt-1 text-xs text-gray-500">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Fecha automática (hoy)
+                        </p>
+                    </div>
+
+                    {{-- Producto del Insumo --}}
+                    <div>
+                        <label for="producto_insumo" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-cube text-cyan-600 mr-1"></i>
+                            Producto del Insumo <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text"
+                               name="producto_insumo"
+                               id="producto_insumo"
+                               value="{{ old('producto_insumo') }}"
+                               required
+                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('producto_insumo') border-red-500 @enderror"
+                               placeholder="Ej: Cloro, Detergente, etc.">
+                        @error('producto_insumo')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
-                <!-- Cuerpo del Formulario -->
-                <div class="modern-card-body">
-                    <form action="{{ route('control.insumos.store') }}" method="POST" id="insumoForm" data-confirm="true">
-                        @csrf
+                {{-- Cantidad y Medidas --}}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {{-- Cantidad --}}
+                    <div>
+                        <label for="cantidad" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-sort-numeric-up text-cyan-600 mr-1"></i>
+                            Cantidad <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number"
+                               step="0.01"
+                               name="cantidad"
+                               id="cantidad"
+                               value="{{ old('cantidad') }}"
+                               min="0"
+                               required
+                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('cantidad') border-red-500 @enderror"
+                               placeholder="0.00">
+                        @error('cantidad')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <!-- Información del Insumo -->
-                        <div class="section-box border-cyan">
-                            <div class="section-header">
-                                <i class="fas fa-info-circle text-info"></i>
-                                <h4>Información del Insumo</h4>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="fecha" class="form-label required-mark">
-                                            <i class="fas fa-calendar-alt"></i> Fecha de Registro
-                                        </label>
-                                        <input type="date"
-                                               name="fecha"
-                                               id="fecha"
-                                               class="modern-input @error('fecha') is-invalid @enderror"
-                                               value="{{ date('Y-m-d') }}"
-                                               readonly
-                                               style="background-color: #f3f4f6; cursor: not-allowed;"
-                                               required>
-                                        @error('fecha')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                        <small class="text-muted">
-                                            <i class="fas fa-info-circle"></i> Fecha automática (hoy)
-                                        </small>
-                                    </div>
-                                </div>
+                    {{-- Unidad de Medida --}}
+                    <div>
+                        <label for="unidad_medida" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-ruler text-cyan-600 mr-1"></i>
+                            Unidad de Medida <span class="text-red-500">*</span>
+                        </label>
+                        <select name="unidad_medida"
+                                id="unidad_medida"
+                                required
+                                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('unidad_medida') border-red-500 @enderror">
+                            <option value="">Seleccione...</option>
+                            <option value="kg" {{ old('unidad_medida') == 'kg' ? 'selected' : '' }}>Kilogramos (kg)</option>
+                            <option value="g" {{ old('unidad_medida') == 'g' ? 'selected' : '' }}>Gramos (g)</option>
+                            <option value="L" {{ old('unidad_medida') == 'L' ? 'selected' : '' }}>Litros (L)</option>
+                            <option value="ml" {{ old('unidad_medida') == 'ml' ? 'selected' : '' }}>Mililitros (ml)</option>
+                        </select>
+                        @error('unidad_medida')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="producto_insumo" class="form-label required-mark">
-                                            <i class="fas fa-cube"></i> Producto del Insumo
-                                        </label>
-                                        <input type="text"
-                                               name="producto_insumo"
-                                               id="producto_insumo"
-                                               class="modern-input @error('producto_insumo') is-invalid @enderror"
-                                               value="{{ old('producto_insumo') }}"
-                                               placeholder="Ej: Cloro, Detergente, Químico de limpieza, etc."
-                                               required>
-                                        @error('producto_insumo')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    {{-- Número de Lote --}}
+                    <div>
+                        <label for="numero_lote" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-barcode text-cyan-600 mr-1"></i>
+                            Número de Lote
+                        </label>
+                        <input type="text"
+                               name="numero_lote"
+                               id="numero_lote"
+                               value="{{ old('numero_lote') }}"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('numero_lote') border-red-500 @enderror"
+                               placeholder="Ej: L-2025-001">
+                        @error('numero_lote')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
 
-                        <!-- Cantidad y Medidas -->
-                        <div class="section-box border-purple">
-                            <div class="section-header">
-                                <i class="fas fa-balance-scale text-purple-600"></i>
-                                <h4>Cantidad y Medidas</h4>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="cantidad" class="form-label required-mark">
-                                            <i class="fas fa-sort-numeric-up"></i> Cantidad
-                                        </label>
-                                        <input type="number"
-                                               step="0.01"
-                                               name="cantidad"
-                                               id="cantidad"
-                                               class="modern-input @error('cantidad') is-invalid @enderror"
-                                               value="{{ old('cantidad') }}"
-                                               min="0"
-                                               required>
-                                        @error('cantidad')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
+                {{-- Vencimiento y Responsable --}}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {{-- Fecha de Vencimiento --}}
+                    <div>
+                        <label for="fecha_vencimiento" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-calendar-times text-cyan-600 mr-1"></i>
+                            Fecha de Vencimiento
+                        </label>
+                        <input type="date"
+                               name="fecha_vencimiento"
+                               id="fecha_vencimiento"
+                               value="{{ old('fecha_vencimiento') }}"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('fecha_vencimiento') border-red-500 @enderror">
+                        @error('fecha_vencimiento')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="unidad_medida" class="form-label required-mark">
-                                            <i class="fas fa-ruler"></i> Unidad de Medida
-                                        </label>
-                                        <select name="unidad_medida"
-                                                id="unidad_medida"
-                                                class="modern-input @error('unidad_medida') is-invalid @enderror"
-                                                required>
-                                            <option value="">Seleccione...</option>
-                                            <option value="kg" {{ old('unidad_medida') == 'kg' ? 'selected' : '' }}>Kilogramos (kg)</option>
-                                            <option value="g" {{ old('unidad_medida') == 'g' ? 'selected' : '' }}>Gramos (g)</option>
-                                            <option value="L" {{ old('unidad_medida') == 'L' ? 'selected' : '' }}>Litros (L)</option>
-                                            <option value="ml" {{ old('unidad_medida') == 'ml' ? 'selected' : '' }}>Mililitros (ml)</option>
-                                        </select>
-                                        @error('unidad_medida')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
+                    {{-- Responsable --}}
+                    <div>
+                        <label for="responsable" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-user-check text-cyan-600 mr-1"></i>
+                            Responsable <span class="text-red-500">*</span>
+                        </label>
+                        <select name="responsable"
+                                id="responsable"
+                                required
+                                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('responsable') border-red-500 @enderror">
+                            <option value="">Seleccione...</option>
+                            @foreach($personal as $persona)
+                                <option value="{{ $persona->nombre_completo }}" {{ old('responsable') == $persona->nombre_completo ? 'selected' : '' }}>
+                                    {{ $persona->nombre_completo }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('responsable')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="numero_lote" class="form-label">
-                                            <i class="fas fa-barcode"></i> Número de Lote
-                                        </label>
-                                        <input type="text"
-                                               name="numero_lote"
-                                               id="numero_lote"
-                                               class="modern-input @error('numero_lote') is-invalid @enderror"
-                                               value="{{ old('numero_lote') }}"
-                                               placeholder="Ej: L-2025-001">
-                                        @error('numero_lote')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    {{-- Proveedor --}}
+                    <div>
+                        <label for="proveedor" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-truck text-cyan-600 mr-1"></i>
+                            Proveedor
+                        </label>
+                        <input type="text"
+                               name="proveedor"
+                               id="proveedor"
+                               value="{{ old('proveedor') }}"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('proveedor') border-red-500 @enderror"
+                               placeholder="Nombre del proveedor">
+                        @error('proveedor')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
 
-                        <!-- Fechas y Responsable -->
-                        <div class="section-box border-orange">
-                            <div class="section-header">
-                                <i class="fas fa-calendar-check text-warning"></i>
-                                <h4>Vencimiento y Responsable</h4>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="fecha_vencimiento" class="form-label">
-                                            <i class="fas fa-calendar-times"></i> Fecha de Vencimiento
-                                        </label>
-                                        <input type="date"
-                                               name="fecha_vencimiento"
-                                               id="fecha_vencimiento"
-                                               class="modern-input @error('fecha_vencimiento') is-invalid @enderror"
-                                               value="{{ old('fecha_vencimiento') }}">
-                                        @error('fecha_vencimiento')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
+                {{-- Observaciones --}}
+                <div>
+                    <label for="observaciones" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-sticky-note text-cyan-600 mr-1"></i>
+                        Observaciones
+                    </label>
+                    <textarea name="observaciones"
+                              id="observaciones"
+                              rows="3"
+                              class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('observaciones') border-red-500 @enderror"
+                              placeholder="Ingrese observaciones adicionales (opcional)...">{{ old('observaciones') }}</textarea>
+                    @error('observaciones')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="responsable" class="form-label required-mark">
-                                            <i class="fas fa-user-check"></i> Responsable
-                                        </label>
-                                        <select name="responsable"
-                                                id="responsable"
-                                                class="modern-input @error('responsable') is-invalid @enderror"
-                                                required>
-                                            <option value="">Seleccione responsable...</option>
-                                            @foreach($personal as $persona)
-                                                <option value="{{ $persona->nombre_completo }}" {{ old('responsable') == $persona->nombre_completo ? 'selected' : '' }}>
-                                                    {{ $persona->nombre_completo }} ({{ $persona->cargo }})
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('responsable')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
+                {{-- Botones --}}
+                <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                    <a href="{{ route('control.insumos.index') }}" class="text-gray-600 hover:text-gray-800 font-semibold transition">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Volver
+                    </a>
 
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="proveedor" class="form-label">
-                                            <i class="fas fa-truck"></i> Proveedor
-                                        </label>
-                                        <input type="text"
-                                               name="proveedor"
-                                               id="proveedor"
-                                               class="modern-input @error('proveedor') is-invalid @enderror"
-                                               value="{{ old('proveedor') }}"
-                                               placeholder="Nombre del proveedor">
-                                        @error('proveedor')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="flex space-x-3">
+                        <button type="reset" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-semibold transition">
+                            <i class="fas fa-redo mr-2"></i>
+                            Limpiar
+                        </button>
 
-                        <!-- Observaciones -->
-                        <div class="section-box border-blue">
-                            <div class="section-header">
-                                <i class="fas fa-sticky-note text-primary"></i>
-                                <h4>Observaciones Adicionales</h4>
-                            </div>
-                            <div class="form-group">
-                                <textarea name="observaciones"
-                                          id="observaciones"
-                                          rows="3"
-                                          class="modern-textarea @error('observaciones') is-invalid @enderror"
-                                          placeholder="Ingrese observaciones adicionales (opcional)...">{{ old('observaciones') }}</textarea>
-                                @error('observaciones')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- Botones de Acción -->
-                        <div class="d-flex justify-content-end gap-3 mt-4">
-                            <a href="{{ route('control.insumos.index') }}" class="btn-modern btn-secondary">
-                                <i class="fas fa-times"></i>
-                                Cancelar
-                            </a>
-                            <button type="submit" class="btn-modern btn-success">
-                                <i class="fas fa-save"></i>
-                                Guardar Insumo
-                            </button>
-                        </div>
-                    </form>
+                        <button type="submit" class="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg">
+                            <i class="fas fa-save mr-2"></i>
+                            Guardar Insumo
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    $(document).ready(function() {
-        // Animación de secciones
-        ModernComponents.initSectionAnimations();
-
-        // Animación al enviar formulario
-        ModernComponents.initFormSubmitAnimation('#insumoForm');
-
-        // Atajos de teclado
-        ModernComponents.initKeyboardShortcuts('#insumoForm', '{{ route("control.insumos.index") }}');
-
-        // Advertencia de cambios no guardados
-        ModernComponents.initUnsavedChangesWarning('#insumoForm');
-    });
-</script>
-@endpush

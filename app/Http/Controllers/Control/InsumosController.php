@@ -17,7 +17,15 @@ class InsumosController extends Controller
 
     public function create()
     {
-        $personal = Personal::where('estado', 'activo')->orderBy('nombre_completo')->get();
+        // Excluir choferes, distribuidores y limpieza
+        $personal = Personal::where('estado', 'activo')
+            ->whereNotIn('cargo', [
+                'Chofer (Despacho)',
+                'Ayudante (Distribuidor)',
+                'Limpieza'
+            ])
+            ->orderBy('nombre_completo')
+            ->get();
         return view('control.insumos.create', compact('personal'));
     }
 
@@ -61,7 +69,15 @@ class InsumosController extends Controller
 
     public function edit(Insumo $insumo)
     {
-        $personal = Personal::where('estado', 'activo')->orderBy('nombre_completo')->get();
+        // Excluir choferes, distribuidores y limpieza
+        $personal = Personal::where('estado', 'activo')
+            ->whereNotIn('cargo', [
+                'Chofer (Despacho)',
+                'Ayudante (Distribuidor)',
+                'Limpieza'
+            ])
+            ->orderBy('nombre_completo')
+            ->get();
         return view('control.insumos.edit', compact('insumo', 'personal'));
     }
 

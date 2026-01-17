@@ -220,21 +220,6 @@
                     </button>
                 </form>
 
-                {{-- Exportar a Excel --}}
-                <form action="{{ route('inventario.movimiento.exportar-excel') }}" method="POST" class="inline">
-                    @csrf
-                    <input type="hidden" name="fecha_inicio" value="{{ $fechaInicio ?? '' }}">
-                    <input type="hidden" name="fecha_fin" value="{{ $fechaFin ?? '' }}">
-                    <input type="hidden" name="tipo_movimiento" value="{{ $tipoMovimiento ?? '' }}">
-                    <input type="hidden" name="id_producto" value="{{ $idProducto ?? '' }}">
-                    <input type="hidden" name="id_usuario" value="{{ $idUsuario ?? '' }}">
-                    <button type="submit"
-                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 shadow-md hover:shadow-lg">
-                        <i class="fa-solid fa-file-excel"></i>
-                        Exportar Excel
-                    </button>
-                </form>
-
                 {{-- Nuevo Movimiento --}}
                 <a href="{{ route('inventario.movimiento.create') }}"
                    class="px-4 py-2 text-white rounded-lg hover:shadow-lg transition flex items-center gap-2"

@@ -168,7 +168,7 @@
                     <!-- Navegación de Semanas Mejorada -->
                     <div class="mb-4" style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);">
                         <div class="d-flex justify-content-between align-items-center">
-                            <a href="{{ route('control.salidas.index', ['semana' => ($semana ?? 0) - 1]) }}"
+                            <a href="{{ route('control.salidas.index', ['semana' => ($semana ?? 0) - 1, 'tipo_salida' => request('tipo_salida')]) }}"
                                class="btn"
                                style="background: white; color: #0284c7; border: 2px solid #0ea5e9; border-radius: 12px; padding: 0.75rem 1.5rem; font-weight: 600; box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2); transition: all 0.3s ease;"
                                onmouseover="this.style.background='#0ea5e9'; this.style.color='white'; this.style.transform='translateX(-5px)'"
@@ -189,7 +189,7 @@
                                 </div>
                             </div>
 
-                            <a href="{{ route('control.salidas.index', ['semana' => ($semana ?? 0) + 1]) }}"
+                            <a href="{{ route('control.salidas.index', ['semana' => ($semana ?? 0) + 1, 'tipo_salida' => request('tipo_salida')]) }}"
                                class="btn"
                                style="background: white; color: #0284c7; border: 2px solid #0ea5e9; border-radius: 12px; padding: 0.75rem 1.5rem; font-weight: 600; box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2); transition: all 0.3s ease;"
                                onmouseover="this.style.background='#0ea5e9'; this.style.color='white'; this.style.transform='translateX(5px)'"

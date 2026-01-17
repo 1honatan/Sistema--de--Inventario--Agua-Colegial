@@ -45,8 +45,12 @@ class VehiculoController extends Controller
      */
     public function create(): View
     {
-        $personal = Personal::where('estado', 'activo')->orderBy('nombre_completo')->get();
-        return view('admin.vehiculos.create', compact('personal'));
+        // Solo mostrar choferes activos para asignar al vehículo
+        $choferes = Personal::where('estado', 'activo')
+            ->where('cargo', 'LIKE', '%Chofer%')
+            ->orderBy('nombre_completo')
+            ->get();
+        return view('admin.vehiculos.create', compact('choferes'));
     }
 
     /**
@@ -87,8 +91,12 @@ class VehiculoController extends Controller
      */
     public function edit(Vehiculo $vehiculo): View
     {
-        $personal = Personal::where('estado', 'activo')->orderBy('nombre_completo')->get();
-        return view('admin.vehiculos.edit', compact('vehiculo', 'personal'));
+        // Solo mostrar choferes activos para asignar al vehículo
+        $choferes = Personal::where('estado', 'activo')
+            ->where('cargo', 'LIKE', '%Chofer%')
+            ->orderBy('nombre_completo')
+            ->get();
+        return view('admin.vehiculos.edit', compact('vehiculo', 'choferes'));
     }
 
     /**

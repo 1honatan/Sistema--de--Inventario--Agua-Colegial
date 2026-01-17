@@ -85,10 +85,11 @@
         }
 
         .sidebar-logo-icon {
-            width: 100%;
+            width: 70%;
+            max-width: 120px;
             height: auto;
             background: transparent;
-            border-radius: 0;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -96,11 +97,13 @@
             flex-shrink: 0;
             padding: 0;
             border: none;
+            margin: 0 auto;
         }
 
         .sidebar-logo-icon img {
             width: 100%;
             height: auto;
+            max-height: 80px;
             object-fit: contain;
             display: block;
         }
@@ -217,6 +220,29 @@
             white-space: nowrap;
             transition: opacity 0.3s ease;
             font-size: 0.8rem;
+        }
+
+        /* Enlaces deshabilitados (restringidos) */
+        .sidebar-link.disabled {
+            opacity: 0.5;
+            cursor: pointer;
+            background: rgba(220, 38, 38, 0.1);
+            border-left: 3px solid #dc2626;
+        }
+
+        .sidebar-link.disabled:hover {
+            background: rgba(220, 38, 38, 0.2);
+            opacity: 0.7;
+            transform: none;
+        }
+
+        .sidebar-link.disabled i:first-child {
+            color: #6b7280;
+        }
+
+        .sidebar-link.disabled .fa-lock {
+            color: #dc2626 !important;
+            opacity: 0.8;
         }
 
         /* User Section Institucional - Mejorado */
@@ -440,10 +466,56 @@
                 z-index: 40 !important;
                 height: 100vh !important;
                 transform: none !important;
+                display: flex !important;
+                flex-direction: column !important;
             }
 
             .sidebar.mobile-open {
                 left: 0 !important;
+            }
+
+            /* Logo header fijo en la parte superior */
+            .sidebar-header {
+                flex-shrink: 0 !important;
+            }
+
+            /* Asegurar que el nav sea scrollable y el logout siempre visible */
+            .sidebar nav {
+                flex: 1 !important;
+                overflow-y: auto !important;
+                min-height: 0 !important;
+                max-height: none !important;
+            }
+
+            /* Mantener el área de usuario fija en la parte inferior */
+            .sidebar-user {
+                flex-shrink: 0 !important;
+                position: relative !important;
+                padding: 0.75rem !important;
+            }
+
+            .user-profile-card {
+                padding: 0.6rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+
+            .sidebar-user-avatar {
+                width: 38px !important;
+                height: 38px !important;
+                font-size: 0.95rem !important;
+            }
+
+            .sidebar-user-name {
+                font-size: 0.8rem !important;
+            }
+
+            .sidebar-user-role {
+                font-size: 0.65rem !important;
+            }
+
+            .sidebar-logout-btn {
+                padding: 0.6rem !important;
+                font-size: 0.85rem !important;
             }
 
             /* Main content full width */
@@ -727,6 +799,53 @@
             table th, table td {
                 padding: 0.5rem 0.4rem !important;
             }
+
+            /* Sidebar user section más compacto */
+            .sidebar-user {
+                padding: 0.5rem !important;
+            }
+
+            .user-profile-card {
+                padding: 0.5rem !important;
+                margin-bottom: 0.4rem !important;
+            }
+
+            .user-profile-header {
+                margin-bottom: 0.4rem !important;
+            }
+
+            .sidebar-user-avatar {
+                width: 32px !important;
+                height: 32px !important;
+                font-size: 0.85rem !important;
+                border-radius: 8px !important;
+            }
+
+            .sidebar-user-info {
+                margin-left: 0.5rem !important;
+            }
+
+            .sidebar-user-name {
+                font-size: 0.75rem !important;
+            }
+
+            .sidebar-user-role {
+                font-size: 0.6rem !important;
+            }
+
+            .user-profile-stats {
+                padding-top: 0.4rem !important;
+            }
+
+            .user-profile-stats .stat-item {
+                font-size: 0.6rem !important;
+            }
+
+            .sidebar-logout-btn {
+                padding: 0.5rem !important;
+                font-size: 0.8rem !important;
+                border-radius: 8px !important;
+            }
         }
 
         @media (max-width: 400px) {
@@ -801,6 +920,40 @@
             .btn {
                 font-size: 0.75rem !important;
                 padding: 0.4rem 0.8rem !important;
+            }
+
+            /* Sidebar aún más compacto en pantallas muy pequeñas */
+            .sidebar-user {
+                padding: 0.4rem !important;
+            }
+
+            .user-profile-card {
+                padding: 0.4rem !important;
+                margin-bottom: 0.3rem !important;
+            }
+
+            /* Ocultar estadísticas de perfil en pantallas muy pequeñas */
+            .user-profile-stats {
+                display: none !important;
+            }
+
+            .sidebar-user-avatar {
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 0.75rem !important;
+            }
+
+            .sidebar-user-name {
+                font-size: 0.7rem !important;
+            }
+
+            .sidebar-user-role {
+                font-size: 0.55rem !important;
+            }
+
+            .sidebar-logout-btn {
+                padding: 0.4rem !important;
+                font-size: 0.75rem !important;
             }
         }
 
@@ -1493,7 +1646,7 @@
             <div class="sidebar-header">
                 <div class="sidebar-logo">
                     <div class="sidebar-logo-icon">
-                        <img src="{{ asset('images/3.jpg') }}" alt="Agua Colegial Logo">
+                        <img src="{{ asset('images/logo.png') }}" alt="Agua Colegial Logo">
                     </div>
                 </div>
             </div>
@@ -1661,12 +1814,29 @@
 
                     <!-- Menú Rol Producción -->
                     @if($rol === 'produccion')
-                        <!-- Inventario General -->
+                        <!-- Sección: Principal -->
+                        <li class="sidebar-section-header">
+                            <p class="sidebar-section-title">
+                                <i class="fas fa-star text-xs"></i>
+                                <span class="sidebar-text">Principal</span>
+                            </p>
+                        </li>
+
+                        <!-- Registro del Personal - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Registro del Personal')" class="sidebar-link flex items-center px-4 py-3 rounded-lg disabled cursor-pointer">
+                                <i class="fas fa-user-clock w-5"></i>
+                                <span class="ml-3 sidebar-text">Registro del Personal</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
+                            </a>
+                        </li>
+
+                        <!-- Inventario General - HABILITADO -->
                         <li>
                             <a href="{{ route('inventario.index') }}"
-                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'inventario.index') ? 'active' : '' }}">
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'inventario') ? 'active' : '' }}">
                                 <i class="fas fa-warehouse w-5"></i>
-                                <span class="ml-3 sidebar-text">Inventario</span>
+                                <span class="ml-3 sidebar-text">Inventario General</span>
                             </a>
                         </li>
 
@@ -1678,7 +1848,7 @@
                             </p>
                         </li>
 
-                        <!-- 4. Productos Producidos Diarios -->
+                        <!-- Productos Producidos Diarios - HABILITADO -->
                         <li>
                             <a href="{{ route('control.produccion.index') }}"
                                class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.produccion') ? 'active' : '' }}">
@@ -1687,7 +1857,7 @@
                             </a>
                         </li>
 
-                        <!-- 5. Salidas Productos Diarios -->
+                        <!-- Salidas Productos Diarios - HABILITADO -->
                         <li>
                             <a href="{{ route('control.salidas.index') }}"
                                class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.salidas') ? 'active' : '' }}">
@@ -1696,57 +1866,91 @@
                             </a>
                         </li>
 
-                        <!-- 6. Control de Insumos -->
+                        <!-- Control de Insumos - DESHABILITADO -->
                         <li>
-                            <a href="{{ route('control.insumos.index') }}"
-                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.insumos') ? 'active' : '' }}">
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Control de Insumos')" class="sidebar-link flex items-center px-4 py-3 rounded-lg disabled cursor-pointer">
                                 <i class="fas fa-box-open w-5"></i>
                                 <span class="ml-3 sidebar-text">Control de Insumos</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
                             </a>
                         </li>
 
-                        <!-- 7. Mantenimiento de Equipo -->
+                        <!-- Mantenimiento de Equipo - DESHABILITADO -->
                         <li>
-                            <a href="{{ route('control.mantenimiento.index') }}"
-                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.mantenimiento') ? 'active' : '' }}">
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Mantenimiento de Equipo')" class="sidebar-link flex items-center px-4 py-3 rounded-lg disabled cursor-pointer">
                                 <i class="fas fa-tools w-5"></i>
                                 <span class="ml-3 sidebar-text">Mantenimiento de Equipo</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
                             </a>
                         </li>
 
-                        <!-- 8. Limpieza de Tanques de Agua -->
+                        <!-- Limpieza de Tanques de Agua - DESHABILITADO -->
                         <li>
-                            <a href="{{ route('control.tanques.index') }}"
-                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.tanques') ? 'active' : '' }}">
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Limpieza Tanques de Agua')" class="sidebar-link flex items-center px-4 py-3 rounded-lg disabled cursor-pointer">
                                 <i class="fas fa-water w-5"></i>
                                 <span class="ml-3 sidebar-text">Limpieza Tanques de Agua</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
                             </a>
                         </li>
 
-                        <!-- 9. Limpieza de Fosa Séptica -->
+                        <!-- Limpieza de Fosa Séptica - DESHABILITADO -->
                         <li>
-                            <a href="{{ route('control.fosa-septica.index') }}"
-                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.fosa-septica') ? 'active' : '' }}">
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Limpieza Fosa Séptica')" class="sidebar-link flex items-center px-4 py-3 rounded-lg disabled cursor-pointer">
                                 <i class="fas fa-toilet w-5"></i>
                                 <span class="ml-3 sidebar-text">Limpieza Fosa Séptica</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
                             </a>
                         </li>
 
-                        <!-- 10. Control de Fumigación -->
+                        <!-- Control de Fumigación - DESHABILITADO -->
                         <li>
-                            <a href="{{ route('control.fumigacion.index') }}"
-                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.fumigacion') ? 'active' : '' }}">
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Control de Fumigación')" class="sidebar-link flex items-center px-4 py-3 rounded-lg disabled cursor-pointer">
                                 <i class="fas fa-spray-can w-5"></i>
                                 <span class="ml-3 sidebar-text">Control de Fumigación</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
                             </a>
                         </li>
 
-                        <!-- 11. Reportes -->
+                        <!-- Sección: Gestión -->
+                        <li class="sidebar-section-header">
+                            <p class="sidebar-section-title">
+                                <i class="fas fa-cog text-xs"></i>
+                                <span class="sidebar-text">Gestión</span>
+                            </p>
+                        </li>
+
+                        <!-- Gestión de Vehículos - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Gestión de Vehículos')" class="sidebar-link flex items-center px-4 py-3 rounded-lg disabled cursor-pointer">
+                                <i class="fas fa-car w-5"></i>
+                                <span class="ml-3 sidebar-text">Gestión de Vehículos</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
+                            </a>
+                        </li>
+
+                        <!-- Reportes - HABILITADO -->
                         <li>
                             <a href="{{ route('admin.reportes.index') }}"
                                class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'admin.reportes') ? 'active' : '' }}">
                                 <i class="fas fa-chart-line w-5"></i>
                                 <span class="ml-3 sidebar-text">Reportes</span>
+                            </a>
+                        </li>
+
+                        <!-- Sección: Administración -->
+                        <li class="sidebar-section-header">
+                            <p class="sidebar-section-title">
+                                <i class="fas fa-users-cog text-xs"></i>
+                                <span class="sidebar-text">Administración</span>
+                            </p>
+                        </li>
+
+                        <!-- Configuración del Sistema - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Configuración del Sistema')" class="sidebar-link flex items-center px-4 py-3 rounded-lg disabled cursor-pointer">
+                                <i class="fas fa-cogs w-5"></i>
+                                <span class="ml-3 sidebar-text">Configuración del Sistema</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
                             </a>
                         </li>
 
@@ -1774,44 +1978,253 @@
 
                     <!-- Menú Rol Inventario -->
                     @if($rol === 'inventario')
-                        <!-- Dashboard Principal -->
-                        <li>
-                            <a href="{{ route('inventario.dashboard') }}"
-                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'inventario.dashboard') ? 'active' : '' }}">
-                                <i class="fas fa-home w-5"></i>
-                                <span class="ml-3 sidebar-text">Inicio</span>
-                            </a>
-                        </li>
-
-                        <!-- Sección: Inventario -->
+                        <!-- Sección: Principal -->
                         <li class="sidebar-section-header">
                             <p class="sidebar-section-title">
-                                <i class="fas fa-boxes text-xs"></i>
-                                <span class="sidebar-text">Gestión de Inventario</span>
+                                <i class="fas fa-star text-xs"></i>
+                                <span class="sidebar-text">Principal</span>
                             </p>
                         </li>
 
+                        <!-- Registro del Personal - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Registro del Personal')" class="sidebar-link flex items-center px-4 py-3 rounded-lg disabled cursor-pointer">
+                                <i class="fas fa-user-clock w-5"></i>
+                                <span class="ml-3 sidebar-text">Registro del Personal</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
+                            </a>
+                        </li>
+
+                        <!-- Inventario General - HABILITADO -->
                         <li>
                             <a href="{{ route('inventario.index') }}"
-                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'inventario.index') ? 'active' : '' }}">
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'inventario') ? 'active' : '' }}">
                                 <i class="fas fa-warehouse w-5"></i>
                                 <span class="ml-3 sidebar-text">Inventario General</span>
                             </a>
                         </li>
 
+                        <!-- Sección: Controles -->
+                        <li class="sidebar-section-header">
+                            <p class="sidebar-section-title">
+                                <i class="fas fa-clipboard-check text-xs"></i>
+                                <span class="sidebar-text">Controles</span>
+                            </p>
+                        </li>
+
+                        <!-- Productos Producidos Diarios - HABILITADO -->
                         <li>
-                            <a href="{{ route('inventario.movimiento.create') }}"
-                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'inventario.movimiento.create') ? 'active' : '' }}">
-                                <i class="fas fa-exchange-alt w-5"></i>
-                                <span class="ml-3 sidebar-text">Registro de Movimientos</span>
+                            <a href="{{ route('control.produccion.index') }}"
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.produccion') ? 'active' : '' }}">
+                                <i class="fas fa-industry w-5"></i>
+                                <span class="ml-3 sidebar-text">Productos Producidos Diarios</span>
                             </a>
                         </li>
 
+                        <!-- Salidas Productos Diarios - HABILITADO -->
                         <li>
-                            <a href="{{ route('inventario.movimiento.historial') }}"
-                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'inventario.movimiento.historial') ? 'active' : '' }}">
-                                <i class="fas fa-history w-5"></i>
-                                <span class="ml-3 sidebar-text">Historial de Movimientos</span>
+                            <a href="{{ route('control.salidas.index') }}"
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.salidas') ? 'active' : '' }}">
+                                <i class="fas fa-truck-loading w-5"></i>
+                                <span class="ml-3 sidebar-text">Salidas Productos Diarios</span>
+                            </a>
+                        </li>
+
+                        <!-- Control de Insumos - HABILITADO -->
+                        <li>
+                            <a href="{{ route('control.insumos.index') }}"
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.insumos') ? 'active' : '' }}">
+                                <i class="fas fa-box-open w-5"></i>
+                                <span class="ml-3 sidebar-text">Control de Insumos</span>
+                            </a>
+                        </li>
+
+                        <!-- Mantenimiento de Equipo - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Mantenimiento de Equipo')" class="sidebar-link flex items-center px-4 py-3 rounded-lg disabled cursor-pointer">
+                                <i class="fas fa-tools w-5"></i>
+                                <span class="ml-3 sidebar-text">Mantenimiento de Equipo</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
+                            </a>
+                        </li>
+
+                        <!-- Limpieza Tanques de Agua - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Limpieza Tanques de Agua')" class="sidebar-link flex items-center px-4 py-3 rounded-lg disabled cursor-pointer">
+                                <i class="fas fa-water w-5"></i>
+                                <span class="ml-3 sidebar-text">Limpieza Tanques de Agua</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
+                            </a>
+                        </li>
+
+                        <!-- Limpieza Fosa Séptica - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Limpieza Fosa Séptica')" class="sidebar-link flex items-center px-4 py-3 rounded-lg disabled cursor-pointer">
+                                <i class="fas fa-toilet w-5"></i>
+                                <span class="ml-3 sidebar-text">Limpieza Fosa Séptica</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
+                            </a>
+                        </li>
+
+                        <!-- Control de Fumigación - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Control de Fumigación')" class="sidebar-link flex items-center px-4 py-3 rounded-lg disabled cursor-pointer">
+                                <i class="fas fa-spray-can w-5"></i>
+                                <span class="ml-3 sidebar-text">Control de Fumigación</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
+                            </a>
+                        </li>
+
+                        <!-- Sección: Gestión -->
+                        <li class="sidebar-section-header">
+                            <p class="sidebar-section-title">
+                                <i class="fas fa-cog text-xs"></i>
+                                <span class="sidebar-text">Gestión</span>
+                            </p>
+                        </li>
+
+                        <!-- Gestión de Vehículos - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Gestión de Vehículos')" class="sidebar-link flex items-center px-4 py-3 rounded-lg disabled cursor-pointer">
+                                <i class="fas fa-car w-5"></i>
+                                <span class="ml-3 sidebar-text">Gestión de Vehículos</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
+                            </a>
+                        </li>
+
+                        <!-- Reportes - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Reportes')" class="sidebar-link flex items-center px-4 py-3 rounded-lg disabled cursor-pointer">
+                                <i class="fas fa-chart-line w-5"></i>
+                                <span class="ml-3 sidebar-text">Reportes</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
+                            </a>
+                        </li>
+
+                    @endif
+
+                    <!-- Menú Rol Despacho (Chofer) -->
+                    @if($rol === 'despacho')
+                        <!-- Sección: Principal -->
+                        <li class="sidebar-section-header">
+                            <p class="sidebar-section-title">
+                                <i class="fas fa-star text-xs"></i>
+                                <span class="sidebar-text">Principal</span>
+                            </p>
+                        </li>
+
+                        <!-- Registro del Personal - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Registro del Personal')" class="sidebar-link flex items-center px-4 py-3 rounded-lg opacity-50 cursor-not-allowed">
+                                <i class="fas fa-user-clock w-5"></i>
+                                <span class="ml-3 sidebar-text">Registro del Personal</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
+                            </a>
+                        </li>
+
+                        <!-- Inventario General - HABILITADO -->
+                        <li>
+                            <a href="{{ route('inventario.index') }}"
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'inventario') ? 'active' : '' }}">
+                                <i class="fas fa-warehouse w-5"></i>
+                                <span class="ml-3 sidebar-text">Inventario General</span>
+                            </a>
+                        </li>
+
+                        <!-- Sección: Controles -->
+                        <li class="sidebar-section-header">
+                            <p class="sidebar-section-title">
+                                <i class="fas fa-clipboard-check text-xs"></i>
+                                <span class="sidebar-text">Controles</span>
+                            </p>
+                        </li>
+
+                        <!-- Productos Producidos Diarios - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Productos Producidos Diarios')" class="sidebar-link flex items-center px-4 py-3 rounded-lg opacity-50 cursor-not-allowed">
+                                <i class="fas fa-industry w-5"></i>
+                                <span class="ml-3 sidebar-text">Productos Producidos Diarios</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
+                            </a>
+                        </li>
+
+                        <!-- Salidas Productos Diarios - HABILITADO -->
+                        <li>
+                            <a href="{{ route('control.salidas.index') }}"
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'control.salidas') ? 'active' : '' }}">
+                                <i class="fas fa-truck-loading w-5"></i>
+                                <span class="ml-3 sidebar-text">Salidas Productos Diarios</span>
+                            </a>
+                        </li>
+
+                        <!-- Control de Insumos - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Control de Insumos')" class="sidebar-link flex items-center px-4 py-3 rounded-lg opacity-50 cursor-not-allowed">
+                                <i class="fas fa-box-open w-5"></i>
+                                <span class="ml-3 sidebar-text">Control de Insumos</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
+                            </a>
+                        </li>
+
+                        <!-- Mantenimiento de Equipo - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Mantenimiento de Equipo')" class="sidebar-link flex items-center px-4 py-3 rounded-lg opacity-50 cursor-not-allowed">
+                                <i class="fas fa-tools w-5"></i>
+                                <span class="ml-3 sidebar-text">Mantenimiento de Equipo</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
+                            </a>
+                        </li>
+
+                        <!-- Limpieza Tanques de Agua - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Limpieza Tanques de Agua')" class="sidebar-link flex items-center px-4 py-3 rounded-lg opacity-50 cursor-not-allowed">
+                                <i class="fas fa-water w-5"></i>
+                                <span class="ml-3 sidebar-text">Limpieza Tanques de Agua</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
+                            </a>
+                        </li>
+
+                        <!-- Limpieza Fosa Séptica - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Limpieza Fosa Séptica')" class="sidebar-link flex items-center px-4 py-3 rounded-lg opacity-50 cursor-not-allowed">
+                                <i class="fas fa-toilet w-5"></i>
+                                <span class="ml-3 sidebar-text">Limpieza Fosa Séptica</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
+                            </a>
+                        </li>
+
+                        <!-- Control de Fumigación - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Control de Fumigación')" class="sidebar-link flex items-center px-4 py-3 rounded-lg opacity-50 cursor-not-allowed">
+                                <i class="fas fa-spray-can w-5"></i>
+                                <span class="ml-3 sidebar-text">Control de Fumigación</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
+                            </a>
+                        </li>
+
+                        <!-- Sección: Gestión -->
+                        <li class="sidebar-section-header">
+                            <p class="sidebar-section-title">
+                                <i class="fas fa-cog text-xs"></i>
+                                <span class="sidebar-text">Gestión</span>
+                            </p>
+                        </li>
+
+                        <!-- Gestión de Vehículos - HABILITADO -->
+                        <li>
+                            <a href="{{ route('admin.vehiculos.index') }}"
+                               class="sidebar-link flex items-center px-4 py-3 rounded-lg {{ str_starts_with($currentRoute, 'admin.vehiculos') ? 'active' : '' }}">
+                                <i class="fas fa-car w-5"></i>
+                                <span class="ml-3 sidebar-text">Gestión de Vehículos</span>
+                            </a>
+                        </li>
+
+                        <!-- Reportes - DESHABILITADO -->
+                        <li>
+                            <a href="javascript:void(0)" onclick="mostrarAccesoDenegado('Reportes')" class="sidebar-link flex items-center px-4 py-3 rounded-lg opacity-50 cursor-not-allowed">
+                                <i class="fas fa-chart-line w-5"></i>
+                                <span class="ml-3 sidebar-text">Reportes</span>
+                                <i class="fas fa-lock text-xs ml-auto text-red-400"></i>
                             </a>
                         </li>
 
@@ -2590,6 +3003,25 @@
                 });
             });
         });
+
+        // Función para mostrar mensaje de acceso denegado
+        function mostrarAccesoDenegado(modulo) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Acceso Denegado',
+                html: `<div class="text-center">
+                    <p class="mb-3">No tienes permisos para acceder al módulo:</p>
+                    <p class="font-bold text-lg text-red-600">${modulo}</p>
+                    <hr class="my-3">
+                    <p class="text-sm text-gray-600">Solo el administrador puede acceder a este módulo.</p>
+                </div>`,
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#dc2626',
+                customClass: {
+                    popup: 'animate__animated animate__shakeX'
+                }
+            });
+        }
     </script>
 
     @stack('scripts')

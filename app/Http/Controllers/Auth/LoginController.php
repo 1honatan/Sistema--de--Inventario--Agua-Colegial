@@ -140,8 +140,9 @@ class LoginController extends Controller
         return match ($rolNombre) {
             'admin' => redirect()->route('admin.dashboard'),
             'produccion' => redirect()->route('control.produccion.index'),
-            'inventario' => redirect()->route('inventario.dashboard'),
-            default => redirect()->route('admin.dashboard'),
+            'inventario' => redirect()->route('inventario.index'),
+            'despacho' => redirect()->route('control.salidas.index'),
+            default => redirect()->route('login'),
         };
     }
 }

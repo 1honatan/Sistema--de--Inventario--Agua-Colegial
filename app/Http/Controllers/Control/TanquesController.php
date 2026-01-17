@@ -17,7 +17,14 @@ class TanquesController extends Controller
 
     public function create()
     {
-        $personal = Personal::where('estado', 'activo')->orderBy('nombre_completo')->get();
+        // Excluir choferes y distribuidores
+        $personal = Personal::where('estado', 'activo')
+            ->whereNotIn('cargo', [
+                'Chofer (Despacho)',
+                'Ayudante (Distribuidor)'
+            ])
+            ->orderBy('nombre_completo')
+            ->get();
         return view('control.tanques.create', compact('personal'));
     }
 
@@ -48,7 +55,14 @@ class TanquesController extends Controller
 
     public function edit(TanqueAgua $tanque)
     {
-        $personal = Personal::where('estado', 'activo')->orderBy('nombre_completo')->get();
+        // Excluir choferes y distribuidores
+        $personal = Personal::where('estado', 'activo')
+            ->whereNotIn('cargo', [
+                'Chofer (Despacho)',
+                'Ayudante (Distribuidor)'
+            ])
+            ->orderBy('nombre_completo')
+            ->get();
         return view('control.tanques.edit', compact('tanque', 'personal'));
     }
 

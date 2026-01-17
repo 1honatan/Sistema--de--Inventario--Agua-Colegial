@@ -9,23 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 class SincronizarProduccionInventario extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'produccion:sincronizar-inventario';
+    protected $description = 'Sincroniza producciones con inventario';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Sincroniza las producciones existentes con el inventario general';
-
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
         $this->info('Sincronizando producciones con inventario...');
@@ -33,12 +19,11 @@ class SincronizarProduccionInventario extends Command
         $producciones = ProduccionDiaria::with('productos.producto')->get();
 
         if ($producciones->isEmpty()) {
-            $this->warn('No hay producciones registradas para sincronizar.');
+            $this->warn('No hay producciones para sincronizar');
             return 0;
         }
 
         $sincronizados = 0;
-        $errores = 0;
 
         DB::beginTransaction();
 
@@ -47,51 +32,35 @@ class SincronizarProduccionInventario extends Command
                 foreach ($produccion->productos as $productoProduccion) {
                     $producto = $productoProduccion->producto;
 
-                    if (!$producto) {
-                        $this->error("Producto no encontrado para producción #{$produccion->id}");
-                        $errores++;
-                        continue;
-                    }
+                    if (!$producto) continue;
 
-                    // Verificar si ya existe en inventario
-                    $existe = Inventario::where('referencia', 'Producción #' . $produccion->id)
+                    $existe = Inventario::where('referencia', 'Produccion #' . $produccion->id)
                         ->where('id_producto', $producto->id)
                         ->exists();
 
                     if (!$existe) {
-                        // Crear entrada en inventario
                         Inventario::create([
                             'id_producto' => $producto->id,
                             'tipo_movimiento' => 'entrada',
                             'cantidad' => $productoProduccion->cantidad,
-                            'origen' => 'Producción Diaria',
-                            'referencia' => 'Producción #' . $produccion->id,
-                            'id_usuario' => 1, // Usuario admin por defecto
+                            'origen' => 'Produccion Diaria',
+                            'referencia' => 'Produccion #' . $produccion->id,
+                            'id_usuario' => 1,
                             'fecha_movimiento' => $produccion->fecha,
-                            'observacion' => 'Entrada automática desde Control de Producción Diaria - Responsable: ' . $produccion->responsable,
+                            'observacion' => 'Entrada desde produccion - ' . $produccion->responsable,
                         ]);
-
                         $sincronizados++;
-                        $this->line("✓ Sincronizado: Producción #{$produccion->id} - {$producto->nombre} ({$productoProduccion->cantidad} unidades)");
                     }
                 }
             }
 
             DB::commit();
-
-            $this->info("\n=================================");
-            $this->info("Sincronización completada:");
-            $this->info("- Entradas creadas: {$sincronizados}");
-            if ($errores > 0) {
-                $this->warn("- Errores: {$errores}");
-            }
-            $this->info("=================================");
-
+            $this->info("Sincronizacion completada: {$sincronizados} entradas creadas");
             return 0;
 
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->error('Error durante la sincronización: ' . $e->getMessage());
+            $this->error('Error: ' . $e->getMessage());
             return 1;
         }
     }

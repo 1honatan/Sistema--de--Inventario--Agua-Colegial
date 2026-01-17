@@ -42,19 +42,19 @@
                     @enderror
                 </div>
 
-                {{-- Responsable --}}
+                {{-- Chofer Asignado --}}
                 <div>
                     <label for="responsable" class="block text-sm font-semibold text-gray-700 mb-2">
                         <i class="fas fa-user-tie text-blue-600 mr-1"></i>
-                        Responsable del Vehículo
+                        Chofer Asignado
                     </label>
                     <select name="responsable"
                             id="responsable"
                             class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition @error('responsable') border-red-500 @enderror">
-                        <option value="">Seleccione un responsable...</option>
-                        @foreach($personal ?? [] as $persona)
-                            <option value="{{ $persona->nombre_completo }}" {{ old('responsable', $vehiculo->responsable) == $persona->nombre_completo ? 'selected' : '' }}>
-                                {{ $persona->nombre_completo }}
+                        <option value="">Seleccione un chofer...</option>
+                        @foreach($choferes ?? [] as $chofer)
+                            <option value="{{ $chofer->nombre_completo }}" {{ old('responsable', $vehiculo->responsable) == $chofer->nombre_completo ? 'selected' : '' }}>
+                                {{ $chofer->nombre_completo }}
                             </option>
                         @endforeach
                     </select>
@@ -63,7 +63,7 @@
                     @enderror
                     <p class="mt-1 text-xs text-gray-500">
                         <i class="fas fa-info-circle mr-1"></i>
-                        Persona responsable del vehículo (opcional)
+                        Chofer responsable del vehículo (opcional)
                     </p>
                 </div>
 

@@ -1,698 +1,408 @@
 @extends('layouts.app')
 
 @section('title', 'Nuevo Empleado')
-
-@push('styles')
-<style>
-    body {
-        background: #c0eaff;
-        min-height: 100vh;
-    }
-
-    .form-container {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 2rem;
-    }
-
-    .form-card {
-        background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 8px 25px rgba(30, 58, 138, 0.15);
-        overflow: hidden;
-        animation: slideUp 0.5s ease-out;
-    }
-
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .form-header {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-        color: white;
-        padding: 2rem 2.5rem;
-        border-bottom: 4px solid #1e3a8a;
-    }
-
-    .form-header h2 {
-        color: white;
-        font-size: 1.75rem;
-        font-weight: 800;
-        margin: 0 0 0.5rem 0;
-    }
-
-    .form-header p {
-        color: rgba(255, 255, 255, 0.9);
-        margin: 0;
-        font-size: 0.95rem;
-    }
-
-    .form-body {
-        padding: 2.5rem;
-    }
-
-    .section-divider {
-        border: none;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, #3b82f6, transparent);
-        margin: 2rem 0;
-        opacity: 0.3;
-    }
-
-    .input-group {
-        margin-bottom: 1.5rem;
-    }
-
-    .input-label {
-        color: #333333;
-        font-size: 0.875rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .input-label i {
-        color: #3b82f6;
-    }
-
-    .input-label.required::after {
-        content: " *";
-        color: #dc2626;
-        font-weight: 900;
-    }
-
-    .form-input,
-    .form-select,
-    .form-textarea {
-        background: #f8fafc;
-        border: 2px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 0.75rem 1rem;
-        color: #333333;
-        font-size: 1rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        width: 100%;
-    }
-
-    .form-input:focus,
-    .form-select:focus,
-    .form-textarea:focus {
-        background: #ffffff;
-        border-color: #3b82f6;
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    /* Sección de información */
-    .info-section {
-        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-        border: 2px solid #3b82f6;
-        border-radius: 15px;
-        padding: 2rem;
-        margin: 1.5rem 0;
-    }
-
-    .info-section-title {
-        color: #1e40af;
-        font-size: 1rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    /* Sección de licencia de conducir */
-    .licencia-section {
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-        border: 2px solid #f59e0b;
-        border-radius: 15px;
-        padding: 2rem;
-        margin: 1.5rem 0;
-        display: none;
-    }
-
-    .licencia-section-title {
-        color: #92400e;
-        font-size: 1rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    /* Observaciones */
-    .obs-section {
-        background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
-        border: 2px solid #6366f1;
-        border-radius: 15px;
-        padding: 1.5rem;
-        margin-top: 1.5rem;
-    }
-
-    .obs-section label {
-        color: #4338ca;
-        font-size: 0.875rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.75rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .obs-section label i {
-        color: #6366f1;
-        font-size: 1.25rem;
-    }
-
-    .obs-section textarea {
-        background: #ffffff;
-        border: 2px solid #6366f1;
-        border-radius: 10px;
-        padding: 1rem;
-        color: #333333;
-        font-size: 0.95rem;
-        resize: vertical;
-        min-height: 100px;
-    }
-
-    .obs-section textarea:focus {
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        outline: none;
-    }
-
-    /* Botones */
-    .btn-colegial {
-        padding: 0.875rem 2.5rem;
-        border-radius: 10px;
-        font-weight: 800;
-        font-size: 1rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border: none;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-
-    .btn-save {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-        color: white;
-        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-    }
-
-    .btn-save:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-        color: white;
-    }
-
-    .btn-cancel {
-        background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-        color: white;
-        box-shadow: 0 4px 15px rgba(100, 116, 139, 0.3);
-    }
-
-    .btn-cancel:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(100, 116, 139, 0.4);
-        color: white;
-    }
-
-    @media (max-width: 768px) {
-        .form-header h2 {
-            font-size: 1.5rem;
-        }
-    }
-</style>
-@endpush
+@section('page-title', 'Nuevo Empleado')
+@section('page-subtitle', 'Complete los datos para registrar un nuevo empleado')
 
 @section('content')
-<div class="form-container">
-    <div class="form-card">
-        <div class="form-header">
-            <h2>
-                <i class="fas fa-user-plus mr-3"></i>
-                Nuevo Empleado
-            </h2>
-            <p>Complete los datos para registrar un nuevo empleado</p>
-        </div>
+<div class="max-w-3xl mx-auto">
+    {{-- Breadcrumb --}}
+    <div class="mb-6">
+        <nav class="text-sm">
+            <a href="{{ route('admin.dashboard') }}" class="text-cyan-600 hover:text-cyan-800">Dashboard</a>
+            <span class="mx-2 text-gray-500">/</span>
+            <a href="{{ route('control.asistencia-semanal.registro-rapido') }}" class="text-cyan-600 hover:text-cyan-800">Personal</a>
+            <span class="mx-2 text-gray-500">/</span>
+            <span class="text-gray-600">Nuevo Empleado</span>
+        </nav>
+    </div>
 
-        <div class="form-body">
-            <form action="{{ route('control.empleados.store') }}" method="POST" id="empleadoForm" enctype="multipart/form-data">
-                @csrf
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <form action="{{ route('control.empleados.store') }}" method="POST" id="empleadoForm" enctype="multipart/form-data">
+            @csrf
 
-                <!-- Información Personal -->
-                <div class="info-section">
-                    <div class="info-section-title">
-                        <i class="fas fa-id-card"></i>
-                        Información Personal
+            <div class="space-y-6">
+                {{-- Información Personal --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {{-- Nombre Completo --}}
+                    <div>
+                        <label for="nombre_completo" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-user text-cyan-600 mr-1"></i>
+                            Nombre Completo <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text"
+                               name="nombre_completo"
+                               id="nombre_completo"
+                               value="{{ old('nombre_completo') }}"
+                               required
+                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('nombre_completo') border-red-500 @enderror"
+                               placeholder="Ej: Juan Pérez García">
+                        @error('nombre_completo')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <div class="input-label required">
-                                    <i class="fas fa-user"></i>
-                                    Nombre Completo
-                                </div>
-                                <input type="text"
-                                       name="nombre_completo"
-                                       id="nombre_completo"
-                                       class="form-input @error('nombre_completo') is-invalid @enderror"
-                                       value="{{ old('nombre_completo') }}"
-                                       placeholder="Ej: Juan Pérez García"
-                                       required>
-                                @error('nombre_completo')
-                                    <div class="text-danger mt-2">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <div class="input-label required">
-                                    <i class="fas fa-briefcase"></i>
-                                    Cargo
-                                </div>
-                                <select name="cargo"
-                                        id="cargo"
-                                        class="form-select @error('cargo') is-invalid @enderror"
-                                        required
-                                        onchange="toggleLicenciaSection(this.value)">
-                                    <option value="">Seleccione un cargo...</option>
-                                    <option value="Operador de Producción" {{ old('cargo') == 'Operador de Producción' ? 'selected' : '' }}>Operador de Producción</option>
-                                    <option value="Distribuidor" {{ old('cargo') == 'Distribuidor' ? 'selected' : '' }}>Distribuidor</option>
-                                    <option value="Chofer" {{ old('cargo') == 'Chofer' ? 'selected' : '' }}>Chofer</option>
-                                    <option value="Supervisor" {{ old('cargo') == 'Supervisor' ? 'selected' : '' }}>Supervisor</option>
-                                    <option value="Encargado de Almacén" {{ old('cargo') == 'Encargado de Almacén' ? 'selected' : '' }}>Encargado de Almacén</option>
-                                    <option value="Encargado de Producción" {{ old('cargo') == 'Encargado de Producción' ? 'selected' : '' }}>Encargado de Producción</option>
-                                    <option value="Mantenimiento" {{ old('cargo') == 'Mantenimiento' ? 'selected' : '' }}>Mantenimiento</option>
-                                    <option value="Administrador" {{ old('cargo') == 'Administrador' ? 'selected' : '' }}>Administrador</option>
-                                </select>
-                                @error('cargo')
-                                    <div class="text-danger mt-2">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <div class="input-label">
-                                    <i class="fas fa-phone"></i>
-                                    Teléfono
-                                </div>
-                                <input type="text"
-                                       name="telefono"
-                                       id="telefono"
-                                       class="form-input @error('telefono') is-invalid @enderror"
-                                       value="{{ old('telefono') }}"
-                                       placeholder="Ej: 7777-7777">
-                                @error('telefono')
-                                    <div class="text-danger mt-2">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <div class="input-label">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    Dirección
-                                </div>
-                                <input type="text"
-                                       name="direccion"
-                                       id="direccion"
-                                       class="form-input @error('direccion') is-invalid @enderror"
-                                       value="{{ old('direccion') }}"
-                                       placeholder="Ej: Colonia Centro, Calle Principal">
-                                @error('direccion')
-                                    <div class="text-danger mt-2">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
+                    {{-- Cargo --}}
+                    <div>
+                        <label for="cargo" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-briefcase text-cyan-600 mr-1"></i>
+                            Cargo <span class="text-red-500">*</span>
+                        </label>
+                        <select name="cargo"
+                                id="cargo"
+                                required
+                                onchange="toggleLicenciaSection(this.value)"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('cargo') border-red-500 @enderror">
+                            <option value="">Seleccione un cargo...</option>
+                            <option value="Encargado de Producción (Embolsador)" {{ old('cargo') == 'Encargado de Producción (Embolsador)' ? 'selected' : '' }}>Encargado de Producción (Embolsador)</option>
+                            <option value="Encargado de Inventario/Almacén" {{ old('cargo') == 'Encargado de Inventario/Almacén' ? 'selected' : '' }}>Encargado de Inventario/Almacén</option>
+                            <option value="Ayudante (Distribuidor)" {{ old('cargo') == 'Ayudante (Distribuidor)' ? 'selected' : '' }}>Ayudante (Distribuidor)</option>
+                            <option value="Chofer (Despacho)" {{ old('cargo') == 'Chofer (Despacho)' ? 'selected' : '' }}>Chofer (Despacho)</option>
+                            <option value="Limpieza" {{ old('cargo') == 'Limpieza' ? 'selected' : '' }}>Limpieza</option>
+                        </select>
+                        @error('cargo')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
-                <hr class="section-divider">
-
-                <!-- Información Laboral -->
-                <div class="info-section">
-                    <div class="info-section-title">
-                        <i class="fas fa-building"></i>
-                        Información Laboral
+                {{-- Teléfono y Dirección --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {{-- Teléfono --}}
+                    <div>
+                        <label for="telefono" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-phone text-cyan-600 mr-1"></i>
+                            Teléfono
+                        </label>
+                        <input type="text"
+                               name="telefono"
+                               id="telefono"
+                               value="{{ old('telefono') }}"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('telefono') border-red-500 @enderror"
+                               placeholder="Ej: 7777-7777">
+                        @error('telefono')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <div class="input-label required">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    Fecha de Ingreso
-                                </div>
-                                <input type="date"
-                                       name="fecha_ingreso"
-                                       id="fecha_ingreso"
-                                       class="form-input @error('fecha_ingreso') is-invalid @enderror"
-                                       value="{{ old('fecha_ingreso', date('Y-m-d')) }}"
-                                       required>
-                                @error('fecha_ingreso')
-                                    <div class="text-danger mt-2">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
+                    {{-- Dirección --}}
+                    <div>
+                        <label for="direccion" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-map-marker-alt text-cyan-600 mr-1"></i>
+                            Dirección
+                        </label>
+                        <input type="text"
+                               name="direccion"
+                               id="direccion"
+                               value="{{ old('direccion') }}"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('direccion') border-red-500 @enderror"
+                               placeholder="Ej: Colonia Centro, Calle Principal">
+                        @error('direccion')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
 
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <div class="input-label">
-                                    <i class="fas fa-dollar-sign"></i>
-                                    Salario
-                                </div>
-                                <input type="number"
-                                       name="salario"
-                                       id="salario"
-                                       class="form-input @error('salario') is-invalid @enderror"
-                                       value="{{ old('salario') }}"
-                                       placeholder="Ej: 400.00"
-                                       step="0.01"
-                                       min="0">
-                                @error('salario')
-                                    <div class="text-danger mt-2">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
+                {{-- Información Laboral --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {{-- Fecha de Ingreso --}}
+                    <div>
+                        <label for="fecha_ingreso" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-calendar-alt text-cyan-600 mr-1"></i>
+                            Fecha de Ingreso <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date"
+                               name="fecha_ingreso"
+                               id="fecha_ingreso"
+                               value="{{ old('fecha_ingreso', date('Y-m-d')) }}"
+                               required
+                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('fecha_ingreso') border-red-500 @enderror">
+                        @error('fecha_ingreso')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
-                    <div class="row mt-3">
-                        <div class="col-12">
-                            <div class="input-group">
-                                <div class="d-flex align-items-center p-3" style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 10px;">
-                                    <div class="form-check form-switch" style="flex-grow: 1;">
-                                        <input class="form-check-input"
-                                               type="checkbox"
-                                               name="acceso_sistema"
-                                               id="acceso_sistema"
-                                               value="1"
-                                               {{ old('acceso_sistema') ? 'checked' : '' }}
-                                               onchange="toggleCredencialesSection(this.checked)"
-                                               style="width: 3rem; height: 1.5rem; cursor: pointer;">
-                                        <label class="form-check-label" for="acceso_sistema" style="font-weight: 700; font-size: 1rem; color: #1e40af; margin-left: 0.5rem; cursor: pointer;">
-                                            <i class="fas fa-key mr-2"></i>
-                                            Acceder al Sistema
-                                        </label>
-                                        <p class="text-muted mb-0 mt-1" style="font-size: 0.85rem; margin-left: 3.5rem;">
-                                            <i class="fas fa-info-circle mr-1"></i>
-                                            Permite al empleado iniciar sesión en el sistema
-                                        </p>
-                                    </div>
-                                </div>
-                                @error('acceso_sistema')
-                                    <div class="text-danger mt-2">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
+                    {{-- Salario --}}
+                    <div>
+                        <label for="salario" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-dollar-sign text-cyan-600 mr-1"></i>
+                            Salario
+                        </label>
+                        <input type="number"
+                               name="salario"
+                               id="salario"
+                               value="{{ old('salario') }}"
+                               step="0.01"
+                               min="0"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('salario') border-red-500 @enderror"
+                               placeholder="Ej: 400.00">
+                        @error('salario')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                {{-- Estado del Empleado --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {{-- Marcar Ausente --}}
+                    <div class="bg-red-50 border-2 border-red-200 rounded-lg p-4">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox"
+                                   name="ausente"
+                                   id="ausente"
+                                   value="1"
+                                   {{ old('ausente') ? 'checked' : '' }}
+                                   onchange="toggleAusenteStatus(this.checked)"
+                                   class="w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                            <span class="ml-3">
+                                <span class="font-semibold text-gray-700">
+                                    <i class="fas fa-user-slash text-red-600 mr-1"></i>
+                                    Marcar como Ausente
+                                </span>
+                                <p class="text-xs text-gray-500 mt-1">El empleado NO podrá acceder al sistema</p>
+                            </span>
+                        </label>
                     </div>
 
-                    <!-- Credenciales de Acceso -->
-                    <div id="credencialesSection" style="display: none; margin-top: 1.5rem;">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                    <div class="input-label required">
-                                        <i class="fas fa-envelope"></i>
-                                        Correo Electrónico
-                                    </div>
-                                    <input type="email"
-                                           name="email_acceso"
-                                           id="email_acceso"
-                                           class="form-input @error('email_acceso') is-invalid @enderror"
-                                           value="{{ old('email_acceso') }}"
-                                           placeholder="Ej: juan.perez@aguacolegial.com">
-                                    <small class="text-muted d-block mt-2">
-                                        <i class="fas fa-info-circle"></i>
-                                        El empleado usará este correo para iniciar sesión
-                                    </small>
-                                    @error('email_acceso')
-                                        <div class="text-danger mt-2">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
+                    {{-- Acceso al Sistema --}}
+                    <div id="accesoSistemaBox" class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox"
+                                   name="acceso_sistema"
+                                   id="acceso_sistema"
+                                   value="1"
+                                   {{ old('acceso_sistema') ? 'checked' : '' }}
+                                   onchange="toggleCredencialesSection(this.checked)"
+                                   class="w-5 h-5 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500">
+                            <span class="ml-3">
+                                <span class="font-semibold text-gray-700">
+                                    <i class="fas fa-key text-cyan-600 mr-1"></i>
+                                    Acceder al Sistema
+                                </span>
+                                <p class="text-xs text-gray-500 mt-1">Permite al empleado iniciar sesión en el sistema</p>
+                            </span>
+                        </label>
+                    </div>
+                </div>
 
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                    <div class="input-label required">
-                                        <i class="fas fa-lock"></i>
-                                        Contraseña
-                                    </div>
-                                    <input type="password"
-                                           name="password_acceso"
-                                           id="password_acceso"
-                                           class="form-input @error('password_acceso') is-invalid @enderror"
-                                           placeholder="Mínimo 6 caracteres">
-                                    <small class="text-muted d-block mt-2">
-                                        <i class="fas fa-info-circle"></i>
-                                        Mínimo 6 caracteres (dejar vacío para asignar: password123)
-                                    </small>
-                                    @error('password_acceso')
-                                        <div class="text-danger mt-2">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="alert alert-warning mt-3" style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 10px;">
-                            <h6 class="font-bold mb-2" style="color: #92400e;">
-                                <i class="fas fa-exclamation-triangle mr-2"></i>
-                                Importante
-                            </h6>
-                            <p class="mb-0" style="color: #92400e; font-size: 0.9rem;">
-                                El empleado recibirá acceso al sistema con rol <strong>"Producción"</strong> y podrá iniciar sesión con las credenciales proporcionadas.
+                {{-- Credenciales de Acceso --}}
+                <div id="credencialesSection" class="hidden space-y-4 bg-gray-50 p-4 rounded-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {{-- Email --}}
+                        <div>
+                            <label for="email_acceso" class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-envelope text-cyan-600 mr-1"></i>
+                                Correo Electrónico <span class="text-red-500">*</span>
+                            </label>
+                            <input type="email"
+                                   name="email_acceso"
+                                   id="email_acceso"
+                                   value="{{ old('email_acceso') }}"
+                                   class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('email_acceso') border-red-500 @enderror"
+                                   placeholder="Ej: juan.perez@aguacolegial.com">
+                            <p class="mt-1 text-xs text-gray-500">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                El empleado usará este correo para iniciar sesión
                             </p>
+                            @error('email_acceso')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        {{-- Contraseña --}}
+                        <div>
+                            <label for="password_acceso" class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fas fa-lock text-cyan-600 mr-1"></i>
+                                Contraseña
+                            </label>
+                            <input type="password"
+                                   name="password_acceso"
+                                   id="password_acceso"
+                                   class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('password_acceso') border-red-500 @enderror"
+                                   placeholder="Mínimo 6 caracteres">
+                            <p class="mt-1 text-xs text-gray-500">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Dejar vacío para asignar: password123
+                            </p>
+                            @error('password_acceso')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
                 </div>
 
-                <!-- Sección Licencia de Conducir (solo para Chofer) -->
-                <div class="licencia-section" id="licenciaSection">
-                    <div class="licencia-section-title">
-                        <i class="fas fa-car" style="color: #f59e0b;"></i>
+                {{-- Sección Licencia de Conducir (solo para Chofer) --}}
+                <div id="licenciaSection" class="hidden bg-amber-50 border-2 border-amber-200 rounded-lg p-4">
+                    <label class="block text-sm font-semibold text-amber-800 mb-3">
+                        <i class="fas fa-car text-amber-600 mr-1"></i>
                         Licencia de Conducir
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <div class="input-label">
-                                    <i class="fas fa-id-badge"></i>
-                                    Foto de Licencia de Conducir
-                                </div>
-                                <div class="custom-file-upload" style="position: relative;">
-                                    <input type="file"
-                                           name="foto_licencia"
-                                           id="foto_licencia"
-                                           class="form-input @error('foto_licencia') is-invalid @enderror"
-                                           accept="image/*"
-                                           onchange="previewLicencia(this)"
-                                           style="padding: 0.5rem;">
-                                    <small class="text-muted d-block mt-2">
-                                        <i class="fas fa-info-circle"></i>
-                                        Formatos: JPG, PNG, GIF. Max: 5MB
-                                    </small>
-                                    @error('foto_licencia')
-                                        <div class="text-danger mt-2">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div id="licenciaPreview" style="display: none; margin-top: 1rem;">
-                                    <p class="text-sm font-semibold mb-2" style="color: #92400e;">
-                                        <i class="fas fa-eye"></i> Vista previa:
-                                    </p>
-                                    <img id="previewLicencia" src="" alt="Vista previa licencia"
-                                         style="max-width: 250px; max-height: 150px; border-radius: 10px; border: 3px solid #f59e0b; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);">
-                                </div>
-                            </div>
-                        </div>
+                    </label>
+                    <input type="file"
+                           name="foto_licencia"
+                           id="foto_licencia"
+                           accept="image/*"
+                           onchange="previewLicencia(this)"
+                           class="w-full border border-amber-300 rounded-lg px-4 py-3 bg-white focus:ring-2 focus:ring-amber-500 focus:border-transparent transition @error('foto_licencia') border-red-500 @enderror">
+                    <p class="mt-1 text-xs text-amber-700">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Formatos: JPG, PNG, GIF. Max: 5MB
+                    </p>
+                    @error('foto_licencia')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                    <div id="licenciaPreview" class="hidden mt-3">
+                        <p class="text-sm font-semibold text-amber-800 mb-2">
+                            <i class="fas fa-eye mr-1"></i> Vista previa:
+                        </p>
+                        <img id="previewLicencia" src="" alt="Vista previa licencia"
+                             class="max-w-xs max-h-40 rounded-lg border-2 border-amber-400 shadow">
                     </div>
                 </div>
 
-                <!-- Documento de Identificación -->
-                <div class="info-section">
-                    <div class="info-section-title">
-                        <i class="fas fa-id-card"></i>
-                        Documento de Identificación / Garantía
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="input-group">
-                                <div class="input-label">
-                                    <i class="fas fa-camera"></i>
-                                    Foto del Documento (DUI, Pasaporte, Libreta Militar, etc.)
-                                </div>
-                                <div class="custom-file-upload" style="position: relative;">
-                                    <input type="file"
-                                           name="foto_documento"
-                                           id="foto_documento"
-                                           class="form-input @error('foto_documento') is-invalid @enderror"
-                                           accept="image/*"
-                                           onchange="previewImage(this)"
-                                           style="padding: 0.5rem;">
-                                    <small class="text-muted d-block mt-2">
-                                        <i class="fas fa-info-circle"></i>
-                                        Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB
-                                    </small>
-                                    @error('foto_documento')
-                                        <div class="text-danger mt-2">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <!-- Preview de imagen -->
-                                <div id="imagePreview" style="display: none; margin-top: 1rem;">
-                                    <p class="text-sm font-semibold mb-2" style="color: #1e40af;">
-                                        <i class="fas fa-eye"></i> Vista previa:
-                                    </p>
-                                    <img id="preview" src="" alt="Vista previa"
-                                         style="max-width: 300px; max-height: 200px; border-radius: 10px; border: 3px solid #3b82f6; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);">
-                                </div>
-                            </div>
-                        </div>
+                {{-- Documento de Identificación --}}
+                <div>
+                    <label for="foto_documento" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-id-card text-cyan-600 mr-1"></i>
+                        Foto del Documento (DUI, Pasaporte, etc.)
+                    </label>
+                    <input type="file"
+                           name="foto_documento"
+                           id="foto_documento"
+                           accept="image/*"
+                           onchange="previewImage(this)"
+                           class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('foto_documento') border-red-500 @enderror">
+                    <p class="mt-1 text-xs text-gray-500">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Formatos: JPG, PNG, GIF. Max: 5MB
+                    </p>
+                    @error('foto_documento')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                    <div id="imagePreview" class="hidden mt-3">
+                        <p class="text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-eye mr-1"></i> Vista previa:
+                        </p>
+                        <img id="preview" src="" alt="Vista previa"
+                             class="max-w-xs max-h-40 rounded-lg border-2 border-cyan-400 shadow">
                     </div>
                 </div>
 
-                <!-- Observaciones -->
-                <div class="obs-section">
-                    <label>
-                        <i class="fas fa-sticky-note"></i>
+                {{-- Observaciones --}}
+                <div>
+                    <label for="observaciones" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-sticky-note text-cyan-600 mr-1"></i>
                         Observaciones
                     </label>
                     <textarea name="observaciones"
                               id="observaciones"
-                              class="form-textarea @error('observaciones') is-invalid @enderror"
-                              placeholder="Ingrese cualquier observación relevante sobre el empleado...">{{ old('observaciones') }}</textarea>
+                              rows="3"
+                              class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('observaciones') border-red-500 @enderror"
+                              placeholder="Ingrese observaciones relevantes sobre el empleado...">{{ old('observaciones') }}</textarea>
                     @error('observaciones')
-                        <div class="text-danger mt-2">{{ $message }}</div>
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <!-- Botones -->
-                <div class="d-flex justify-content-end gap-3 mt-4">
-                    <a href="{{ route('control.asistencia-semanal.registro-rapido') }}" class="btn-colegial btn-cancel">
-                        <i class="fas fa-times mr-2"></i>
-                        Cancelar
+                {{-- Botones --}}
+                <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                    <a href="{{ route('control.asistencia-semanal.registro-rapido') }}" class="text-gray-600 hover:text-gray-800 font-semibold transition">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Volver
                     </a>
-                    <button type="submit" class="btn-colegial btn-save">
-                        <i class="fas fa-save mr-2"></i>
-                        Guardar
-                    </button>
+
+                    <div class="flex space-x-3">
+                        <button type="reset" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-semibold transition">
+                            <i class="fas fa-redo mr-2"></i>
+                            Limpiar
+                        </button>
+
+                        <button type="submit" class="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg">
+                            <i class="fas fa-save mr-2"></i>
+                            Guardar Empleado
+                        </button>
+                    </div>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 @endsection
 
 @push('scripts')
 <script>
-// Toggle sección de licencia según cargo
 function toggleLicenciaSection(cargo) {
-    if (cargo === 'Chofer') {
-        $('#licenciaSection').slideDown();
+    if (cargo === 'Chofer (Despacho)') {
+        $('#licenciaSection').removeClass('hidden').hide().slideDown();
     } else {
-        $('#licenciaSection').slideUp();
+        $('#licenciaSection').slideUp(function() {
+            $(this).addClass('hidden');
+        });
     }
 }
 
-// Toggle sección de credenciales según checkbox
 function toggleCredencialesSection(checked) {
     if (checked) {
-        $('#credencialesSection').slideDown();
-        // Hacer email requerido
+        $('#credencialesSection').removeClass('hidden').hide().slideDown();
         $('#email_acceso').prop('required', true);
     } else {
-        $('#credencialesSection').slideUp();
-        // Quitar requerido del email
+        $('#credencialesSection').slideUp(function() {
+            $(this).addClass('hidden');
+        });
         $('#email_acceso').prop('required', false);
     }
 }
 
-// Vista previa de imagen documento
+function toggleAusenteStatus(ausente) {
+    if (ausente) {
+        // Si está ausente, deshabilitar acceso al sistema
+        $('#acceso_sistema').prop('checked', false).prop('disabled', true);
+        $('#accesoSistemaBox').addClass('opacity-50 cursor-not-allowed');
+        toggleCredencialesSection(false);
+    } else {
+        // Si no está ausente, habilitar acceso al sistema
+        $('#acceso_sistema').prop('disabled', false);
+        $('#accesoSistemaBox').removeClass('opacity-50 cursor-not-allowed');
+    }
+}
+
 function previewImage(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
             $('#preview').attr('src', e.target.result);
-            $('#imagePreview').fadeIn();
+            $('#imagePreview').removeClass('hidden');
         }
         reader.readAsDataURL(input.files[0]);
     } else {
-        $('#imagePreview').fadeOut();
+        $('#imagePreview').addClass('hidden');
     }
 }
 
-// Vista previa de licencia
 function previewLicencia(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
             $('#previewLicencia').attr('src', e.target.result);
-            $('#licenciaPreview').fadeIn();
+            $('#licenciaPreview').removeClass('hidden');
         }
         reader.readAsDataURL(input.files[0]);
     } else {
-        $('#licenciaPreview').fadeOut();
+        $('#licenciaPreview').addClass('hidden');
     }
 }
 
 $(document).ready(function() {
-    // Verificar si ya hay cargo seleccionado (para old values)
+    // Verificar cargo al cargar (para old values)
     const cargoActual = $('#cargo').val();
-    if (cargoActual === 'Chofer') {
-        $('#licenciaSection').show();
+    if (cargoActual === 'Chofer (Despacho)') {
+        $('#licenciaSection').removeClass('hidden');
     }
 
-    // Verificar si acceso_sistema está marcado al cargar (para old values)
-    const accesoSistema = $('#acceso_sistema').is(':checked');
-    if (accesoSistema) {
-        $('#credencialesSection').show();
+    // Verificar acceso_sistema al cargar (para old values)
+    if ($('#acceso_sistema').is(':checked')) {
+        $('#credencialesSection').removeClass('hidden');
         $('#email_acceso').prop('required', true);
     }
-
-    // Atajos de teclado
-    $(document).on('keydown', function(e) {
-        if (e.ctrlKey && e.key === 's') {
-            e.preventDefault();
-            $('#empleadoForm').submit();
-        }
-        if (e.key === 'Escape') {
-            window.location.href = "{{ route('control.asistencia-semanal.registro-rapido') }}";
-        }
-    });
-
-    // Animación al enviar
-    $('#empleadoForm').on('submit', function() {
-        const btn = $(this).find('button[type="submit"]');
-        btn.html('<i class="fas fa-spinner fa-spin mr-2"></i>Guardando...').prop('disabled', true);
-    });
 });
 </script>
 @endpush

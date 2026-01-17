@@ -298,6 +298,60 @@
 
             <div class="divider"></div>
 
+            <!-- Acceso al Sistema -->
+            <div class="section-title">
+                <i class="fas fa-key"></i>
+                Acceso al Sistema
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">
+                        <i class="fas fa-lock mr-1"></i>
+                        Tiene Acceso
+                    </span>
+                    @if($empleado->tieneAccesoSistema())
+                        <span class="badge-estado-activo">
+                            <i class="fas fa-check-circle mr-1"></i>
+                            Sí tiene acceso
+                        </span>
+                    @else
+                        <span class="badge-estado-inactivo">
+                            <i class="fas fa-times-circle mr-1"></i>
+                            Sin acceso
+                        </span>
+                    @endif
+                </div>
+
+                @if($empleado->usuario)
+                <div class="info-item">
+                    <span class="info-label">
+                        <i class="fas fa-user mr-1"></i>
+                        Usuario
+                    </span>
+                    <span class="info-value">{{ $empleado->usuario->nombre }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">
+                        <i class="fas fa-shield-alt mr-1"></i>
+                        Rol
+                    </span>
+                    <span class="badge-cargo">{{ ucfirst($empleado->usuario->rol->nombre ?? 'Sin rol') }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">
+                        <i class="fas fa-at mr-1"></i>
+                        Email de Acceso
+                    </span>
+                    <span class="info-value">{{ $empleado->usuario->email ?? 'No especificado' }}</span>
+                </div>
+                @endif
+            </div>
+
+            <div class="divider"></div>
+
             <!-- Información Laboral -->
             <div class="section-title">
                 <i class="fas fa-building"></i>

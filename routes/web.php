@@ -6,14 +6,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductoController;
-use App\Http\Controllers\Admin\TipoProductoController;
 use App\Http\Controllers\Admin\VehiculoController;
 use App\Http\Controllers\Admin\ReporteController;
 use App\Http\Controllers\Admin\ConfiguracionController;
 // use App\Http\Controllers\Produccion\ProduccionController; // Sistema antiguo - deshabilitado
 // use App\Http\Controllers\Produccion\DashboardProduccionController; // Sistema antiguo - deshabilitado
 use App\Http\Controllers\Inventario\InventarioController;
-use App\Http\Controllers\Inventario\DashboardInventarioController;
 use App\Http\Controllers\Admin\AsistenciaController as AdminAsistenciaController;
 use App\Http\Controllers\Personal\AsistenciaController;
 
@@ -54,6 +52,16 @@ Route::post('/logout', [LoginController::class, 'logout'])
 
 /*
 |--------------------------------------------------------------------------
+| Gestión de Vehículos (roles: admin, despacho)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin,despacho'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('vehiculos', VehiculoController::class)->except(['show']);
+    Route::post('vehiculos/{vehiculo}/toggle-estado', [VehiculoController::class, 'toggleEstado'])->name('vehiculos.toggle-estado');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Rutas Administrativas (solo rol: admin)
 |--------------------------------------------------------------------------
 */
@@ -62,10 +70,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/data', [DashboardController::class, 'getData'])->name('dashboard.data');
-
-    // Gestión de Vehículos
-    Route::resource('vehiculos', VehiculoController::class)->except(['show']);
-    Route::post('vehiculos/{vehiculo}/toggle-estado', [VehiculoController::class, 'toggleEstado'])->name('vehiculos.toggle-estado');
 
     // Configuración del Sistema
     Route::prefix('configuracion')->name('configuracion.')->group(function () {
@@ -165,21 +169,17 @@ Route::middleware(['auth', 'role:admin,produccion'])->prefix('almacen')->name('a
 
 /*
 |--------------------------------------------------------------------------
-| Módulo de Inventario (roles: admin, inventario, produccion)
+| Módulo de Inventario (roles: admin, inventario, produccion, despacho)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:admin,inventario,produccion'])->prefix('inventario')->name('inventario.')->group(function () {
-    // Dashboard de Inventario
-    Route::get('/dashboard', [DashboardInventarioController::class, 'index'])->name('dashboard');
-
+Route::middleware(['auth', 'role:admin,inventario,produccion,despacho'])->prefix('inventario')->name('inventario.')->group(function () {
     // Gestión de Inventario
     Route::get('/', [InventarioController::class, 'index'])->name('index');
     Route::get('/movimiento/crear', [InventarioController::class, 'createMovimiento'])->name('movimiento.create');
     Route::post('/movimiento', [InventarioController::class, 'storeMovimiento'])->name('movimiento.store');
     Route::get('/movimiento/historial', [InventarioController::class, 'historialMovimientos'])->name('movimiento.historial');
     Route::post('/movimiento/exportar-pdf', [InventarioController::class, 'exportarMovimientosPDF'])->name('movimiento.exportar-pdf');
-    Route::post('/movimiento/exportar-excel', [InventarioController::class, 'exportarMovimientosExcel'])->name('movimiento.exportar-excel');
     Route::get('/producto/{producto}/historial', [InventarioController::class, 'historial'])->name('historial');
 
     // Gestión de Productos
@@ -225,11 +225,11 @@ Route::middleware(['auth'])->prefix('mi-asistencia')->name('personal.asistencia.
 
 /*
 |--------------------------------------------------------------------------
-| Módulos de Control (roles: admin, produccion)
+| Módulos de Control (roles: admin, produccion, inventario)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:admin,produccion'])->prefix('control')->name('control.')->group(function () {
+Route::middleware(['auth', 'role:admin,produccion,inventario,despacho'])->prefix('control')->name('control.')->group(function () {
 
     // 1. Control de Salidas de Productos "Colegial"
     Route::prefix('salidas')->name('salidas.')->group(function () {
@@ -254,6 +254,24 @@ Route::middleware(['auth', 'role:admin,produccion'])->prefix('control')->name('c
         Route::delete('/{produccion}', [\App\Http\Controllers\Control\ProduccionDiariaController::class, 'destroy'])->name('destroy');
     });
 
+    // 3. Control de Insumos (admin, produccion, inventario)
+    Route::prefix('insumos')->name('insumos.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Control\InsumosController::class, 'index'])->name('index');
+        Route::get('/crear', [\App\Http\Controllers\Control\InsumosController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Control\InsumosController::class, 'store'])->name('store');
+        Route::get('/{insumo}/editar', [\App\Http\Controllers\Control\InsumosController::class, 'edit'])->name('edit');
+        Route::put('/{insumo}', [\App\Http\Controllers\Control\InsumosController::class, 'update'])->name('update');
+        Route::delete('/{insumo}', [\App\Http\Controllers\Control\InsumosController::class, 'destroy'])->name('destroy');
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Módulos de Control (solo admin)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin'])->prefix('control')->name('control.')->group(function () {
+
     // 4. Control de Mantenimiento de Equipos
     Route::prefix('mantenimiento')->name('mantenimiento.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Control\MantenimientoController::class, 'index'])->name('index');
@@ -275,15 +293,6 @@ Route::middleware(['auth', 'role:admin,produccion'])->prefix('control')->name('c
         Route::delete('/{fosa}', [\App\Http\Controllers\Control\FosaSepticaController::class, 'destroy'])->name('destroy');
     });
 
-    // 6. Control de Insumos
-    Route::prefix('insumos')->name('insumos.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Control\InsumosController::class, 'index'])->name('index');
-        Route::get('/crear', [\App\Http\Controllers\Control\InsumosController::class, 'create'])->name('create');
-        Route::post('/', [\App\Http\Controllers\Control\InsumosController::class, 'store'])->name('store');
-        Route::get('/{insumo}/editar', [\App\Http\Controllers\Control\InsumosController::class, 'edit'])->name('edit');
-        Route::put('/{insumo}', [\App\Http\Controllers\Control\InsumosController::class, 'update'])->name('update');
-        Route::delete('/{insumo}', [\App\Http\Controllers\Control\InsumosController::class, 'destroy'])->name('destroy');
-    });
 
     // 7. Control de Fumigación
     Route::prefix('fumigacion')->name('fumigacion.')->group(function () {
@@ -330,6 +339,8 @@ Route::middleware(['auth', 'role:admin,produccion'])->prefix('control')->name('c
         Route::put('/{id}', [\App\Http\Controllers\Control\EmpleadoController::class, 'update'])->name('update');
         Route::get('/{id}', [\App\Http\Controllers\Control\EmpleadoController::class, 'show'])->name('show');
         Route::delete('/{id}', [\App\Http\Controllers\Control\EmpleadoController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/deshabilitar-acceso', [\App\Http\Controllers\Control\EmpleadoController::class, 'deshabilitarAcceso'])->name('deshabilitar-acceso');
+        Route::post('/{id}/habilitar-acceso', [\App\Http\Controllers\Control\EmpleadoController::class, 'habilitarAcceso'])->name('habilitar-acceso');
     });
 });
 

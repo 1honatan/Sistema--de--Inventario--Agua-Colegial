@@ -40,7 +40,14 @@ class MantenimientoController extends Controller
 
     public function create()
     {
-        $personal = Personal::where('estado', 'activo')->orderBy('nombre_completo')->get();
+        // Excluir choferes y distribuidores
+        $personal = Personal::where('estado', 'activo')
+            ->whereNotIn('cargo', [
+                'Chofer (Despacho)',
+                'Ayudante (Distribuidor)'
+            ])
+            ->orderBy('nombre_completo')
+            ->get();
         $productosLimpieza = $this->getProductosLimpieza();
 
         return view('control.mantenimiento.create', compact('personal', 'productosLimpieza'));
@@ -94,7 +101,14 @@ class MantenimientoController extends Controller
 
     public function edit(MantenimientoEquipo $mantenimiento)
     {
-        $personal = Personal::where('estado', 'activo')->orderBy('nombre_completo')->get();
+        // Excluir choferes y distribuidores
+        $personal = Personal::where('estado', 'activo')
+            ->whereNotIn('cargo', [
+                'Chofer (Despacho)',
+                'Ayudante (Distribuidor)'
+            ])
+            ->orderBy('nombre_completo')
+            ->get();
         $productosLimpieza = $this->getProductosLimpieza();
 
         return view('control.mantenimiento.edit', compact('mantenimiento', 'personal', 'productosLimpieza'));

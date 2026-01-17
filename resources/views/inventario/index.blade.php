@@ -289,6 +289,274 @@
         background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
         color: white;
     }
+
+    /* ==================== ESTILOS RESPONSIVE ==================== */
+
+    /* Tablet (992px y menos) */
+    @media (max-width: 992px) {
+        .inventario-table-header {
+            padding: 1rem 1.5rem;
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .inventario-table-header h3 {
+            font-size: 1.25rem;
+        }
+
+        .inventario-table-body {
+            padding: 1rem;
+        }
+
+        .modern-table thead th {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .modern-table tbody td {
+            padding: 0.75rem 0.5rem;
+        }
+
+        .producto-icon {
+            width: 36px;
+            height: 36px;
+            font-size: 1.1rem;
+            margin-right: 0.5rem;
+        }
+
+        .producto-nombre {
+            font-size: 0.95rem;
+        }
+
+        .stock-value {
+            padding: 0.4rem 0.8rem;
+            font-size: 1rem;
+        }
+
+        .stock-minimo-value {
+            padding: 0.35rem 0.7rem;
+            font-size: 0.85rem;
+        }
+    }
+
+    /* Móvil (768px y menos) */
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+
+        .inventario-table-card {
+            border-radius: 12px;
+        }
+
+        .inventario-table-header {
+            padding: 1rem;
+        }
+
+        .inventario-table-header h3 {
+            font-size: 1.1rem;
+        }
+
+        .inventario-table-header h3 i {
+            font-size: 1.3rem;
+        }
+
+        .btn-nuevo-producto {
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .inventario-table-body {
+            padding: 0.75rem;
+        }
+
+        /* Ocultar columnas menos importantes en móvil */
+        .modern-table thead th:nth-child(2),
+        .modern-table tbody td:nth-child(2) {
+            display: none; /* Ocultar descripción */
+        }
+
+        .modern-table thead th:nth-child(5),
+        .modern-table tbody td:nth-child(5) {
+            display: none; /* Ocultar stock mínimo */
+        }
+
+        .modern-table thead th {
+            padding: 0.6rem 0.4rem;
+            font-size: 0.7rem;
+        }
+
+        .modern-table tbody td {
+            padding: 0.6rem 0.4rem;
+            font-size: 0.85rem;
+        }
+
+        .producto-icon {
+            width: 32px;
+            height: 32px;
+            font-size: 0.9rem;
+            margin-right: 0.4rem;
+            border-radius: 8px;
+        }
+
+        .producto-nombre {
+            font-size: 0.85rem;
+        }
+
+        .unidad-badge {
+            padding: 0.35rem 0.6rem;
+            font-size: 0.75rem;
+        }
+
+        .stock-value {
+            padding: 0.35rem 0.6rem;
+            font-size: 0.9rem;
+            border-radius: 8px;
+        }
+
+        .action-buttons-group {
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .btn-action {
+            padding: 0.5rem 0.7rem;
+            font-size: 0.75rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .action-buttons-group .form-delete-producto {
+            width: 100%;
+        }
+
+        .action-buttons-group .form-delete-producto .btn-action {
+            width: 100%;
+        }
+
+        /* DataTables responsive */
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_length {
+            float: none !important;
+            text-align: center !important;
+            margin-bottom: 0.75rem !important;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            width: 100% !important;
+            max-width: 250px;
+            font-size: 0.85rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .dataTables_wrapper .dataTables_info {
+            text-align: center !important;
+            font-size: 0.75rem;
+        }
+
+        .dataTables_wrapper .dataTables_paginate {
+            text-align: center !important;
+            margin-top: 0.75rem !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0.4rem 0.6rem !important;
+            font-size: 0.75rem !important;
+        }
+    }
+
+    /* Móvil pequeño (480px y menos) */
+    @media (max-width: 480px) {
+        .container-fluid {
+            padding-left: 0.25rem !important;
+            padding-right: 0.25rem !important;
+        }
+
+        .inventario-table-card {
+            border-radius: 8px;
+        }
+
+        .inventario-table-header {
+            padding: 0.75rem;
+        }
+
+        .inventario-table-header h3 {
+            font-size: 1rem;
+        }
+
+        .btn-nuevo-producto {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        .inventario-table-body {
+            padding: 0.5rem;
+        }
+
+        /* Ocultar también la columna de unidad en pantallas muy pequeñas */
+        .modern-table thead th:nth-child(3),
+        .modern-table tbody td:nth-child(3) {
+            display: none;
+        }
+
+        .modern-table thead th {
+            padding: 0.5rem 0.3rem;
+            font-size: 0.65rem;
+        }
+
+        .modern-table tbody td {
+            padding: 0.5rem 0.3rem;
+        }
+
+        .producto-icon {
+            width: 28px;
+            height: 28px;
+            font-size: 0.8rem;
+            margin-right: 0.3rem;
+        }
+
+        .producto-nombre {
+            font-size: 0.8rem;
+        }
+
+        .stock-value {
+            padding: 0.3rem 0.5rem;
+            font-size: 0.8rem;
+            gap: 0.25rem;
+        }
+
+        .stock-value i {
+            font-size: 0.7rem;
+        }
+
+        .btn-action {
+            padding: 0.4rem 0.5rem;
+            font-size: 0.7rem;
+        }
+
+        .btn-action i {
+            font-size: 0.75rem;
+        }
+
+        /* Solo mostrar icono en los botones en pantallas muy pequeñas */
+        .btn-action span.btn-text {
+            display: none;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            max-width: 180px;
+            font-size: 0.8rem;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0.3rem 0.5rem !important;
+            font-size: 0.7rem !important;
+        }
+    }
 </style>
 @endpush
 
@@ -304,10 +572,12 @@
                         <i class="fas fa-boxes"></i>
                         Stock por Producto
                     </h3>
+                    @if(auth()->user()->rol->nombre === 'admin')
                     <a href="{{ route('inventario.productos.create') }}" class="btn-nuevo-producto">
                         <i class="fas fa-plus-circle"></i>
                         Nuevo Producto
                     </a>
+                    @endif
                 </div>
 
                 <!-- Cuerpo de la tabla -->
@@ -325,12 +595,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @php
-                                    $hasProducts = false;
-                                @endphp
                                 @foreach($productos ?? [] as $producto)
                                     @php
-                                        $hasProducts = true;
                                         $stock = \App\Models\Inventario::stockDisponible($producto->id);
                                     @endphp
                                     <tr>
@@ -370,16 +636,17 @@
                                             </span>
                                         </td>
                                         <td class="text-center">
+                                            @if(auth()->user()->rol->nombre === 'admin')
                                             <div class="action-buttons-group">
                                                 <a href="{{ route('inventario.productos.edit', $producto->id) }}"
                                                    class="btn-action btn-action-edit"
                                                    title="Editar producto">
                                                     <i class="fas fa-edit"></i>
-                                                    Editar
+                                                    <span class="btn-text">Editar</span>
                                                 </a>
                                                 <form action="{{ route('inventario.productos.destroy', $producto->id) }}"
                                                       method="POST"
-                                                      class="d-inline"
+                                                      class="d-inline form-delete-producto"
                                                       onsubmit="return confirm('¿Está seguro de eliminar este producto?');">
                                                     @csrf
                                                     @method('DELETE')
@@ -387,23 +654,19 @@
                                                             class="btn-action btn-action-delete"
                                                             title="Eliminar producto">
                                                         <i class="fas fa-trash-alt"></i>
-                                                        Eliminar
+                                                        <span class="btn-text">Eliminar</span>
                                                     </button>
                                                 </form>
                                             </div>
+                                            @else
+                                            <span class="text-gray-400 text-sm">
+                                                <i class="fas fa-lock mr-1"></i>
+                                                Solo lectura
+                                            </span>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
-                                @if(!$hasProducts)
-                                    <tr>
-                                        <td colspan="6">
-                                            <div class="text-center py-5">
-                                                <i class="fas fa-inbox text-gray-300" style="font-size: 4rem; display: block; margin-bottom: 1rem; color: #cbd5e1;"></i>
-                                                <p style="color: #94a3b8; font-weight: 600; font-size: 1.1rem;">No hay productos registrados</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endif
                             </tbody>
                         </table>
                     </div>

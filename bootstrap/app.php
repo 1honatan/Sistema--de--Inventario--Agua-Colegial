@@ -17,14 +17,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // ═══════════════════════════════════════════════════════════════
+        // MIDDLEWARE GLOBAL DE SEGURIDAD
+        // Se aplica a TODAS las respuestas del sistema
+        // ═══════════════════════════════════════════════════════════════
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+
         // Registrar middleware de alias
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
-            'restrict.ip' => \App\Http\Middleware\RestrictIpAddress::class,
+            'security.headers' => \App\Http\Middleware\SecurityHeaders::class,
         ]);
-
-        // Aplicar restricción de IP globalmente (opcional, puedes comentar si solo quieres aplicarlo en rutas específicas)
-        // $middleware->append(\App\Http\Middleware\RestrictIpAddress::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // Manejar error 419 (CSRF token expirado)

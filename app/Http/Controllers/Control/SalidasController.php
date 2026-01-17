@@ -45,21 +45,22 @@ class SalidasController extends Controller
      */
     public function create()
     {
-        // Obtener solo Choferes activos
+        // Obtener solo Choferes activos (cargo contiene "Chofer")
         $choferes = Personal::where('estado', 'activo')
-            ->where('cargo', 'Chofer')
+            ->where('cargo', 'LIKE', '%Chofer%')
             ->orderBy('nombre_completo')
             ->get();
 
-        // Obtener solo Distribuidores activos
+        // Obtener solo Distribuidores activos (cargo contiene "Distribuidor")
         $distribuidores = Personal::where('estado', 'activo')
-            ->where('cargo', 'Distribuidor')
+            ->where('cargo', 'LIKE', '%Distribuidor%')
             ->orderBy('nombre_completo')
             ->get();
 
         // Obtener responsables para venta directa (sin choferes ni distribuidores)
         $responsablesVenta = Personal::where('estado', 'activo')
-            ->whereNotIn('cargo', ['Chofer', 'Distribuidor'])
+            ->where('cargo', 'NOT LIKE', '%Chofer%')
+            ->where('cargo', 'NOT LIKE', '%Distribuidor%')
             ->orderBy('nombre_completo')
             ->get();
 
@@ -354,21 +355,22 @@ class SalidasController extends Controller
      */
     public function edit(SalidaProducto $salida)
     {
-        // Obtener solo Choferes activos
+        // Obtener solo Choferes activos (cargo contiene "Chofer")
         $choferes = Personal::where('estado', 'activo')
-            ->where('cargo', 'Chofer')
+            ->where('cargo', 'LIKE', '%Chofer%')
             ->orderBy('nombre_completo')
             ->get();
 
-        // Obtener solo Distribuidores activos
+        // Obtener solo Distribuidores activos (cargo contiene "Distribuidor")
         $distribuidores = Personal::where('estado', 'activo')
-            ->where('cargo', 'Distribuidor')
+            ->where('cargo', 'LIKE', '%Distribuidor%')
             ->orderBy('nombre_completo')
             ->get();
 
         // Obtener responsables para venta directa (sin choferes ni distribuidores)
         $responsablesVenta = Personal::where('estado', 'activo')
-            ->whereNotIn('cargo', ['Chofer', 'Distribuidor'])
+            ->where('cargo', 'NOT LIKE', '%Chofer%')
+            ->where('cargo', 'NOT LIKE', '%Distribuidor%')
             ->orderBy('nombre_completo')
             ->get();
 

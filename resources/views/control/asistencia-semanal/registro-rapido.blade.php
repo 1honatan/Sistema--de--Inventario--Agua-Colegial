@@ -257,6 +257,140 @@
         color: #9ca3af;
         font-size: 1.2rem;
     }
+
+    /* ========== ESTILOS RESPONSIVOS ========== */
+    @media (max-width: 992px) {
+        .header-buttons {
+            flex-direction: column;
+            width: 100%;
+            gap: 0.5rem;
+        }
+
+        .header-buttons a {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .personal-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .personal-info {
+            width: 100%;
+        }
+
+        .personal-actions {
+            width: 100%;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .estado-badge {
+            margin-right: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-group-mobile {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .btn-action {
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .registro-card {
+            padding: 1rem;
+        }
+
+        .header-info {
+            padding: 1.5rem 1rem;
+        }
+
+        .hora-actual {
+            font-size: 2.5rem;
+        }
+
+        .search-header {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .search-box {
+            width: 100%;
+            margin-right: 0 !important;
+        }
+
+        .personal-avatar {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+        }
+
+        .personal-details h4 {
+            font-size: 1rem;
+        }
+
+        .personal-details p {
+            font-size: 0.8rem;
+        }
+
+        .btn-action {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-action i {
+            font-size: 0.9rem;
+        }
+
+        .btn-action span {
+            display: none;
+        }
+
+        .estado-badge {
+            font-size: 0.75rem;
+            padding: 0.4rem 0.75rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hora-actual {
+            font-size: 2rem;
+        }
+
+        .personal-item {
+            padding: 1rem;
+        }
+
+        .personal-info {
+            gap: 0.75rem;
+        }
+
+        .personal-avatar {
+            width: 45px;
+            height: 45px;
+            font-size: 1rem;
+        }
+
+        .btn-group-mobile {
+            justify-content: space-between;
+        }
+
+        .btn-action {
+            flex: 1;
+            justify-content: center;
+            min-width: 0;
+        }
+    }
 </style>
 @endpush
 
@@ -276,26 +410,24 @@
 
     <div class="registro-card">
         <!-- Header con buscador y botones -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="search-box flex-grow-1 mr-3 mb-0">
+        <div class="search-header d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <div class="search-box flex-grow-1">
                 <i class="fas fa-search"></i>
                 <input type="text"
                        id="searchPersonal"
                        placeholder="Buscar personal por nombre..."
                        autocomplete="off">
             </div>
-            <div class="d-flex gap-2">
+            <div class="header-buttons d-flex gap-2">
                 <a href="{{ route('control.asistencia-semanal.index') }}"
-                   class="btn btn-primary btn-lg d-flex align-items-center gap-2"
-                   style="white-space: nowrap;">
+                   class="btn btn-primary d-flex align-items-center gap-2">
                     <i class="fas fa-calendar-week"></i>
-                    Ver Registro Semanal
+                    <span>Ver Registro Semanal</span>
                 </a>
                 <a href="{{ route('control.empleados.create') }}"
-                   class="btn btn-success btn-lg d-flex align-items-center gap-2"
-                   style="white-space: nowrap;">
+                   class="btn btn-success d-flex align-items-center gap-2">
                     <i class="fas fa-user-plus"></i>
-                    Crear Empleado
+                    <span>Crear Empleado</span>
                 </a>
             </div>
         </div>
@@ -320,16 +452,16 @@
                         </div>
                     </div>
 
-                    <div class="d-flex align-items-center">
+                    <div class="personal-actions d-flex align-items-center flex-wrap">
                         @if($tieneSalida)
                             <span class="estado-badge completo">
                                 <i class="fas fa-check-double"></i>
-                                Completo ({{ \Carbon\Carbon::parse($asistencia->entrada_hora)->format('H:i') }} - {{ \Carbon\Carbon::parse($asistencia->salida_hora)->format('H:i') }})
+                                {{ \Carbon\Carbon::parse($asistencia->entrada_hora)->format('H:i') }} - {{ \Carbon\Carbon::parse($asistencia->salida_hora)->format('H:i') }}
                             </span>
                         @elseif($tieneEntrada)
                             <span class="estado-badge entrada">
                                 <i class="fas fa-sign-in-alt"></i>
-                                Entrada: {{ \Carbon\Carbon::parse($asistencia->entrada_hora)->format('H:i') }}
+                                {{ \Carbon\Carbon::parse($asistencia->entrada_hora)->format('H:i') }}
                             </span>
                         @else
                             <span class="estado-badge pendiente">
@@ -338,7 +470,7 @@
                             </span>
                         @endif
 
-                        <div class="btn-group" role="group">
+                        <div class="btn-group-mobile">
                             <form action="{{ route('control.asistencia-semanal.registrar-entrada') }}"
                                   method="POST"
                                   style="display: inline;">
@@ -346,34 +478,35 @@
                                 <input type="hidden" name="personal_id" value="{{ $empleado->id }}">
                                 <button type="submit"
                                         class="btn-action btn-entrada"
-                                        {{ $tieneEntrada ? 'disabled' : '' }}>
+                                        {{ $tieneEntrada ? 'disabled' : '' }}
+                                        title="Registrar entrada">
                                     <i class="fas fa-sign-in-alt"></i>
-                                    Entrada
+                                    <span>Entrada</span>
                                 </button>
                             </form>
 
                             <form action="{{ route('control.asistencia-semanal.registrar-salida') }}"
                                   method="POST"
-                                  style="display: inline;"
-                                  class="ml-2">
+                                  style="display: inline;">
                                 @csrf
                                 <input type="hidden" name="personal_id" value="{{ $empleado->id }}">
                                 <button type="submit"
                                         class="btn-action btn-salida"
-                                        {{ !$tieneEntrada || $tieneSalida ? 'disabled' : '' }}>
+                                        {{ !$tieneEntrada || $tieneSalida ? 'disabled' : '' }}
+                                        title="Registrar salida">
                                     <i class="fas fa-sign-out-alt"></i>
-                                    Salida
+                                    <span>Salida</span>
                                 </button>
                             </form>
 
                             <a href="{{ route('control.empleados.show', $empleado->id) }}"
-                               class="btn-action btn-detalle ml-2"
+                               class="btn-action btn-detalle"
                                title="Ver detalle">
                                 <i class="fas fa-eye"></i>
                             </a>
 
                             <a href="{{ route('control.empleados.edit', $empleado->id) }}"
-                               class="btn-action btn-editar ml-2"
+                               class="btn-action btn-editar"
                                title="Editar empleado">
                                 <i class="fas fa-edit"></i>
                             </a>
@@ -381,12 +514,12 @@
                             <form action="{{ route('control.empleados.destroy', $empleado->id) }}"
                                   method="POST"
                                   style="display: inline;"
-                                  class="ml-2"
                                   onsubmit="return confirm('¿Está seguro de eliminar a {{ $empleado->nombre_completo }}? Esta acción no se puede deshacer.')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"
-                                        class="btn-action btn-eliminar">
+                                        class="btn-action btn-eliminar"
+                                        title="Eliminar empleado">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </form>

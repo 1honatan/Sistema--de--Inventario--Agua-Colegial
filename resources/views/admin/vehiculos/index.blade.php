@@ -71,8 +71,8 @@
 
     .info-value {
         font-size: 0.95rem;
-        color: #1f2937;
-        font-weight: 500;
+        color: #000000;
+        font-weight: 700;
     }
 
     .badge-placa {
@@ -299,6 +299,19 @@
                             </div>
                             <div class="vehiculo-body">
                                 <div class="info-grid">
+                                    <div class="info-item">
+                                        <span class="info-label">
+                                            <i class="fas fa-user-tie text-success"></i> Chofer Asignado
+                                        </span>
+                                        <span class="info-value">
+                                            @if($v->responsable)
+                                                <i class="fas fa-user text-success mr-1"></i> {{ $v->responsable }}
+                                            @else
+                                                <span class="text-muted"><i class="fas fa-user-slash mr-1"></i> Sin asignar</span>
+                                            @endif
+                                        </span>
+                                    </div>
+
                                     <div class="info-item">
                                         <span class="info-label">
                                             <i class="fas fa-industry text-primary"></i> Marca

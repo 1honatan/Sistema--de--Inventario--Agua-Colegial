@@ -1,322 +1,233 @@
 @extends('layouts.app')
 
 @section('title', 'Registrar Producción')
-
-@push('styles')
-<style>
-    body {
-        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #14b8a6 100%);
-        min-height: 100vh;
-        position: relative;
-    }
-
-    body::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        pointer-events: none;
-        z-index: 0;
-    }
-
-    .item-row {
-        background: white;
-        border: 3px solid #e5e7eb;
-        border-radius: 16px;
-        padding: 20px;
-        margin-bottom: 15px;
-        transition: all 0.3s ease;
-        animation: slideIn 0.3s ease-out;
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    .item-row:hover {
-        border-color: #3b82f6;
-        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
-        transform: translateY(-2px);
-    }
-
-    .btn-add-item {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        border: none;
-        color: white;
-        padding: 12px 24px;
-        border-radius: 12px;
-        font-weight: 700;
-        transition: all 0.3s ease;
-        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
-    }
-
-    .btn-add-item:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
-        color: white;
-    }
-
-    .btn-remove-item {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        border: none;
-        color: white;
-        padding: 10px 16px;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-    }
-
-    .btn-remove-item:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
-        color: white;
-    }
-</style>
-@endpush
+@section('page-title', 'Registrar Producción Diaria')
+@section('page-subtitle', 'Complete el formulario para registrar la producción del día')
 
 @section('content')
-<div class="container-fluid px-4">
-    <div class="row">
-        <div class="col-xl-11 col-lg-12 mx-auto">
-            <!-- Tarjeta Principal -->
-            <div class="modern-card">
-                <!-- Encabezado con Gradiente -->
-                <div class="modern-card-header">
-                    <h3 class="modern-card-title">
-                        <i class="fas fa-industry mr-2"></i>
-                        Nuevo Registro de Producción Diaria
-                    </h3>
-                    <p class="modern-card-subtitle">
-                        Complete el formulario para registrar la producción del día
-                    </p>
+<div class="max-w-3xl mx-auto">
+    {{-- Breadcrumb --}}
+    <div class="mb-6">
+        <nav class="text-sm">
+            <a href="{{ route('admin.dashboard') }}" class="text-cyan-600 hover:text-cyan-800">Dashboard</a>
+            <span class="mx-2 text-gray-500">/</span>
+            <a href="{{ route('control.produccion.index') }}" class="text-cyan-600 hover:text-cyan-800">Producción</a>
+            <span class="mx-2 text-gray-500">/</span>
+            <span class="text-gray-600">Registrar</span>
+        </nav>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <form action="{{ route('control.produccion.store') }}" method="POST" id="produccionForm">
+            @csrf
+
+            <div class="space-y-6">
+                {{-- Fecha --}}
+                <div>
+                    <label for="fecha" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-calendar-alt text-cyan-600 mr-1"></i>
+                        Fecha <span class="text-red-500">*</span>
+                    </label>
+                    <input type="date"
+                           name="fecha"
+                           id="fecha"
+                           value="{{ old('fecha', date('Y-m-d')) }}"
+                           readonly
+                           required
+                           class="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-100 cursor-not-allowed @error('fecha') border-red-500 @enderror">
+                    @error('fecha')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <!-- Cuerpo del Formulario -->
-                <div class="modern-card-body">
-                    <form action="{{ route('control.produccion.store') }}" method="POST" id="produccionForm" data-confirm="true">
-                        @csrf
+                {{-- Responsable --}}
+                <div>
+                    <label for="responsable" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-user-tie text-cyan-600 mr-1"></i>
+                        Responsable <span class="text-red-500">*</span>
+                    </label>
+                    @if(auth()->user()->rol->nombre !== 'admin')
+                        {{-- Para empleados: campo bloqueado con su nombre --}}
+                        <input type="text"
+                               value="{{ auth()->user()->nombre }}"
+                               readonly
+                               class="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-100 cursor-not-allowed">
+                        <input type="hidden" name="responsable" value="{{ auth()->user()->nombre }}">
+                    @else
+                        {{-- Para admin: puede seleccionar cualquier responsable --}}
+                        <select name="responsable"
+                                id="responsable"
+                                required
+                                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('responsable') border-red-500 @enderror">
+                            <option value="">Seleccione un responsable...</option>
+                            @foreach($personal ?? [] as $persona)
+                                <option value="{{ $persona->nombre_completo }}"
+                                        {{ old('responsable') == $persona->nombre_completo ? 'selected' : '' }}>
+                                    {{ $persona->nombre_completo }} ({{ $persona->cargo }})
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
+                    @error('responsable')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                        <!-- Información General -->
-                        <div class="section-box border-cyan">
-                            <div class="section-header">
-                                <i class="fas fa-info-circle text-info"></i>
-                                <h4>Información General</h4>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="fecha" class="form-label required-mark">
-                                            <i class="fas fa-calendar-alt"></i> Fecha
-                                        </label>
-                                        <input type="date"
-                                               name="fecha"
-                                               id="fecha"
-                                               class="modern-input @error('fecha') is-invalid @enderror"
-                                               value="{{ old('fecha', date('Y-m-d')) }}"
-                                               readonly
-                                               style="background-color: #e5e7eb; cursor: not-allowed;"
-                                               required>
-                                        @error('fecha')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                {{-- Gasto Material (Campo oculto) --}}
+                <input type="hidden" name="gasto_material" value="0">
+
+                {{-- Separador --}}
+                <div class="border-t border-gray-200 pt-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">
+                            <i class="fas fa-boxes text-cyan-600 mr-2"></i>
+                            Productos Producidos
+                        </h3>
+                        <button type="button" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold transition" onclick="agregarProducto()">
+                            <i class="fas fa-plus mr-1"></i>
+                            Agregar
+                        </button>
+                    </div>
+
+                    <div id="productos-container" class="space-y-4">
+                        {{-- Producto inicial --}}
+                        <div class="item-row bg-gray-50 border-2 border-gray-200 rounded-lg p-4 hover:border-cyan-400 transition" data-index="0">
+                            <div class="grid grid-cols-12 gap-4 items-end">
+                                <div class="col-span-6">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-box text-cyan-600 mr-1"></i>
+                                        Producto <span class="text-red-500">*</span>
+                                    </label>
+                                    <select name="productos[0][producto]" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent" required>
+                                        <option value="">Seleccione...</option>
+                                        @foreach($productos ?? [] as $producto)
+                                            <option value="{{ $producto->nombre }}">
+                                                {{ $producto->nombre }}{{ $producto->unidades_por_paquete ? ' (' . $producto->unidades_por_paquete . ' uds/paq)' : '' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
-
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="responsable" class="form-label required-mark">
-                                            <i class="fas fa-user-tie"></i> Responsable
-                                        </label>
-                                        <select name="responsable"
-                                                id="responsable"
-                                                class="modern-select @error('responsable') is-invalid @enderror"
-                                                required>
-                                            <option value="">Seleccione un responsable...</option>
-                                            @foreach($personal ?? [] as $persona)
-                                                @php
-                                                    $isCurrentUser = auth()->check() &&
-                                                                     auth()->user()->personal &&
-                                                                     auth()->user()->personal->id === $persona->id;
-                                                    $shouldAutoSelect = $isCurrentUser && auth()->user()->rol->nombre === 'produccion';
-                                                @endphp
-                                                <option value="{{ $persona->nombre_completo }}"
-                                                        {{ old('responsable') == $persona->nombre_completo || $shouldAutoSelect ? 'selected' : '' }}>
-                                                    {{ $persona->nombre_completo }} ({{ $persona->cargo }})
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('responsable')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                                <div class="col-span-4">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-sort-numeric-up text-cyan-600 mr-1"></i>
+                                        Cantidad <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="number"
+                                           name="productos[0][cantidad]"
+                                           class="w-full border border-gray-300 rounded-lg px-4 py-3 text-center focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                           min="0"
+                                           value="0"
+                                           data-product-qty
+                                           required>
                                 </div>
-                            </div>
-
-                            <!-- Gasto Material (Campo oculto) -->
-                            <input type="hidden" name="gasto_material" value="0">
-                        </div>
-
-                        <!-- Productos Producidos -->
-                        <div class="section-box border-green">
-                            <div class="section-header">
-                                <i class="fas fa-boxes text-success"></i>
-                                <h4>Productos Producidos</h4>
-                            </div>
-                            <div class="d-flex justify-content-end mb-3">
-                                <button type="button" class="btn-add-item" onclick="agregarProducto()">
-                                    <i class="fas fa-plus"></i>
-                                    Agregar Producto
-                                </button>
-                            </div>
-
-                            <div id="productos-container">
-                                <!-- Producto inicial -->
-                                <div class="item-row" data-index="0">
-                                    <div class="row align-items-end">
-                                        <div class="col-md-5">
-                                            <div class="form-group">
-                                                <label class="form-label required-mark">
-                                                    <i class="fas fa-box"></i> Producto
-                                                </label>
-                                                <select name="productos[0][producto]" class="modern-select" required>
-                                                    <option value="">Seleccione un producto...</option>
-                                                    @foreach($productos ?? [] as $producto)
-                                                        <option value="{{ $producto->nombre }}">
-                                                            {{ $producto->nombre }}{{ $producto->unidades_por_paquete ? ' (' . $producto->unidades_por_paquete . ' unidades por paquete)' : '' }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label class="form-label required-mark">
-                                                    <i class="fas fa-sort-numeric-up"></i> Cantidad
-                                                </label>
-                                                <input type="number"
-                                                       name="productos[0][cantidad]"
-                                                       class="modern-input text-center"
-                                                       min="0"
-                                                       value="0"
-                                                       data-product-qty
-                                                       required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-1">
-                                            <button type="button"
-                                                    class="btn-remove-item w-100"
-                                                    onclick="eliminarItem(this)"
-                                                    title="Eliminar">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
+                                <div class="col-span-2">
+                                    <button type="button"
+                                            class="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-lg transition"
+                                            onclick="eliminarItem(this)"
+                                            title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Materiales Utilizados -->
-                        <div class="section-box border-purple">
-                            <div class="section-header">
-                                <i class="fas fa-tools text-purple-600"></i>
-                                <h4>Materiales Utilizados</h4>
-                            </div>
-                            <div class="d-flex justify-content-end mb-3">
-                                <button type="button" class="btn-add-item" onclick="agregarMaterial()">
-                                    <i class="fas fa-plus"></i>
-                                    Agregar Material
-                                </button>
-                            </div>
+                {{-- Total de Producción --}}
+                <div class="bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg p-6 text-center text-white">
+                    <p class="text-sm font-medium opacity-90 mb-1">Total de Productos Producidos</p>
+                    <h3 id="totalProduccion" class="text-4xl font-bold transition-transform">0</h3>
+                </div>
 
-                            <div id="materiales-container">
-                                <!-- Material inicial -->
-                                <div class="item-row" data-index="0">
-                                    <div class="row align-items-end">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="form-label">
-                                                    <i class="fas fa-tools"></i> Material
-                                                </label>
-                                                <select name="materiales[0][material]" class="modern-select">
-                                                    <option value="">Seleccione un material...</option>
-                                                    <option value="Bolsa para empaquetar">Bolsa para empaquetar</option>
-                                                    <option value="Etiquetas para botellones">Etiquetas para botellones</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-5">
-                                            <div class="form-group">
-                                                <label class="form-label">
-                                                    <i class="fas fa-sort-numeric-up"></i> Cantidad
-                                                </label>
-                                                <input type="number"
-                                                       name="materiales[0][cantidad]"
-                                                       class="modern-input text-center"
-                                                       min="0"
-                                                       value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-1">
-                                            <button type="button"
-                                                    class="btn-remove-item w-100"
-                                                    onclick="eliminarItem(this)"
-                                                    title="Eliminar">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
+                {{-- Materiales Utilizados --}}
+                <div class="border-t border-gray-200 pt-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">
+                            <i class="fas fa-tools text-purple-600 mr-2"></i>
+                            Materiales Utilizados
+                        </h3>
+                        <button type="button" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold transition" onclick="agregarMaterial()">
+                            <i class="fas fa-plus mr-1"></i>
+                            Agregar
+                        </button>
+                    </div>
+
+                    <div id="materiales-container" class="space-y-4">
+                        {{-- Material inicial --}}
+                        <div class="item-row bg-gray-50 border-2 border-gray-200 rounded-lg p-4 hover:border-purple-400 transition" data-index="0">
+                            <div class="grid grid-cols-12 gap-4 items-end">
+                                <div class="col-span-6">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-tools text-purple-600 mr-1"></i>
+                                        Material
+                                    </label>
+                                    <select name="materiales[0][material]" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                        <option value="">Seleccione...</option>
+                                        <option value="Bolsa para empaquetar">Bolsa para empaquetar</option>
+                                        <option value="Etiquetas para botellones">Etiquetas para botellones</option>
+                                    </select>
+                                </div>
+                                <div class="col-span-4">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-sort-numeric-up text-purple-600 mr-1"></i>
+                                        Cantidad
+                                    </label>
+                                    <input type="number"
+                                           name="materiales[0][cantidad]"
+                                           class="w-full border border-gray-300 rounded-lg px-4 py-3 text-center focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                           min="0"
+                                           value="0">
+                                </div>
+                                <div class="col-span-2">
+                                    <button type="button"
+                                            class="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-lg transition"
+                                            onclick="eliminarItem(this)"
+                                            title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Total de Producción -->
-                        <div class="stat-display">
-                            <p>Total de Productos Producidos</p>
-                            <h3 id="totalProduccion">0</h3>
-                        </div>
+                {{-- Observaciones --}}
+                <div>
+                    <label for="observaciones" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-sticky-note text-cyan-600 mr-1"></i>
+                        Observaciones
+                    </label>
+                    <textarea name="observaciones"
+                              id="observaciones"
+                              rows="4"
+                              class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('observaciones') border-red-500 @enderror"
+                              placeholder="Ingrese observaciones adicionales...">{{ old('observaciones') }}</textarea>
+                    @error('observaciones')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                        <!-- Observaciones -->
-                        <div class="section-box border-blue">
-                            <div class="section-header">
-                                <i class="fas fa-sticky-note text-primary"></i>
-                                <h4>Observaciones</h4>
-                            </div>
-                            <div class="form-group">
-                                <textarea name="observaciones"
-                                          id="observaciones"
-                                          rows="4"
-                                          class="modern-textarea @error('observaciones') is-invalid @enderror"
-                                          placeholder="Ingrese observaciones adicionales...">{{ old('observaciones') }}</textarea>
-                                @error('observaciones')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
+                {{-- Botones --}}
+                <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                    <a href="{{ route('control.produccion.index') }}" class="text-gray-600 hover:text-gray-800 font-semibold transition">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Volver
+                    </a>
 
-                        <!-- Botones de Acción -->
-                        <div class="d-flex justify-content-end gap-3 mt-4">
-                            <a href="{{ route('control.produccion.index') }}" class="btn-modern btn-secondary">
-                                <i class="fas fa-times"></i>
-                                Cancelar
-                            </a>
-                            <button type="submit" class="btn-modern btn-success">
-                                <i class="fas fa-save"></i>
-                                Guardar Producción
-                            </button>
-                        </div>
-                    </form>
+                    <div class="flex space-x-3">
+                        <button type="reset" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-semibold transition">
+                            <i class="fas fa-redo mr-2"></i>
+                            Limpiar
+                        </button>
+
+                        <button type="submit" class="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg">
+                            <i class="fas fa-save mr-2"></i>
+                            Guardar Producción
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 @endsection
@@ -327,9 +238,6 @@
     let materialIndex = 1;
 
     $(document).ready(function() {
-        // Inicializar Select2
-        ModernComponents.initModernSelect2('.modern-select');
-
         // Calcular total dinámico
         function calcularTotal() {
             let total = 0;
@@ -345,61 +253,40 @@
         }
 
         // Event listeners para cálculo
-        $(document).on('input', '[data-product-qty]', function() {
-            calcularTotal();
-            $(this).addClass('input-changed');
-            setTimeout(() => $(this).removeClass('input-changed'), 400);
-        });
+        $(document).on('input', '[data-product-qty]', calcularTotal);
 
         // Calcular inicial
         calcularTotal();
-
-        // Auto-select en inputs numéricos
-        ModernComponents.initAutoSelect('input[type="number"]');
-
-        // Validación en tiempo real
-        ModernComponents.initRealtimeValidation('input[type="number"]');
-
-        // Animación de secciones
-        ModernComponents.initSectionAnimations();
-
-        // Animación al enviar
-        ModernComponents.initFormSubmitAnimation('#produccionForm');
-
-        // Atajos de teclado
-        ModernComponents.initKeyboardShortcuts('#produccionForm', '{{ route("control.produccion.index") }}');
     });
 
     // Agregar Producto
     function agregarProducto() {
         const html = `
-            <div class="item-row" data-index="${productoIndex}">
-                <div class="row align-items-end">
-                    <div class="col-md-5">
-                        <div class="form-group">
-                            <label class="form-label required-mark">
-                                <i class="fas fa-box"></i> Producto
-                            </label>
-                            <select name="productos[${productoIndex}][producto]" class="modern-select" required>
-                                <option value="">Seleccione un producto...</option>
-                                @foreach($productos ?? [] as $producto)
-                                    <option value="{{ $producto->nombre }}">
-                                        {{ $producto->nombre }}{{ $producto->unidades_por_paquete ? ' (' . $producto->unidades_por_paquete . ' unidades por paquete)' : '' }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+            <div class="item-row bg-gray-50 border-2 border-gray-200 rounded-lg p-4 hover:border-cyan-400 transition" data-index="${productoIndex}">
+                <div class="grid grid-cols-12 gap-4 items-end">
+                    <div class="col-span-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-box text-cyan-600 mr-1"></i>
+                            Producto <span class="text-red-500">*</span>
+                        </label>
+                        <select name="productos[${productoIndex}][producto]" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent" required>
+                            <option value="">Seleccione...</option>
+                            @foreach($productos ?? [] as $producto)
+                                <option value="{{ $producto->nombre }}">
+                                    {{ $producto->nombre }}{{ $producto->unidades_por_paquete ? ' (' . $producto->unidades_por_paquete . ' uds/paq)' : '' }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label class="form-label required-mark">
-                                <i class="fas fa-sort-numeric-up"></i> Cantidad
-                            </label>
-                            <input type="number" name="productos[${productoIndex}][cantidad]" class="modern-input text-center" min="0" value="0" data-product-qty required>
-                        </div>
+                    <div class="col-span-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-sort-numeric-up text-cyan-600 mr-1"></i>
+                            Cantidad <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" name="productos[${productoIndex}][cantidad]" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-center focus:ring-2 focus:ring-cyan-500 focus:border-transparent" min="0" value="0" data-product-qty required>
                     </div>
-                    <div class="col-md-1">
-                        <button type="button" class="btn-remove-item w-100" onclick="eliminarItem(this)" title="Eliminar">
+                    <div class="col-span-2">
+                        <button type="button" class="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-lg transition" onclick="eliminarItem(this)" title="Eliminar">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -407,37 +294,34 @@
             </div>
         `;
         $('#productos-container').append(html);
-        ModernComponents.initModernSelect2(`select[name="productos[${productoIndex}][producto]"]`);
         productoIndex++;
     }
 
     // Agregar Material
     function agregarMaterial() {
         const html = `
-            <div class="item-row" data-index="${materialIndex}">
-                <div class="row align-items-end">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-tools"></i> Material
-                            </label>
-                            <select name="materiales[${materialIndex}][material]" class="modern-select">
-                                <option value="">Seleccione un material...</option>
-                                <option value="Bolsa para empaquetar">Bolsa para empaquetar</option>
-                                <option value="Etiquetas para botellones">Etiquetas para botellones</option>
-                            </select>
-                        </div>
+            <div class="item-row bg-gray-50 border-2 border-gray-200 rounded-lg p-4 hover:border-purple-400 transition" data-index="${materialIndex}">
+                <div class="grid grid-cols-12 gap-4 items-end">
+                    <div class="col-span-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-tools text-purple-600 mr-1"></i>
+                            Material
+                        </label>
+                        <select name="materiales[${materialIndex}][material]" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="">Seleccione...</option>
+                            <option value="Bolsa para empaquetar">Bolsa para empaquetar</option>
+                            <option value="Etiquetas para botellones">Etiquetas para botellones</option>
+                        </select>
                     </div>
-                    <div class="col-md-5">
-                        <div class="form-group">
-                            <label class="form-label">
-                                <i class="fas fa-sort-numeric-up"></i> Cantidad
-                            </label>
-                            <input type="number" name="materiales[${materialIndex}][cantidad]" class="modern-input text-center" min="0" value="0">
-                        </div>
+                    <div class="col-span-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-sort-numeric-up text-purple-600 mr-1"></i>
+                            Cantidad
+                        </label>
+                        <input type="number" name="materiales[${materialIndex}][cantidad]" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-center focus:ring-2 focus:ring-purple-500 focus:border-transparent" min="0" value="0">
                     </div>
-                    <div class="col-md-1">
-                        <button type="button" class="btn-remove-item w-100" onclick="eliminarItem(this)" title="Eliminar">
+                    <div class="col-span-2">
+                        <button type="button" class="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-lg transition" onclick="eliminarItem(this)" title="Eliminar">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -445,7 +329,6 @@
             </div>
         `;
         $('#materiales-container').append(html);
-        ModernComponents.initModernSelect2(`select[name="materiales[${materialIndex}][material]"]`);
         materialIndex++;
     }
 
@@ -453,10 +336,12 @@
     function eliminarItem(btn) {
         $(btn).closest('.item-row').fadeOut(300, function() {
             $(this).remove();
-            // Recalcular si es producto
-            if ($(btn).closest('#productos-container').length) {
-                $(document).find('[data-product-qty]').first().trigger('input');
-            }
+            // Recalcular total
+            let total = 0;
+            $('[data-product-qty]').each(function() {
+                total += parseInt($(this).val()) || 0;
+            });
+            $('#totalProduccion').text(total.toLocaleString());
         });
     }
 </script>

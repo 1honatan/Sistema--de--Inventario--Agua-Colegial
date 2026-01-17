@@ -36,9 +36,9 @@ class ProduccionDiariaController extends Controller
             ->orderBy('nombre')
             ->get();
 
-        // Excluir choferes, distribuidores y supervisores
+        // Excluir choferes, distribuidores y limpieza (solo personal de producción e inventario)
         $personal = Personal::where('estado', 'activo')
-            ->whereNotIn('cargo', ['Chofer', 'Distribuidor', 'Supervisor'])
+            ->whereNotIn('cargo', ['Chofer (Despacho)', 'Limpieza', 'Ayudante (Distribuidor)'])
             ->orderBy('nombre_completo')
             ->get();
 
@@ -148,9 +148,9 @@ class ProduccionDiariaController extends Controller
     {
         $productos = Producto::orderBy('nombre')->get();
 
-        // Excluir choferes, distribuidores y supervisores
+        // Excluir choferes, distribuidores y limpieza (solo personal de producción e inventario)
         $personal = Personal::where('estado', 'activo')
-            ->whereNotIn('cargo', ['Chofer', 'Distribuidor', 'Supervisor'])
+            ->whereNotIn('cargo', ['Chofer (Despacho)', 'Limpieza', 'Ayudante (Distribuidor)'])
             ->orderBy('nombre_completo')
             ->get();
 

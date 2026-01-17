@@ -440,53 +440,6 @@ class InventarioController extends Controller
     }
 
     /**
-     * Exportar movimientos a Excel.
-     */
-    public function exportarMovimientosExcel(Request $request)
-    {
-        try {
-            // Construir consulta con los filtros
-            $query = Inventario::with(['producto.tipoProducto', 'usuario.personal']);
-
-            // Aplicar filtros
-            if ($request->filled('tipo_movimiento')) {
-                $query->where('tipo_movimiento', $request->tipo_movimiento);
-            }
-
-            if ($request->filled('id_producto')) {
-                $query->where('id_producto', $request->id_producto);
-            }
-
-            if ($request->filled('id_usuario')) {
-                $query->where('id_usuario', $request->id_usuario);
-            }
-
-            if ($request->filled('fecha_inicio') && $request->filled('fecha_fin')) {
-                $query->whereBetween('fecha_movimiento', [
-                    $request->fecha_inicio . ' 00:00:00',
-                    $request->fecha_fin . ' 23:59:59',
-                ]);
-            } elseif ($request->filled('fecha_inicio')) {
-                $query->whereDate('fecha_movimiento', '>=', $request->fecha_inicio);
-            } elseif ($request->filled('fecha_fin')) {
-                $query->whereDate('fecha_movimiento', '<=', $request->fecha_fin);
-            }
-
-            $movimientos = $query->orderBy('fecha_movimiento', 'desc')->get();
-
-            // Generar nombre de archivo
-            $filename = 'Movimientos_Inventario_' . date('Y-m-d_His') . '.xlsx';
-
-            // Descargar Excel usando la clase Export
-            return Excel::download(new MovimientosExport($movimientos), $filename);
-
-        } catch (\Exception $e) {
-            \Log::error('Error al exportar movimientos a Excel: ' . $e->getMessage());
-            return back()->with('error', 'Error al generar el archivo Excel: ' . $e->getMessage());
-        }
-    }
-
-    /**
      * Determinar estado del stock según cantidad.
      *
      * @param  int  $stock
@@ -608,14 +561,25 @@ class InventarioController extends Controller
      */
     public function createProducto(): View
     {
+        // Solo admin puede crear productos
+        if (auth()->user()->rol->nombre !== 'admin') {
+            abort(403, 'No tiene permisos para crear productos');
+        }
+
         return view('inventario.productos.create');
     }
 
     /**
      * Guardar nuevo producto.
+     * Solo admin puede crear.
      */
     public function storeProducto(Request $request): RedirectResponse
     {
+        // Solo admin puede crear productos
+        if (auth()->user()->rol->nombre !== 'admin') {
+            abort(403, 'No tiene permisos para crear productos');
+        }
+
         $validated = $request->validate([
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
@@ -634,17 +598,29 @@ class InventarioController extends Controller
 
     /**
      * Mostrar formulario para editar producto.
+     * Solo admin puede editar.
      */
     public function editProducto(Producto $producto): View
     {
+        // Solo admin puede editar productos
+        if (auth()->user()->rol->nombre !== 'admin') {
+            abort(403, 'No tiene permisos para editar productos');
+        }
+
         return view('inventario.productos.edit', compact('producto'));
     }
 
     /**
      * Actualizar producto.
+     * Solo admin puede actualizar.
      */
     public function updateProducto(Request $request, Producto $producto): RedirectResponse
     {
+        // Solo admin puede actualizar productos
+        if (auth()->user()->rol->nombre !== 'admin') {
+            abort(403, 'No tiene permisos para actualizar productos');
+        }
+
         $validated = $request->validate([
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
@@ -662,9 +638,15 @@ class InventarioController extends Controller
 
     /**
      * Eliminar producto.
+     * Solo admin puede eliminar.
      */
     public function destroyProducto(Producto $producto): RedirectResponse
     {
+        // Solo admin puede eliminar productos
+        if (auth()->user()->rol->nombre !== 'admin') {
+            abort(403, 'No tiene permisos para eliminar productos');
+        }
+
         $producto->update(['estado' => 'inactivo']);
 
         return redirect()->route('inventario.index')

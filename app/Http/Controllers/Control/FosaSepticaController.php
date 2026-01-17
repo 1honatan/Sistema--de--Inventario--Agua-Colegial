@@ -17,7 +17,14 @@ class FosaSepticaController extends Controller
 
     public function create()
     {
-        $personal = Personal::where('estado', 'activo')->orderBy('nombre_completo')->get();
+        // Excluir choferes y distribuidores
+        $personal = Personal::where('estado', 'activo')
+            ->whereNotIn('cargo', [
+                'Chofer (Despacho)',
+                'Ayudante (Distribuidor)'
+            ])
+            ->orderBy('nombre_completo')
+            ->get();
         return view('control.fosa-septica.create', compact('personal'));
     }
 
@@ -41,7 +48,14 @@ class FosaSepticaController extends Controller
 
     public function edit(FosaSeptica $fosa)
     {
-        $personal = Personal::where('estado', 'activo')->orderBy('nombre_completo')->get();
+        // Excluir choferes y distribuidores
+        $personal = Personal::where('estado', 'activo')
+            ->whereNotIn('cargo', [
+                'Chofer (Despacho)',
+                'Ayudante (Distribuidor)'
+            ])
+            ->orderBy('nombre_completo')
+            ->get();
         return view('control.fosa-septica.edit', compact('fosa', 'personal'));
     }
 

@@ -1,241 +1,186 @@
 @extends('layouts.app')
 
 @section('title', 'Editar Limpieza Fosa Séptica')
-
-@push('styles')
-<style>
-    body {
-        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #14b8a6 100%);
-        min-height: 100vh;
-        position: relative;
-    }
-
-    body::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        pointer-events: none;
-        z-index: 0;
-    }
-</style>
-@endpush
+@section('page-title', 'Editar Limpieza Fosa Séptica')
+@section('page-subtitle', 'Modifique los datos del registro #' . $fosa->id)
 
 @section('content')
-<div class="container-fluid px-4">
-    <div class="row">
-        <div class="col-xl-10 col-lg-11 mx-auto">
-            <!-- Tarjeta Principal -->
-            <div class="modern-card">
-                <!-- Encabezado con Gradiente -->
-                <div class="modern-card-header">
-                    <h3 class="modern-card-title">
-                        <i class="fas fa-edit mr-2"></i>
-                        Editar Registro de Limpieza #{{ $fosa->id }}
-                    </h3>
-                    <p class="modern-card-subtitle">
-                        Modifique los datos del registro de limpieza de fosa séptica
-                    </p>
+<div class="max-w-3xl mx-auto">
+    {{-- Breadcrumb --}}
+    <div class="mb-6">
+        <nav class="text-sm">
+            <a href="{{ route('admin.dashboard') }}" class="text-cyan-600 hover:text-cyan-800">Dashboard</a>
+            <span class="mx-2 text-gray-500">/</span>
+            <a href="{{ route('control.fosa-septica.index') }}" class="text-cyan-600 hover:text-cyan-800">Fosa Séptica</a>
+            <span class="mx-2 text-gray-500">/</span>
+            <span class="text-gray-600">Editar Registro #{{ $fosa->id }}</span>
+        </nav>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <form action="{{ route('control.fosa-septica.update', $fosa) }}" method="POST" id="fosaForm">
+            @csrf
+            @method('PUT')
+
+            <div class="space-y-6">
+                {{-- Información de la Limpieza --}}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {{-- Fecha de Limpieza --}}
+                    <div>
+                        <label for="fecha_limpieza" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-calendar-alt text-cyan-600 mr-1"></i>
+                            Fecha de Limpieza <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date"
+                               name="fecha_limpieza"
+                               id="fecha_limpieza"
+                               value="{{ old('fecha_limpieza', $fosa->fecha_limpieza->format('Y-m-d')) }}"
+                               required
+                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('fecha_limpieza') border-red-500 @enderror">
+                        @error('fecha_limpieza')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Tipo de Fosa --}}
+                    <div>
+                        <label for="tipo_fosa" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-tag text-cyan-600 mr-1"></i>
+                            Tipo de Fosa <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text"
+                               name="tipo_fosa"
+                               id="tipo_fosa"
+                               value="{{ old('tipo_fosa', $fosa->tipo_fosa) }}"
+                               required
+                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('tipo_fosa') border-red-500 @enderror"
+                               placeholder="Ej: Fosa Principal, Fosa #1">
+                        @error('tipo_fosa')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Próxima Limpieza --}}
+                    <div>
+                        <label for="proxima_limpieza" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-calendar-plus text-cyan-600 mr-1"></i>
+                            Próxima Limpieza <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date"
+                               name="proxima_limpieza"
+                               id="proxima_limpieza"
+                               value="{{ old('proxima_limpieza', $fosa->proxima_limpieza ? $fosa->proxima_limpieza->format('Y-m-d') : '') }}"
+                               required
+                               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('proxima_limpieza') border-red-500 @enderror">
+                        @error('proxima_limpieza')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
-                <!-- Cuerpo del Formulario -->
-                <div class="modern-card-body">
-                    <form action="{{ route('control.fosa-septica.update', $fosa) }}" method="POST" id="fosaForm">
-                        @csrf
-                        @method('PUT')
+                {{-- Responsable y Empresa --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {{-- Responsable --}}
+                    <div>
+                        <label for="responsable" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-user-check text-cyan-600 mr-1"></i>
+                            Responsable <span class="text-red-500">*</span>
+                        </label>
+                        <select name="responsable"
+                                id="responsable"
+                                required
+                                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('responsable') border-red-500 @enderror">
+                            <option value="">Seleccione responsable...</option>
+                            @foreach($personal as $persona)
+                                <option value="{{ $persona->nombre_completo }}" {{ old('responsable', $fosa->responsable) == $persona->nombre_completo ? 'selected' : '' }}>
+                                    {{ $persona->nombre_completo }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('responsable')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <!-- Información de la Limpieza -->
-                        <div class="section-box border-cyan">
-                            <div class="section-header">
-                                <i class="fas fa-calendar-check text-info"></i>
-                                <h4>Información de la Limpieza</h4>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="fecha_limpieza" class="form-label required-mark">
-                                            <i class="fas fa-calendar-alt"></i> Fecha de Limpieza
-                                        </label>
-                                        <input type="date"
-                                               name="fecha_limpieza"
-                                               id="fecha_limpieza"
-                                               class="modern-input @error('fecha_limpieza') is-invalid @enderror"
-                                               value="{{ old('fecha_limpieza', $fosa->fecha_limpieza->format('Y-m-d')) }}"
-                                               required>
-                                        @error('fecha_limpieza')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
+                    {{-- Empresa Contratada --}}
+                    <div>
+                        <label for="empresa_contratada" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-building text-cyan-600 mr-1"></i>
+                            Empresa Contratada <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text"
+                               name="empresa_contratada"
+                               id="empresa_contratada"
+                               value="{{ old('empresa_contratada', $fosa->empresa_contratada) }}"
+                               readonly
+                               required
+                               class="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-100 cursor-not-allowed">
+                        @error('empresa_contratada')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
 
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="tipo_fosa" class="form-label required-mark">
-                                            <i class="fas fa-tag"></i> Tipo de Fosa (Identificación)
-                                        </label>
-                                        <input type="text"
-                                               name="tipo_fosa"
-                                               id="tipo_fosa"
-                                               class="modern-input @error('tipo_fosa') is-invalid @enderror"
-                                               value="{{ old('tipo_fosa', $fosa->tipo_fosa) }}"
-                                               placeholder="Ej: Fosa Principal, Fosa #1, etc."
-                                               required>
-                                        @error('tipo_fosa')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
+                {{-- Detalle del Trabajo --}}
+                <div>
+                    <label for="detalle_trabajo" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-tasks text-cyan-600 mr-1"></i>
+                        Tipo de Trabajo Realizado <span class="text-red-500">*</span>
+                    </label>
+                    <select name="detalle_trabajo"
+                            id="detalle_trabajo"
+                            required
+                            class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('detalle_trabajo') border-red-500 @enderror">
+                        <option value="">Seleccione el tipo de trabajo...</option>
+                        <option value="Limpieza y Retiro" {{ old('detalle_trabajo', $fosa->detalle_trabajo) == 'Limpieza y Retiro' ? 'selected' : '' }}>
+                            Limpieza y Retiro
+                        </option>
+                        <option value="Retiro de Residuos" {{ old('detalle_trabajo', $fosa->detalle_trabajo) == 'Retiro de Residuos' ? 'selected' : '' }}>
+                            Retiro de Residuos
+                        </option>
+                    </select>
+                    @error('detalle_trabajo')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="proxima_limpieza" class="form-label required-mark">
-                                            <i class="fas fa-calendar-plus"></i> Próxima Limpieza
-                                        </label>
-                                        <input type="date"
-                                               name="proxima_limpieza"
-                                               id="proxima_limpieza"
-                                               class="modern-input @error('proxima_limpieza') is-invalid @enderror"
-                                               value="{{ old('proxima_limpieza', $fosa->proxima_limpieza ? $fosa->proxima_limpieza->format('Y-m-d') : '') }}"
-                                               required>
-                                        @error('proxima_limpieza')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                {{-- Observaciones --}}
+                <div>
+                    <label for="observaciones" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-sticky-note text-cyan-600 mr-1"></i>
+                        Observaciones
+                    </label>
+                    <textarea name="observaciones"
+                              id="observaciones"
+                              rows="3"
+                              class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition @error('observaciones') border-red-500 @enderror"
+                              placeholder="Ingrese observaciones adicionales (opcional)...">{{ old('observaciones', $fosa->observaciones) }}</textarea>
+                    @error('observaciones')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
-                        <!-- Responsable y Empresa -->
-                        <div class="section-box border-purple">
-                            <div class="section-header">
-                                <i class="fas fa-users text-purple-600"></i>
-                                <h4>Responsable y Empresa Contratada</h4>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="responsable" class="form-label required-mark">
-                                            <i class="fas fa-user-check"></i> Responsable
-                                        </label>
-                                        <select name="responsable"
-                                                id="responsable"
-                                                class="modern-input @error('responsable') is-invalid @enderror"
-                                                required>
-                                            <option value="">Seleccione responsable...</option>
-                                            @foreach($personal as $persona)
-                                                <option value="{{ $persona->nombre_completo }}" {{ old('responsable', $fosa->responsable) == $persona->nombre_completo ? 'selected' : '' }}>
-                                                    {{ $persona->nombre_completo }} ({{ $persona->cargo }})
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('responsable')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
+                {{-- Botones --}}
+                <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                    <a href="{{ route('control.fosa-septica.index') }}" class="text-gray-600 hover:text-gray-800 font-semibold transition">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Volver
+                    </a>
 
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="empresa_contratada" class="form-label required-mark">
-                                            <i class="fas fa-building"></i> Empresa Contratada
-                                        </label>
-                                        <input type="text"
-                                               name="empresa_contratada"
-                                               id="empresa_contratada"
-                                               class="modern-input @error('empresa_contratada') is-invalid @enderror"
-                                               value="{{ old('empresa_contratada', $fosa->empresa_contratada) }}"
-                                               readonly
-                                               required>
-                                        @error('empresa_contratada')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="flex space-x-3">
+                        <button type="reset" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-lg font-semibold transition">
+                            <i class="fas fa-redo mr-2"></i>
+                            Restaurar
+                        </button>
 
-                        <!-- Detalle del Trabajo -->
-                        <div class="section-box border-orange">
-                            <div class="section-header">
-                                <i class="fas fa-clipboard-list text-warning"></i>
-                                <h4>Detalle del Trabajo</h4>
-                            </div>
-                            <div class="form-group">
-                                <label for="detalle_trabajo" class="form-label required-mark">
-                                    <i class="fas fa-tasks"></i> Tipo de Trabajo Realizado
-                                </label>
-                                <select name="detalle_trabajo"
-                                        id="detalle_trabajo"
-                                        class="modern-input @error('detalle_trabajo') is-invalid @enderror"
-                                        required>
-                                    <option value="">Seleccione el tipo de trabajo...</option>
-                                    <option value="Limpieza y Retiro" {{ old('detalle_trabajo', $fosa->detalle_trabajo) == 'Limpieza y Retiro' ? 'selected' : '' }}>
-                                        Limpieza y Retiro
-                                    </option>
-                                    <option value="Retiro de Residuos" {{ old('detalle_trabajo', $fosa->detalle_trabajo) == 'Retiro de Residuos' ? 'selected' : '' }}>
-                                        Retiro de Residuos
-                                    </option>
-                                </select>
-                                @error('detalle_trabajo')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- Observaciones -->
-                        <div class="section-box border-blue">
-                            <div class="section-header">
-                                <i class="fas fa-sticky-note text-primary"></i>
-                                <h4>Observaciones Adicionales</h4>
-                            </div>
-                            <div class="form-group">
-                                <textarea name="observaciones"
-                                          id="observaciones"
-                                          rows="3"
-                                          class="modern-textarea @error('observaciones') is-invalid @enderror"
-                                          placeholder="Ingrese observaciones adicionales (opcional)...">{{ old('observaciones', $fosa->observaciones) }}</textarea>
-                                @error('observaciones')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- Botones de Acción -->
-                        <div class="d-flex justify-content-end gap-3 mt-4">
-                            <a href="{{ route('control.fosa-septica.index') }}" class="btn-modern btn-secondary">
-                                <i class="fas fa-times"></i>
-                                Cancelar
-                            </a>
-                            <button type="submit" class="btn-modern btn-primary">
-                                <i class="fas fa-save"></i>
-                                Actualizar Registro
-                            </button>
-                        </div>
-                    </form>
+                        <button type="submit" class="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg">
+                            <i class="fas fa-save mr-2"></i>
+                            Actualizar Registro
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    $(document).ready(function() {
-        // Animación de secciones
-        ModernComponents.initSectionAnimations();
-
-        // Animación al enviar formulario
-        ModernComponents.initFormSubmitAnimation('#fosaForm');
-
-        // Atajos de teclado
-        ModernComponents.initKeyboardShortcuts('#fosaForm', '{{ route("control.fosa-septica.index") }}');
-
-        // Advertencia de cambios no guardados
-        ModernComponents.initUnsavedChangesWarning('#fosaForm');
-    });
-</script>
-@endpush

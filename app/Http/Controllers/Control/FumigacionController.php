@@ -17,7 +17,14 @@ class FumigacionController extends Controller
 
     public function create()
     {
-        $personal = Personal::where('estado', 'activo')->orderBy('nombre_completo')->get();
+        // Excluir choferes y distribuidores
+        $personal = Personal::where('estado', 'activo')
+            ->whereNotIn('cargo', [
+                'Chofer (Despacho)',
+                'Ayudante (Distribuidor)'
+            ])
+            ->orderBy('nombre_completo')
+            ->get();
         return view('control.fumigacion.create', compact('personal'));
     }
 
@@ -42,7 +49,14 @@ class FumigacionController extends Controller
 
     public function edit(Fumigacion $fumigacion)
     {
-        $personal = Personal::where('estado', 'activo')->orderBy('nombre_completo')->get();
+        // Excluir choferes y distribuidores
+        $personal = Personal::where('estado', 'activo')
+            ->whereNotIn('cargo', [
+                'Chofer (Despacho)',
+                'Ayudante (Distribuidor)'
+            ])
+            ->orderBy('nombre_completo')
+            ->get();
         return view('control.fumigacion.edit', compact('fumigacion', 'personal'));
     }
 
