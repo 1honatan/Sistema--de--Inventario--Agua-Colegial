@@ -16,8 +16,26 @@ use Illuminate\View\View;
 
 class LoginController extends Controller
 {
+    /**
+     * Rutas de destino según el rol del usuario.
+     * Definidas en un solo lugar para evitar inconsistencias.
+     */
+    private const RUTAS_POR_ROL = [
+        'admin' => 'admin.dashboard',
+        'produccion' => 'control.produccion.index',
+        'inventario' => 'inventario.index',
+        'despacho' => 'control.salidas.index',
+    ];
+
+    /**
+     * Ruta por defecto si el rol no está definido.
+     * NUNCA debe ser 'login' para evitar loops de redirección.
+     */
+    private const RUTA_DEFAULT = 'admin.dashboard';
+
     public function showLoginForm(): View|RedirectResponse
     {
+        // Si ya está autenticado, redirigir según rol
         if (Auth::check()) {
             return $this->redirigirSegunRol();
         }
@@ -40,11 +58,13 @@ class LoginController extends Controller
         $this->ensureIsNotRateLimited($request);
 
         if (Auth::attempt($credenciales, $request->filled('remember'))) {
+            // Regenerar sesión para prevenir session fixation
             $request->session()->regenerate();
 
             $currentUserId = Auth::id();
             if (!$currentUserId) {
                 Auth::logout();
+                $request->session()->invalidate();
                 return back()->with('error', 'Error al obtener ID del usuario');
             }
 
@@ -52,11 +72,13 @@ class LoginController extends Controller
 
             if (!$usuario) {
                 Auth::logout();
+                $request->session()->invalidate();
                 return back()->with('error', 'Error al obtener datos del usuario');
             }
 
             if ($usuario->estado !== 'activo') {
                 Auth::logout();
+                $request->session()->invalidate();
                 RateLimiter::hit($this->throttleKey($request));
                 return back()->with('error', 'Su cuenta está inactiva. Contacte al administrador');
             }
@@ -115,34 +137,51 @@ class LoginController extends Controller
         return redirect()->route('login')->with('success', 'Sesión cerrada exitosamente');
     }
 
+    /**
+     * Redirige al usuario según su rol.
+     *
+     * IMPORTANTE: Esta función NUNCA debe redirigir a 'login' cuando el usuario
+     * está autenticado, ya que causaría un loop infinito de redirecciones.
+     */
     protected function redirigirSegunRol(): RedirectResponse
     {
         $userId = Auth::id();
+
+        // Si no hay usuario autenticado, ir al login (esto solo pasa si se llama incorrectamente)
         if (!$userId) {
-            Auth::logout();
-            return redirect()->route('login')->with('error', 'Sesión inválida');
+            return redirect()->route('login');
         }
 
         $usuario = User::query()->with('rol')->find($userId);
 
+        // Si el usuario no existe en BD, cerrar sesión y al login
         if (!$usuario) {
             Auth::logout();
+            request()->session()->invalidate();
             return redirect()->route('login')->with('error', 'Usuario no encontrado');
         }
 
-        if (!$usuario->rol) {
-            Auth::logout();
-            return redirect()->route('login')->with('error', 'Usuario sin rol asignado');
+        // Obtener nombre del rol (con fallback seguro)
+        $rolNombre = $usuario->rol?->nombre ?? 'admin';
+
+        // Buscar la ruta correspondiente al rol
+        $rutaNombre = self::RUTAS_POR_ROL[$rolNombre] ?? self::RUTA_DEFAULT;
+
+        // Verificar que la ruta existe antes de redirigir
+        try {
+            return redirect()->route($rutaNombre);
+        } catch (\Exception $e) {
+            // Si la ruta no existe, usar la ruta por defecto
+            return redirect()->route(self::RUTA_DEFAULT);
         }
+    }
 
-        $rolNombre = $usuario->rol->nombre ?? 'admin';
-
-        return match ($rolNombre) {
-            'admin' => redirect()->route('admin.dashboard'),
-            'produccion' => redirect()->route('control.produccion.index'),
-            'inventario' => redirect()->route('inventario.index'),
-            'despacho' => redirect()->route('control.salidas.index'),
-            default => redirect()->route('login'),
-        };
+    /**
+     * Obtiene la ruta de destino para un rol específico.
+     * Útil para otros componentes que necesiten conocer las rutas.
+     */
+    public static function obtenerRutaPorRol(string $rol): string
+    {
+        return self::RUTAS_POR_ROL[$rol] ?? self::RUTA_DEFAULT;
     }
 }

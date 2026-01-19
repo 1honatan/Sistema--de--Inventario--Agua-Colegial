@@ -11,11 +11,12 @@
         {{-- Breadcrumb --}}
         <div class="mb-6">
             <nav class="text-sm">
-                @if(auth()->user()->rol->nombre === 'admin')
+                @php $userRol = auth()->user()?->rol?->nombre ?? 'guest'; @endphp
+                @if($userRol === 'admin')
                     <a href="{{ route('admin.dashboard') }}" class="text-blue-600 hover:text-blue-800">Dashboard</a>
-                @elseif(auth()->user()->rol->nombre === 'inventario')
+                @elseif($userRol === 'inventario')
                     <a href="{{ route('inventario.dashboard') }}" class="text-blue-600 hover:text-blue-800">Dashboard</a>
-                @elseif(auth()->user()->rol->nombre === 'produccion')
+                @elseif($userRol === 'produccion')
                     <a href="{{ route('produccion.dashboard') }}" class="text-blue-600 hover:text-blue-800">Dashboard</a>
                 @endif
                 <span class="mx-2 text-gray-500">/</span>

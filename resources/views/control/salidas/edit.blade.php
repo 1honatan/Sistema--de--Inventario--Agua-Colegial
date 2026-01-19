@@ -156,20 +156,7 @@
                         Detalle de Productos
                     </h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                        @php
-                            $productosDisponibles = [
-                                ['id' => 1, 'nombre' => 'Botellones', 'campo' => 'botellones', 'icono' => 'fa-water'],
-                                ['id' => 3, 'nombre' => 'Agua Natural', 'campo' => 'agua_natural', 'icono' => 'fa-water'],
-                                ['id' => 4, 'nombre' => 'Agua Saborizada', 'campo' => 'agua_saborizada', 'icono' => 'fa-tint'],
-                                ['id' => 6, 'nombre' => 'Gelatina', 'campo' => 'gelatina', 'icono' => 'fa-cube'],
-                                ['id' => 8, 'nombre' => 'Hielo', 'campo' => 'hielo', 'icono' => 'fa-snowflake'],
-                                ['id' => 9, 'nombre' => 'Bolo Grande', 'campo' => 'bolo_grande', 'icono' => 'fa-shopping-bag'],
-                                ['id' => 10, 'nombre' => 'Bolo Pequeño', 'campo' => 'bolo_pequeño', 'icono' => 'fa-shopping-bag'],
-                                ['id' => 11, 'nombre' => 'Dispenser', 'campo' => 'dispenser', 'icono' => 'fa-faucet'],
-                                ['id' => 12, 'nombre' => 'Agua Limón', 'campo' => 'agua_limon', 'icono' => 'fa-lemon'],
-                            ];
-                        @endphp
-                        @foreach($productosDisponibles as $producto)
+                        @foreach($productos as $producto)
                         <div class="bg-gray-50 border-2 border-gray-200 rounded-lg p-4 hover:border-blue-400 transition">
                             <label class="block text-xs font-bold text-gray-700 mb-2">
                                 <i class="fas {{ $producto['icono'] }} text-blue-600"></i> {{ $producto['nombre'] }}
@@ -189,7 +176,7 @@
                         Productos de Retorno
                     </h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                        @foreach($productosDisponibles as $producto)
+                        @foreach($productos as $producto)
                         <div class="bg-amber-50 border-2 border-amber-200 rounded-lg p-4 hover:border-amber-400 transition">
                             <label class="block text-xs font-bold text-amber-800 mb-2">
                                 <i class="fas {{ $producto['icono'] }} text-amber-600"></i> {{ $producto['nombre'] }}

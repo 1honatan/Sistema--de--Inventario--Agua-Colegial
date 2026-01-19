@@ -271,16 +271,23 @@
 $(document).ready(function() {
     function actualizarCamposPorTipo() {
         const tipo = $('#tipo_salida').val();
+
+        // Ocultar todas las secciones y deshabilitar sus campos
         $('.tipo-salida-fields').addClass('hidden');
+        $('.tipo-salida-fields').find('input, select, textarea').prop('disabled', true);
         $('#seccion-retornos').addClass('hidden');
 
+        // Mostrar y habilitar solo la seccion correspondiente
         if (tipo === 'Despacho Interno') {
             $('#campos-despacho-interno').removeClass('hidden');
+            $('#campos-despacho-interno').find('input, select, textarea').prop('disabled', false);
             $('#seccion-retornos').removeClass('hidden');
         } else if (tipo === 'Pedido Cliente') {
             $('#campos-pedido-cliente').removeClass('hidden');
+            $('#campos-pedido-cliente').find('input, select, textarea').prop('disabled', false);
         } else if (tipo === 'Venta Directa') {
             $('#campos-venta-directa').removeClass('hidden');
+            $('#campos-venta-directa').find('input, select, textarea').prop('disabled', false);
         }
     }
 
@@ -303,6 +310,53 @@ $(document).ready(function() {
     $(document).on('input', '[data-retorno-input]', calcularRetornos);
 
     $('[data-product-input], [data-retorno-input]').on('click', function() { $(this).select(); });
+
+    // Guardar todas las opciones de vehiculos originales
+    var vehiculosOriginal = {};
+    $('select[name="vehiculo_placa"]').each(function() {
+        var selectId = $(this).attr('id');
+        vehiculosOriginal[selectId] = $(this).find('option').clone();
+    });
+
+    // Funcion para filtrar vehiculos segun el chofer seleccionado
+    function filtrarVehiculosPorChofer(selectChofer, selectVehiculo) {
+        var choferSeleccionado = $(selectChofer).val();
+        var vehiculoSelect = $(selectVehiculo);
+        var selectId = vehiculoSelect.attr('id');
+
+        // Restaurar todas las opciones originales
+        vehiculoSelect.empty();
+        vehiculosOriginal[selectId].each(function() {
+            vehiculoSelect.append($(this).clone());
+        });
+
+        // Si hay un chofer seleccionado, filtrar
+        if (choferSeleccionado) {
+            vehiculoSelect.find('option').each(function() {
+                var responsable = $(this).data('responsable');
+                // Mantener la opcion vacia y las que coincidan con el chofer
+                if ($(this).val() !== '' && responsable !== choferSeleccionado) {
+                    $(this).remove();
+                }
+            });
+
+            // Si solo queda la opcion vacia y hay vehiculos del chofer, seleccionar el primero
+            var vehiculosDisponibles = vehiculoSelect.find('option[value!=""]');
+            if (vehiculosDisponibles.length === 1) {
+                vehiculosDisponibles.first().prop('selected', true);
+            }
+        }
+    }
+
+    // Eventos para Despacho Interno
+    $('#chofer').on('change', function() {
+        filtrarVehiculosPorChofer(this, '#vehiculo_placa');
+    });
+
+    // Eventos para Pedido Cliente
+    $('#chofer_pedido').on('change', function() {
+        filtrarVehiculosPorChofer(this, '#vehiculo_pedido');
+    });
 });
 </script>
 @endpush

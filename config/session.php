@@ -127,10 +127,8 @@ return [
     |
     */
 
-    'cookie' => env(
-        'SESSION_COOKIE',
-        Str::slug((string) env('APP_NAME', 'laravel'), '_').'_session'
-    ),
+    // Nombre de cookie fijo para evitar problemas con caracteres especiales
+    'cookie' => env('SESSION_COOKIE', 'agua_colegial_session'),
 
     /*
     |--------------------------------------------------------------------------
@@ -156,7 +154,8 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN'),
+    // Dominio null permite que funcione con localhost, 127.0.0.1 y cualquier IP
+    'domain' => env('SESSION_DOMAIN', null),
 
     /*
     |--------------------------------------------------------------------------

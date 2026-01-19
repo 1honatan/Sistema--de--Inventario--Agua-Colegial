@@ -572,7 +572,7 @@
                         <i class="fas fa-boxes"></i>
                         Stock por Producto
                     </h3>
-                    @if(auth()->user()->rol->nombre === 'admin')
+                    @if((auth()->user()?->rol?->nombre ?? 'guest') === 'admin')
                     <a href="{{ route('inventario.productos.create') }}" class="btn-nuevo-producto">
                         <i class="fas fa-plus-circle"></i>
                         Nuevo Producto
@@ -636,7 +636,7 @@
                                             </span>
                                         </td>
                                         <td class="text-center">
-                                            @if(auth()->user()->rol->nombre === 'admin')
+                                            @if((auth()->user()?->rol?->nombre ?? 'guest') === 'admin')
                                             <div class="action-buttons-group">
                                                 <a href="{{ route('inventario.productos.edit', $producto->id) }}"
                                                    class="btn-action btn-action-edit"

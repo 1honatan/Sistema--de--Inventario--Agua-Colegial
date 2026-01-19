@@ -243,7 +243,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h2 class="text-3xl font-bold mb-2">Panel de Producción 🏭</h2>
-                <p class="text-green-100 text-lg">Bienvenido, {{ auth()->user()->nombre }}</p>
+                <p class="text-green-100 text-lg">Bienvenido, {{ auth()->user()?->nombre ?? 'Usuario' }}</p>
             </div>
             <div class="hidden md:block animate-float">
                 <i class="fas fa-industry text-white text-6xl opacity-20"></i>

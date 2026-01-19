@@ -390,10 +390,10 @@
 
 {{-- Scripts --}}
 @push('scripts')
-<!-- Flatpickr para fechas -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+<!-- Flatpickr para fechas (Local) -->
+<link rel="stylesheet" href="{{ asset('assets/css/flatpickr.min.css') }}">
+<script src="{{ asset('assets/js/flatpickr.min.js') }}"></script>
+<script src="{{ asset('assets/js/flatpickr-es.js') }}"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

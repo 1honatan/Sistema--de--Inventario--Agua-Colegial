@@ -9,34 +9,31 @@
     <!-- Favicon - Gota de Agua -->
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%230ea5e9' d='M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z'/%3E%3C/svg%3E" type="image/svg+xml">
 
-    <!-- Tailwind CSS -->
-    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS (Local) -->
+    <script src="{{ asset('assets/js/tailwind.min.js') }}"></script>
 
-    <!-- Font Awesome 6 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Awesome 6 (Local) -->
+    <link rel="stylesheet" href="{{ asset('assets/css/fontawesome.min.css') }}">
 
-    <!-- jQuery (Required for Select2 and DataTables) -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- jQuery (Local) -->
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
 
-    <!-- Select2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Select2 CSS (Local) -->
+    <link href="{{ asset('assets/css/select2.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/css/select2-bootstrap-5-theme.min.css') }}" rel="stylesheet" />
 
-    <!-- Select2 Bootstrap Theme -->
-    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <!-- DataTables CSS (Local) -->
+    <link rel="stylesheet" href="{{ asset('assets/css/jquery.dataTables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/responsive.dataTables.min.css') }}">
 
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+    <!-- Toastr CSS (Local) -->
+    <link rel="stylesheet" href="{{ asset('assets/css/toastr.min.css') }}">
 
-    <!-- Toastr CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <!-- Animate.css (Local) -->
+    <link rel="stylesheet" href="{{ asset('assets/css/animate.min.css') }}">
 
-    <!-- Animate.css -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- SweetAlert2 (Local) -->
+    <script src="{{ asset('assets/js/sweetalert2.min.js') }}"></script>
 
     <!-- Estilos Globales Unificados -->
     <link rel="stylesheet" href="{{ asset('css/global-styles.css') }}">
@@ -1655,7 +1652,7 @@
             <nav class="flex-1 overflow-y-auto py-4">
                 <ul class="space-y-1 px-2">
                     @php
-                        $rol = auth()->user()->rol->nombre ?? 'guest';
+                        $rol = auth()->check() ? (auth()->user()->rol->nombre ?? 'guest') : 'guest';
                         $currentRoute = request()->route()->getName() ?? '';
                     @endphp
 
@@ -2256,13 +2253,13 @@
                 <div class="user-profile-card">
                     <div class="user-profile-header">
                         <div class="sidebar-user-avatar">
-                            {{ strtoupper(substr(auth()->user()->nombre, 0, 1)) }}
+                            {{ auth()->check() ? strtoupper(substr(auth()->user()->nombre ?? 'U', 0, 1)) : 'U' }}
                         </div>
                         <div class="sidebar-user-info">
-                            <p class="sidebar-user-name truncate">{{ auth()->user()->nombre }}</p>
+                            <p class="sidebar-user-name truncate">{{ auth()->check() ? (auth()->user()->nombre ?? 'Usuario') : 'Usuario' }}</p>
                             <p class="sidebar-user-role">
                                 <i class="fas fa-shield-alt mr-1"></i>
-                                {{ ucfirst($rol) }}
+                                {{ ucfirst($rol ?? 'invitado') }}
                             </p>
                         </div>
                     </div>
@@ -2343,15 +2340,15 @@
         </div>
     </div>
 
-    <!-- Select2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- Select2 JS (Local) -->
+    <script src="{{ asset('assets/js/select2.min.js') }}"></script>
 
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <!-- DataTables JS (Local) -->
+    <script src="{{ asset('assets/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/dataTables.responsive.min.js') }}"></script>
 
-    <!-- Toastr JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- Toastr JS (Local) -->
+    <script src="{{ asset('assets/js/toastr.min.js') }}"></script>
 
     <!-- Componentes Modernos JS -->
     <script src="{{ asset('js/modern-components.js') }}"></script>
@@ -2624,7 +2621,7 @@
 
         function verificarAlertasStock() {
             // Solo verificar si el usuario tiene permisos de inventario
-            @if(in_array(auth()->user()->rol->nombre ?? '', ['admin', 'inventario', 'produccion']))
+            @if(auth()->check() && in_array(auth()->user()->rol->nombre ?? '', ['admin', 'inventario', 'produccion']))
                 // Verificar si han pasado al menos 5 minutos desde la última notificación
                 const now = Date.now();
                 const storedTime = localStorage.getItem('lastStockNotification');

@@ -159,22 +159,24 @@
                 </h4>
 
                 @php
-                    $productos = [
-                        ['nombre' => 'Botellones', 'cantidad' => $salida->botellones ?? 0, 'icono' => 'fa-water', 'color' => 'green'],
-                        ['nombre' => 'Retornos', 'cantidad' => $salida->retornos ?? 0, 'icono' => 'fa-undo', 'color' => 'yellow'],
-                        ['nombre' => 'Bolo Grande', 'cantidad' => $salida->bolo_grande ?? 0, 'icono' => 'fa-shopping-bag', 'color' => 'green'],
-                        ['nombre' => 'Bolo Pequeño', 'cantidad' => $salida->bolo_pequeño ?? 0, 'icono' => 'fa-shopping-bag', 'color' => 'green'],
-                        ['nombre' => 'Gelatina', 'cantidad' => $salida->gelatina ?? 0, 'icono' => 'fa-cube', 'color' => 'green'],
-                        ['nombre' => 'Agua Saborizada', 'cantidad' => $salida->agua_saborizada ?? 0, 'icono' => 'fa-tint', 'color' => 'green'],
-                        ['nombre' => 'Agua Limón', 'cantidad' => $salida->agua_limon ?? 0, 'icono' => 'fa-lemon', 'color' => 'green'],
-                        ['nombre' => 'Agua Natural', 'cantidad' => $salida->agua_natural ?? 0, 'icono' => 'fa-water', 'color' => 'green'],
-                        ['nombre' => 'Hielo', 'cantidad' => $salida->hielo ?? 0, 'icono' => 'fa-snowflake', 'color' => 'green'],
-                        ['nombre' => 'Dispenser', 'cantidad' => $salida->dispenser ?? 0, 'icono' => 'fa-faucet', 'color' => 'green'],
-                        ['nombre' => 'Choreados', 'cantidad' => $salida->choreados ?? 0, 'icono' => 'fa-tint-slash', 'color' => 'red'],
-                    ];
+                    // Generar la lista de productos dinámicamente desde la base de datos
+                    $productosLista = [];
+                    foreach($productos as $producto) {
+                        $campo = $producto['campo'];
+                        $cantidad = $salida->{$campo} ?? 0;
+                        $productosLista[] = [
+                            'nombre' => $producto['nombre'],
+                            'cantidad' => $cantidad,
+                            'icono' => $producto['icono'],
+                            'color' => 'green'
+                        ];
+                    }
+                    // Agregar Retornos y Choreados (campos especiales)
+                    $productosLista[] = ['nombre' => 'Retornos (Total)', 'cantidad' => $salida->retornos ?? 0, 'icono' => 'fa-undo', 'color' => 'yellow'];
+                    $productosLista[] = ['nombre' => 'Choreados', 'cantidad' => $salida->choreados ?? 0, 'icono' => 'fa-tint-slash', 'color' => 'red'];
 
-                    $productosConCantidad = collect($productos)->filter(fn($p) => $p['cantidad'] > 0);
-                    $totalDespachado = collect($productos)->whereIn('color', ['green'])->sum('cantidad');
+                    $productosConCantidad = collect($productosLista)->filter(fn($p) => $p['cantidad'] > 0);
+                    $totalDespachado = collect($productosLista)->whereIn('color', ['green'])->sum('cantidad');
                 @endphp
 
                 @if($productosConCantidad->count() > 0)
@@ -227,17 +229,17 @@
             <!-- Detalle de Retornos -->
             @if($salida->tipo_salida !== 'Pedido Cliente')
             @php
-                $retornosDetalle = [
-                    ['nombre' => 'Botellones', 'cantidad' => $salida->retorno_botellones ?? 0, 'icono' => 'fa-water'],
-                    ['nombre' => 'Bolo Grande', 'cantidad' => $salida->retorno_bolo_grande ?? 0, 'icono' => 'fa-shopping-bag'],
-                    ['nombre' => 'Bolo Pequeño', 'cantidad' => $salida->retorno_bolo_pequeno ?? 0, 'icono' => 'fa-shopping-bag'],
-                    ['nombre' => 'Gelatina', 'cantidad' => $salida->retorno_gelatina ?? 0, 'icono' => 'fa-cube'],
-                    ['nombre' => 'Agua Saborizada', 'cantidad' => $salida->retorno_agua_saborizada ?? 0, 'icono' => 'fa-tint'],
-                    ['nombre' => 'Agua Limón', 'cantidad' => $salida->retorno_agua_limon ?? 0, 'icono' => 'fa-lemon'],
-                    ['nombre' => 'Agua Natural', 'cantidad' => $salida->retorno_agua_natural ?? 0, 'icono' => 'fa-water'],
-                    ['nombre' => 'Hielo', 'cantidad' => $salida->retorno_hielo ?? 0, 'icono' => 'fa-snowflake'],
-                    ['nombre' => 'Dispenser', 'cantidad' => $salida->retorno_dispenser ?? 0, 'icono' => 'fa-faucet'],
-                ];
+                // Generar la lista de retornos dinámicamente desde los productos de la base de datos
+                $retornosDetalle = [];
+                foreach($productos as $producto) {
+                    $campoRetorno = 'retorno_' . str_replace('ñ', 'n', $producto['campo']);
+                    $cantidad = $salida->{$campoRetorno} ?? 0;
+                    $retornosDetalle[] = [
+                        'nombre' => $producto['nombre'],
+                        'cantidad' => $cantidad,
+                        'icono' => $producto['icono']
+                    ];
+                }
                 $totalRetornos = collect($retornosDetalle)->sum('cantidad');
             @endphp
 

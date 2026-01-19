@@ -207,15 +207,17 @@ class SalidasController extends Controller
             // Mapear retornos a campos específicos
             $retornosRecibidos = $validated['retornos'] ?? [];
             $productosMap = [
-                1 => 'retorno_botellones',      // Botellón 20L
-                3 => 'retorno_agua_natural',    // Agua Natural
-                4 => 'retorno_agua_saborizada', // Agua Saborizada
-                6 => 'retorno_gelatina',        // Gelatina
-                8 => 'retorno_hielo',           // Hielo en Bolsa 3kg
-                9 => 'retorno_bolo_grande',     // Bolo Grande
-                10 => 'retorno_bolo_pequeno',   // Bolo Pequeño
-                11 => 'retorno_dispenser',      // Dispenser
-                12 => 'retorno_agua_limon',     // Agua De Limon
+                1 => 'retorno_agua_limon',       // ID 1: Agua De Limon
+                2 => 'retorno_agua_saborizada',  // ID 2: Agua Saborizada
+                3 => 'retorno_agua_natural',     // ID 3: Agua Natural
+                4 => 'retorno_bolo_pequeno',     // ID 4: Bolo Pequeño
+                5 => 'retorno_bolo_grande',      // ID 5: Bolo Grande
+                6 => 'retorno_gelatina',         // ID 6: Gelatina
+                7 => 'retorno_botellones',       // ID 7: Botellón 14 LITROS
+                8 => 'retorno_botellones',       // ID 8: Botellon De 20 litros
+                9 => 'retorno_hielo',            // ID 9: Hielo 2/5kg
+                10 => 'retorno_hielo',           // ID 10: Hielo 2kg
+                11 => 'retorno_dispenser',       // ID 11: Dispenser
             ];
 
             // Inicializar campos de retorno
@@ -252,15 +254,17 @@ class SalidasController extends Controller
 
             // Mapear productos enviados a campos específicos
             $productosEnviadosMap = [
-                1 => 'botellones',           // Botellón 20L
-                3 => 'agua_natural',         // Agua Natural
-                4 => 'agua_saborizada',      // Agua Saborizada
-                6 => 'gelatina',             // Gelatina
-                8 => 'hielo',                // Hielo en Bolsa 3kg
-                9 => 'bolo_grande',          // Bolo Grande
-                10 => 'bolo_pequeño',        // Bolo Pequeño
-                11 => 'dispenser',           // Dispenser
-                12 => 'agua_limon',          // Agua De Limon
+                1 => 'agua_limon',            // ID 1: Agua De Limon
+                2 => 'agua_saborizada',       // ID 2: Agua Saborizada
+                3 => 'agua_natural',          // ID 3: Agua Natural
+                4 => 'bolo_pequeño',          // ID 4: Bolo Pequeño
+                5 => 'bolo_grande',           // ID 5: Bolo Grande
+                6 => 'gelatina',              // ID 6: Gelatina
+                7 => 'botellones',            // ID 7: Botellón 14 LITROS
+                8 => 'botellones',            // ID 8: Botellon De 20 litros
+                9 => 'hielo',                 // ID 9: Hielo 2/5kg
+                10 => 'hielo',                // ID 10: Hielo 2kg
+                11 => 'dispenser',            // ID 11: Dispenser
             ];
 
             // Inicializar campos de productos enviados
@@ -347,7 +351,20 @@ class SalidasController extends Controller
      */
     public function show(SalidaProducto $salida)
     {
-        return view('control.salidas.show', compact('salida'));
+        // Obtener productos activos para mostrar nombres correctos
+        $productos = Producto::where('estado', 'activo')
+            ->orderBy('nombre')
+            ->get()
+            ->map(function ($producto) {
+                return [
+                    'id' => $producto->id,
+                    'nombre' => $producto->nombre,
+                    'icono' => self::obtenerIconoProducto($producto->nombre),
+                    'campo' => self::obtenerCampoProducto($producto->id),
+                ];
+            });
+
+        return view('control.salidas.show', compact('salida', 'productos'));
     }
 
     /**
@@ -379,7 +396,45 @@ class SalidasController extends Controller
             ->orderBy('placa')
             ->get();
 
-        return view('control.salidas.edit', compact('salida', 'choferes', 'distribuidores', 'responsablesVenta', 'vehiculos'));
+        // Obtener productos activos con su stock disponible dinámicamente
+        $productos = Producto::where('estado', 'activo')
+            ->orderBy('nombre')
+            ->get()
+            ->map(function ($producto) {
+                return [
+                    'id' => $producto->id,
+                    'nombre' => $producto->nombre,
+                    'unidad_medida' => $producto->unidad_medida,
+                    'unidades_por_paquete' => $producto->unidades_por_paquete,
+                    'stock' => Inventario::stockDisponible($producto->id),
+                    'icono' => self::obtenerIconoProducto($producto->nombre),
+                    'campo' => self::obtenerCampoProducto($producto->id),
+                ];
+            });
+
+        return view('control.salidas.edit', compact('salida', 'choferes', 'distribuidores', 'responsablesVenta', 'vehiculos', 'productos'));
+    }
+
+    /**
+     * Obtener el campo de la tabla correspondiente al producto
+     */
+    private static function obtenerCampoProducto($productoId)
+    {
+        $mapaCampos = [
+            1 => 'agua_limon',       // Agua De Limon
+            2 => 'agua_saborizada',  // Agua Saborizada
+            3 => 'agua_natural',     // Agua Natural
+            4 => 'bolo_pequeño',     // Bolo Pequeño
+            5 => 'bolo_grande',      // Bolo Grande
+            6 => 'gelatina',         // Gelatina
+            7 => 'botellones',       // Botellón 14 LITROS
+            8 => 'botellones',       // Botellon De 20 litros
+            9 => 'hielo',            // Hielo 2/5kg
+            10 => 'hielo',           // Hielo 2kg
+            11 => 'dispenser',       // Dispenser
+        ];
+
+        return $mapaCampos[$productoId] ?? 'otros';
     }
 
     /**
@@ -460,28 +515,32 @@ class SalidasController extends Controller
 
             // Mapear productos enviados a campos específicos
             $productosEnviadosMap = [
-                1 => 'botellones',           // Botellón 20L
-                3 => 'agua_natural',         // Agua Natural
-                4 => 'agua_saborizada',      // Agua Saborizada
-                6 => 'gelatina',             // Gelatina
-                8 => 'hielo',                // Hielo en Bolsa 3kg
-                9 => 'bolo_grande',          // Bolo Grande
-                10 => 'bolo_pequeño',        // Bolo Pequeño
-                11 => 'dispenser',           // Dispenser
-                12 => 'agua_limon',          // Agua De Limon
+                1 => 'agua_limon',            // ID 1: Agua De Limon
+                2 => 'agua_saborizada',       // ID 2: Agua Saborizada
+                3 => 'agua_natural',          // ID 3: Agua Natural
+                4 => 'bolo_pequeño',          // ID 4: Bolo Pequeño
+                5 => 'bolo_grande',           // ID 5: Bolo Grande
+                6 => 'gelatina',              // ID 6: Gelatina
+                7 => 'botellones',            // ID 7: Botellón 14 LITROS
+                8 => 'botellones',            // ID 8: Botellon De 20 litros
+                9 => 'hielo',                 // ID 9: Hielo 2/5kg
+                10 => 'hielo',                // ID 10: Hielo 2kg
+                11 => 'dispenser',            // ID 11: Dispenser
             ];
 
             // Mapear retornos a campos específicos
             $retornosMap = [
-                1 => 'retorno_botellones',      // Botellón 20L
-                3 => 'retorno_agua_natural',    // Agua Natural
-                4 => 'retorno_agua_saborizada', // Agua Saborizada
-                6 => 'retorno_gelatina',        // Gelatina
-                8 => 'retorno_hielo',           // Hielo en Bolsa 3kg
-                9 => 'retorno_bolo_grande',     // Bolo Grande
-                10 => 'retorno_bolo_pequeno',   // Bolo Pequeño
-                11 => 'retorno_dispenser',      // Dispenser
-                12 => 'retorno_agua_limon',     // Agua De Limon
+                1 => 'retorno_agua_limon',       // ID 1: Agua De Limon
+                2 => 'retorno_agua_saborizada',  // ID 2: Agua Saborizada
+                3 => 'retorno_agua_natural',     // ID 3: Agua Natural
+                4 => 'retorno_bolo_pequeno',     // ID 4: Bolo Pequeño
+                5 => 'retorno_bolo_grande',      // ID 5: Bolo Grande
+                6 => 'retorno_gelatina',         // ID 6: Gelatina
+                7 => 'retorno_botellones',       // ID 7: Botellón 14 LITROS
+                8 => 'retorno_botellones',       // ID 8: Botellon De 20 litros
+                9 => 'retorno_hielo',            // ID 9: Hielo 2/5kg
+                10 => 'retorno_hielo',           // ID 10: Hielo 2kg
+                11 => 'retorno_dispenser',       // ID 11: Dispenser
             ];
 
             // Inicializar campos de productos enviados
