@@ -269,6 +269,11 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
+    // Datos del usuario logueado
+    var usuarioLogueado = @json(auth()->user()->personal?->nombre_completo ?? auth()->user()->nombre);
+    var cargoUsuario = @json(auth()->user()->personal?->cargo ?? '');
+    var esChofer = cargoUsuario.toLowerCase().includes('chofer');
+
     function actualizarCamposPorTipo() {
         const tipo = $('#tipo_salida').val();
 
@@ -282,13 +287,53 @@ $(document).ready(function() {
             $('#campos-despacho-interno').removeClass('hidden');
             $('#campos-despacho-interno').find('input, select, textarea').prop('disabled', false);
             $('#seccion-retornos').removeClass('hidden');
+
+            // Si es chofer, auto-seleccionar su nombre y vehículo
+            if (esChofer && usuarioLogueado) {
+                autoSeleccionarChofer('#chofer', '#vehiculo_placa');
+            }
         } else if (tipo === 'Pedido Cliente') {
             $('#campos-pedido-cliente').removeClass('hidden');
             $('#campos-pedido-cliente').find('input, select, textarea').prop('disabled', false);
+
+            // Si es chofer, auto-seleccionar su nombre y vehículo
+            if (esChofer && usuarioLogueado) {
+                autoSeleccionarChofer('#chofer_pedido', '#vehiculo_pedido');
+            }
         } else if (tipo === 'Venta Directa') {
             $('#campos-venta-directa').removeClass('hidden');
             $('#campos-venta-directa').find('input, select, textarea').prop('disabled', false);
+
+            // Auto-seleccionar el usuario logueado como responsable
+            if (usuarioLogueado) {
+                $('#responsable_venta option').each(function() {
+                    if ($(this).val() === usuarioLogueado || $(this).text() === usuarioLogueado) {
+                        $(this).prop('selected', true);
+                        return false; // break
+                    }
+                });
+            }
         }
+    }
+
+    // Función para auto-seleccionar chofer y su vehículo asignado
+    function autoSeleccionarChofer(selectorChofer, selectorVehiculo) {
+        // Auto-seleccionar el chofer
+        $(selectorChofer + ' option').each(function() {
+            if ($(this).val() === usuarioLogueado || $(this).text() === usuarioLogueado) {
+                $(this).prop('selected', true);
+                return false; // break
+            }
+        });
+
+        // Buscar y seleccionar el vehículo asignado a este chofer
+        $(selectorVehiculo + ' option').each(function() {
+            var responsable = $(this).data('responsable');
+            if (responsable === usuarioLogueado) {
+                $(this).prop('selected', true);
+                return false; // break
+            }
+        });
     }
 
     $('#tipo_salida').on('change', actualizarCamposPorTipo);
